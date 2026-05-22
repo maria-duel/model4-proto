@@ -1,0 +1,16 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input, button, textarea { font-family: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+input:focus { outline: none; border-color: rgba(66,66,66,0.5) !important; }
+
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
