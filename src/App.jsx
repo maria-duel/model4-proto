@@ -994,15 +994,26 @@ export default function App() {
       </div>
 
       {!isMobileViewport && (
-        <div style={{ display: 'flex', gap: 7, marginTop: 24, alignItems: 'center' }}>
-          {screens.map((_, i) => (
-            <motion.div
-              key={i}
-              animate={{ width: i === screen ? 22 : 7, background: i === screen ? '#1c1c1e' : 'rgba(0,0,0,0.2)' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-              style={{ height: 7, borderRadius: 4 }}
-            />
-          ))}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, marginTop: 24 }}>
+          <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>
+            {screens.map((_, i) => (
+              <motion.div
+                key={i}
+                animate={{ width: i === screen ? 22 : 7, background: i === screen ? '#1c1c1e' : 'rgba(0,0,0,0.2)' }}
+                transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                style={{ height: 7, borderRadius: 4 }}
+              />
+            ))}
+          </div>
+          {screen !== 3 && (
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => go(3)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', ...fw(500), fontSize: 13, color: 'rgba(0,0,0,0.45)', textDecoration: 'underline', padding: '4px 8px' }}
+            >
+              Skip to feed →
+            </motion.button>
+          )}
         </div>
       )}
     </div>
