@@ -117,7 +117,7 @@ function TopNav() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <motion.button whileTap={{ scale: 0.92 }} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(66,66,66,0.09)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '0 8px', height: 24, cursor: 'pointer' }}>
           <Icon name="star" size={13} color={C.textBody} />
-          <span style={{ ...fw(700), fontSize: 12, color: C.text }}>1,234</span>
+          <span style={{ ...fw(700), fontSize: 12, fontWeifht color: C.text }}>1,234</span>
         </motion.button>
         <IconButton icon="store" size={28} />
         <IconButton icon="bell" size={28} />
@@ -155,7 +155,7 @@ function EmailScreen({ onNext }) {
       </div>
       <div style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: 16, width: 358, display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px' }}>Welcome back!</p>
+          <p style={{ ...fw(700), fontSize: 20, color: C.text, lineHeight: '28px' }}>Welcome back!</p>
           <p style={{ ...fw(400), fontSize: 16, color: C.textSecondary, lineHeight: '24px' }}>Enter your email address</p>
         </div>
         <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" onKeyDown={e => e.key === 'Enter' && valid && onNext(email)} style={{ width: '100%', height: 48, borderRadius: 4, border: `1px solid ${C.border}`, padding: '0 16px', ...fw(400), fontSize: 14, color: C.text, background: C.white, boxSizing: 'border-box' }} />
@@ -280,8 +280,8 @@ function FeedTab() {
       </div>
 
       <div style={{ padding: '20px 16px 32px' }}>
-        <p style={{ ...fw(400), fontSize: 18, color: C.text, lineHeight: '24px', marginBottom: 20 }}>Hi Zara!</p>
-        <p style={{ ...fw(400), fontSize: 14, color: C.text, marginBottom: 14 }}>Try a recommended challenge</p>
+        <p style={{ ...fw(400), fontSize: 18, color: C.text, lineHeight: '24px', marginBottom: 4 }}>Hi Zara!</p>
+        <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, marginBottom: 24 }}>Try a recommended challenge</p>
 
         <div style={{ position: 'relative', marginBottom: 24, paddingTop: 8 }}>
           <div style={{ position: 'absolute', top: 0, left: 18, right: 18, height: 'calc(100% - 8px)', background: 'rgba(66,66,66,0.03)', borderRadius: 12, border: `1px solid ${C.border}` }} />
