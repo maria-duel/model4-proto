@@ -57,6 +57,8 @@ function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.5 }) {
     search: <><circle cx="11" cy="11" r="8" {...s}/><line x1="21" y1="21" x2="16.65" y2="16.65" {...s}/></>,
     award: <><circle cx="12" cy="8" r="7" {...s}/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" {...s}/></>,
     gift: <><polyline points="20,12 20,22 4,22 4,12" {...s}/><rect x="2" y="7" width="20" height="5" {...s}/><line x1="12" y1="22" x2="12" y2="7" {...s}/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" {...s}/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" {...s}/></>,
+    pencilRuler: <><path d="m15 5 4 4" {...s}/><path d="M13 7 8.7 2.7a2.41 2.41 0 0 0-3.4 0L2.7 5.3a2.41 2.41 0 0 0 0 3.4L7 13" {...s}/><path d="m8 6 2-2" {...s}/><path d="m2 22 5.5-1.5L21.17 6.83a2.82 2.82 0 0 0-4-4L3.5 16.5Z" {...s}/><path d="m18 16 2-2" {...s}/><path d="m17 11 4.3 4.3c.94.94.94 2.46 0 3.4l-2.6 2.6c-.94.94-2.46.94-3.4 0L11 17" {...s}/></>,
+    sliders: <><line x1="4" y1="21" x2="4" y2="14" {...s}/><line x1="4" y1="10" x2="4" y2="3" {...s}/><line x1="12" y1="21" x2="12" y2="12" {...s}/><line x1="12" y1="8" x2="12" y2="3" {...s}/><line x1="20" y1="21" x2="20" y2="16" {...s}/><line x1="20" y1="12" x2="20" y2="3" {...s}/><line x1="1" y1="14" x2="7" y2="14" {...s}/><line x1="9" y1="8" x2="15" y2="8" {...s}/><line x1="17" y1="16" x2="23" y2="16" {...s}/></>,
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0, display: 'block' }}>
@@ -260,7 +262,7 @@ const TABS = [
   { id: 'feed',       icon: 'house',    label: 'Home'       },
   { id: 'challenges', icon: 'flag',     label: 'Challenges' },
   { id: 'community',  icon: 'users',    label: 'Community'  },
-  { id: 'studio',     icon: 'scissors', label: 'Studio'     },
+  { id: 'studio',     icon: 'pencilRuler', label: 'Studio'   },
   { id: 'progress',   icon: 'chart',    label: 'Progress'   },
 ]
 
@@ -422,9 +424,128 @@ function FeedTab() {
   )
 }
 
+// ── CHALLENGES FILTER PANEL ───────────────────────────
+
+function ChallengesFilterPanel({ onClose }) {
+  const [myChallenges, setMyChallenges] = useState([])
+  const [types, setTypes] = useState([])
+  const [time, setTime] = useState(null)
+  const [difficulty, setDifficulty] = useState([])
+  const [productTypes, setProductTypes] = useState([])
+
+  const toggle = (arr, setArr, val) => setArr(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val])
+
+  const FilterSection = ({ title, children }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
+      <p style={{ ...fw(400), fontSize: 16, color: C.text }}>{title}</p>
+      {children}
+    </div>
+  )
+
+  return (
+    <motion.div
+      initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      style={{ position: 'absolute', inset: 0, background: C.white, zIndex: 50, display: 'flex', flexDirection: 'column' }}
+    >
+      <div style={{ position: 'sticky', top: 0, background: C.white, zIndex: 10, borderBottom: `1px solid ${C.borderLight}`, flexShrink: 0 }}>
+        <div style={{ height: 56, display: 'flex', alignItems: 'center', padding: '0 16px', gap: 8 }}>
+          <motion.button whileTap={{ scale: 0.9 }} onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}>
+            <Icon name="arrowLeft" size={22} color={C.textBody} />
+          </motion.button>
+          <span style={{ ...fw(400), fontSize: 20, color: C.text }}>Filters</span>
+        </div>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 16px 40px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <FilterSection title="My Challenges">
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[{ key: 'saved', icon: 'heart', label: 'Saved' }, { key: 'completed', icon: 'check', label: 'Completed' }].map(({ key, icon, label }) => {
+              const on = myChallenges.includes(key)
+              return (
+                <motion.button key={key} whileTap={{ scale: 0.96 }} onClick={() => toggle(myChallenges, setMyChallenges, key)}
+                  style={{ flex: 1, height: 48, border: `1px solid ${on ? C.text : C.border}`, borderRadius: 12, background: on ? C.text : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}>
+                  <Icon name={icon} size={16} color={on ? C.white : C.textBody} />
+                  <span style={{ ...fw(600), fontSize: 14, color: on ? C.white : C.text }}>{label}</span>
+                </motion.button>
+              )
+            })}
+          </div>
+        </FilterSection>
+
+        <FilterSection title="Type">
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['Review', 'Tutorial', 'Challenge'].map(t => {
+              const on = types.includes(t)
+              return (
+                <motion.button key={t} whileTap={{ scale: 0.96 }} onClick={() => toggle(types, setTypes, t)}
+                  style={{ flex: 1, border: `1px solid ${on ? C.text : C.border}`, borderRadius: 12, padding: '16px 8px', background: on ? C.text : 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <Icon name="bookmark" size={16} color={on ? C.white : C.textBody} />
+                  <span style={{ ...fw(400), fontSize: 12, color: on ? C.white : C.text }}>{t}</span>
+                </motion.button>
+              )
+            })}
+          </div>
+        </FilterSection>
+
+        <FilterSection title="Time">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
+            {[{ val: '10min', label: '10', unit: 'min' }, { val: '30min', label: '30', unit: 'min' }, { val: '1h', label: '1', unit: 'hour' }, { val: '2h', label: '2', unit: 'hours' }, { val: '3h', label: '3', unit: 'hours' }].map(({ val, label, unit }) => {
+              const on = time === val
+              return (
+                <motion.button key={val} whileTap={{ scale: 0.96 }} onClick={() => setTime(on ? null : val)}
+                  style={{ flex: 1, aspectRatio: '1', borderRadius: '50%', border: `1px solid ${on ? C.text : C.border}`, background: on ? C.text : 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', minWidth: 0 }}>
+                  <span style={{ ...fw(700), fontSize: 15, color: on ? C.white : C.text, lineHeight: 1.2 }}>{label}</span>
+                  <span style={{ ...fw(400), fontSize: 10, color: on ? 'rgba(255,255,255,0.75)' : C.textMuted }}>{unit}</span>
+                </motion.button>
+              )
+            })}
+          </div>
+        </FilterSection>
+
+        <FilterSection title="Difficulty">
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[{ key: 'beginner', label: 'Beginner', dots: 1 }, { key: 'intermediate', label: 'Intermediate', dots: 2 }, { key: 'advanced', label: 'Advanced', dots: 3 }].map(({ key, label, dots }) => {
+              const on = difficulty.includes(key)
+              return (
+                <motion.button key={key} whileTap={{ scale: 0.96 }} onClick={() => toggle(difficulty, setDifficulty, key)}
+                  style={{ flex: 1, border: `1px solid ${on ? C.text : C.border}`, borderRadius: 12, padding: '16px 8px', background: on ? C.text : 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', gap: 3 }}>
+                    {[1,2,3].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: d <= dots ? (on ? C.white : C.text) : (on ? 'rgba(255,255,255,0.25)' : C.border) }} />)}
+                  </div>
+                  <span style={{ ...fw(400), fontSize: 12, color: on ? C.white : C.text }}>{label}</span>
+                </motion.button>
+              )
+            })}
+          </div>
+        </FilterSection>
+
+        <FilterSection title="Product Type">
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[{ key: 'makeup', icon: 'heart', label: 'Make up' }, { key: 'skin', icon: 'star', label: 'Skin' }, { key: 'fragrance', icon: 'gift', label: 'Fragrance' }].map(({ key, icon, label }) => {
+              const on = productTypes.includes(key)
+              return (
+                <motion.button key={key} whileTap={{ scale: 0.96 }} onClick={() => toggle(productTypes, setProductTypes, key)}
+                  style={{ flex: 1, border: `1px solid ${on ? C.text : C.border}`, borderRadius: 12, padding: '16px 8px', background: on ? C.text : 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <Icon name={icon} size={16} color={on ? C.white : C.textBody} />
+                  <span style={{ ...fw(400), fontSize: 12, color: on ? C.white : C.text }}>{label}</span>
+                </motion.button>
+              )
+            })}
+          </div>
+        </FilterSection>
+
+        <motion.button whileTap={{ scale: 0.97 }} onClick={onClose}
+          style={{ width: '100%', height: 48, background: C.text, color: C.white, border: 'none', borderRadius: 12, cursor: 'pointer', ...fw(700), fontSize: 15, marginTop: 8 }}>
+          Apply Filters
+        </motion.button>
+      </div>
+    </motion.div>
+  )
+}
+
 // ── TAB: CHALLENGES ───────────────────────────────────
 
-function ChallengesTab() {
+function ChallengesTab({ onFilterOpen }) {
   const [filter, setFilter] = useState('Explore')
   const challenges = [
     { title: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', pts: 120, type: 'Product Review', time: '1h', level: 'Beginner', emoji: '💄', bg: 'linear-gradient(145deg,#faeae4,#e0a090)' },
@@ -441,10 +562,13 @@ function ChallengesTab() {
             <Icon name="search" size={15} color={C.textMuted} />
             <span style={{ ...fw(400), fontSize: 14, color: C.textPlaceholder }}>Search challenges</span>
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             {['Explore', 'Review', 'Tutorial'].map(f => (
               <motion.button key={f} whileTap={{ scale: 0.94 }} onClick={() => setFilter(f)} style={{ height: 30, padding: '0 14px', borderRadius: 20, border: `1px solid ${filter === f ? C.text : C.border}`, background: filter === f ? C.text : 'transparent', ...fw(filter === f ? 600 : 400), fontSize: 13, color: filter === f ? C.white : C.textBody, cursor: 'pointer' }}>{f}</motion.button>
             ))}
+            <motion.button whileTap={{ scale: 0.9 }} onClick={onFilterOpen} style={{ width: 30, height: 30, borderRadius: 20, border: `1px solid ${C.border}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+              <Icon name="sliders" size={14} color={C.textBody} />
+            </motion.button>
           </div>
         </div>
       </div>
@@ -496,9 +620,9 @@ function CommunityTab() {
             Leaderboard
           </motion.button>
         </div>
-        <div style={{ padding: '0 16px 12px', display: 'flex', gap: 6 }}>
+        <div style={{ padding: '0 16px', display: 'flex', gap: 20 }}>
           {['Inspiring', 'Trending', 'New'].map(f => (
-            <motion.button key={f} whileTap={{ scale: 0.94 }} onClick={() => setFilter(f)} style={{ height: 30, padding: '0 14px', borderRadius: 20, border: `1px solid ${filter === f ? C.text : C.border}`, background: filter === f ? C.text : 'transparent', ...fw(filter === f ? 600 : 400), fontSize: 13, color: filter === f ? C.white : C.textBody, cursor: 'pointer' }}>{f}</motion.button>
+            <motion.button key={f} whileTap={{ scale: 0.96 }} onClick={() => setFilter(f)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 12px', ...fw(filter === f ? 700 : 400), fontSize: 15, color: filter === f ? C.text : C.textMuted, borderBottom: `2px solid ${filter === f ? C.text : 'transparent'}`, marginBottom: -1 }}>{f}</motion.button>
           ))}
         </div>
       </div>
@@ -551,7 +675,9 @@ function StudioTab() {
   ]
   return (
     <div>
-      <StudioNav />
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, borderBottom: `1px solid ${C.borderLight}` }}>
+        <TopNav />
+      </div>
       <div style={{ padding: '20px 16px 32px' }}>
         <p style={{ ...fw(400), fontSize: 22, color: C.text, marginBottom: 16 }}>Studio</p>
         <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
@@ -734,10 +860,11 @@ function ProgressTab() {
 
 function HomeScreen() {
   const [activeTab, setActiveTab] = useState('feed')
+  const [filterOpen, setFilterOpen] = useState(false)
   const renderTab = () => {
     switch (activeTab) {
       case 'feed':        return <FeedTab />
-      case 'challenges':  return <ChallengesTab />
+      case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} />
       case 'community':   return <CommunityTab />
       case 'studio':      return <StudioTab />
       case 'progress':    return <ProgressTab />
@@ -745,7 +872,7 @@ function HomeScreen() {
     }
   }
   return (
-    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', minHeight: 0 }}>
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}>
@@ -769,6 +896,9 @@ function HomeScreen() {
           <div style={{ width: 108, height: 4, background: 'rgba(66,66,66,0.14)', borderRadius: 2 }} />
         </div>
       </div>
+      <AnimatePresence>
+        {filterOpen && <ChallengesFilterPanel onClose={() => setFilterOpen(false)} />}
+      </AnimatePresence>
     </div>
   )
 }
