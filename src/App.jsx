@@ -117,7 +117,7 @@ function TopNav() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <motion.button whileTap={{ scale: 0.92 }} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(66,66,66,0.09)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '0 8px', height: 24, cursor: 'pointer' }}>
           <Icon name="star" size={13} color={C.textBody} />
-          <span style={{ ...fw(700), fontSize: 12, fontWeifht color: C.text }}>1,234</span>
+          <span style={{ ...fw(700), fontSize: 12, color: C.text }}>1,234</span>
         </motion.button>
         <IconButton icon="store" size={28} />
         <IconButton icon="bell" size={28} />
