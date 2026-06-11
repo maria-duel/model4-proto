@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const C = {
@@ -22,6 +22,7 @@ const slideVariants = {
   exit: (dir) => ({ x: dir > 0 ? '-100%' : '100%' }),
 }
 const spring = { type: 'spring', stiffness: 300, damping: 30 }
+const slowSpring = { type: 'spring', stiffness: 150, damping: 28 }
 
 function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.5 }) {
   const s = { stroke: color, strokeWidth, strokeLinecap: 'round', strokeLinejoin: 'round', fill: 'none' }
@@ -61,11 +62,18 @@ function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.5 }) {
     pencilRuler: <><path d="m15 5 4 4" {...s}/><path d="M13 7 8.7 2.7a2.41 2.41 0 0 0-3.4 0L2.7 5.3a2.41 2.41 0 0 0 0 3.4L7 13" {...s}/><path d="m8 6 2-2" {...s}/><path d="m2 22 5.5-1.5L21.17 6.83a2.82 2.82 0 0 0-4-4L3.5 16.5Z" {...s}/><path d="m18 16 2-2" {...s}/><path d="m17 11 4.3 4.3c.94.94.94 2.46 0 3.4l-2.6 2.6c-.94.94-2.46.94-3.4 0L11 17" {...s}/></>,
     sliders: <><line x1="4" y1="21" x2="4" y2="14" {...s}/><line x1="4" y1="10" x2="4" y2="3" {...s}/><line x1="12" y1="21" x2="12" y2="12" {...s}/><line x1="12" y1="8" x2="12" y2="3" {...s}/><line x1="20" y1="21" x2="20" y2="16" {...s}/><line x1="20" y1="12" x2="20" y2="3" {...s}/><line x1="1" y1="14" x2="7" y2="14" {...s}/><line x1="9" y1="8" x2="15" y2="8" {...s}/><line x1="17" y1="16" x2="23" y2="16" {...s}/></>,
     person:    <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" {...s}/><circle cx="12" cy="7" r="4" {...s}/></>,
+    userPlus:  <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" {...s}/><circle cx="12" cy="7" r="4" {...s}/><line x1="19" y1="8" x2="19" y2="14" {...s}/><line x1="22" y1="11" x2="16" y2="11" {...s}/></>,
+    userCheck: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" {...s}/><circle cx="9" cy="7" r="4" {...s}/><polyline points="16,11 18,13 22,9" {...s}/></>,
     listLines: <><line x1="3" y1="6" x2="21" y2="6" {...s}/><line x1="3" y1="12" x2="21" y2="12" {...s}/><line x1="3" y1="18" x2="21" y2="18" {...s}/></>,
     grid4:     <><rect x="3" y="3" width="7" height="7" rx="1" {...s}/><rect x="14" y="3" width="7" height="7" rx="1" {...s}/><rect x="3" y="14" width="7" height="7" rx="1" {...s}/><rect x="14" y="14" width="7" height="7" rx="1" {...s}/></>,
     globe:     <><circle cx="12" cy="12" r="10" {...s}/><line x1="2" y1="12" x2="22" y2="12" {...s}/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" {...s}/></>,
     link:      <><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" {...s}/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" {...s}/></>,
     unlink:    <><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" {...s}/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" {...s}/><line x1="2" y1="2" x2="22" y2="22" {...s}/></>,
+    wallet:    <><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" {...s}/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4" {...s}/><path d="M18 12a2 2 0 0 0 0 4h4v-4z" {...s}/></>,
+    music:     <><path d="M9 18V5l12-2v13" {...s}/><circle cx="6" cy="18" r="3" {...s}/><circle cx="18" cy="16" r="3" {...s}/></>,
+    flame:     <path d="M12 2c0 0-5 5-5 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-3 3-1 0-2-1-2-2 0-1 1-2 2-3z" {...s}/>,
+    instagram: <><rect x="2" y="2" width="20" height="20" rx="5" {...s}/><circle cx="12" cy="12" r="4" {...s}/><circle cx="17.5" cy="6.5" r="1.2" fill={color} stroke="none"/></>,
+    tiktok:    <><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" {...s}/></>,
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0, display: 'block' }}>
@@ -76,11 +84,14 @@ function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.5 }) {
 
 // ── SHARED COMPONENTS ─────────────────────────────────
 
-function Avatar({ initial = '?', size = 32, showIndicator = false }) {
+function Avatar({ initial = '?', size = 32, showIndicator = false, photo = null }) {
   return (
     <div style={{ width: size, height: size, borderRadius: '50%', background: 'rgba(66,66,66,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0 }}>
-      <span style={{ ...fw(900), fontSize: size * 0.38, color: C.text, lineHeight: 1 }}>{initial}</span>
-      {showIndicator && <div style={{ position: 'absolute', top: -1, right: -1, width: Math.max(8, size * 0.28), height: Math.max(8, size * 0.28), background: C.lime, borderRadius: '50%', border: '2px solid white' }} />}
+      {photo
+        ? <img src={photo} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+        : <span style={{ ...fw(900), fontSize: size * 0.38, color: C.text, lineHeight: 1 }}>{initial}</span>
+      }
+      {showIndicator && <div style={{ position: 'absolute', top: -1, right: -1, width: Math.max(8, size * 0.28), height: Math.max(8, size * 0.28), background: C.lime, borderRadius: '50%', border: '2px solid white', zIndex: 1 }} />}
     </div>
   )
 }
@@ -114,7 +125,7 @@ function IconButton({ icon, size = 32, onClick, color = C.textBody }) {
 }
 
 // Shared top nav — used by Feed, Challenges, Community, Progress
-function TopNav({ onMenuOpen }) {
+function TopNav({ onMenuOpen, onWalletOpen }) {
   return (
     <div style={{ height: 63, background: C.white, display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -122,7 +133,7 @@ function TopNav({ onMenuOpen }) {
         <span style={{ ...fw(400), fontSize: 14, color: C.textMuted }}>Brand Name 1</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <motion.button whileTap={{ scale: 0.92 }} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(66,66,66,0.09)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '0 8px', height: 24, cursor: 'pointer' }}>
+        <motion.button whileTap={{ scale: 0.92 }} onClick={onWalletOpen} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(66,66,66,0.09)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '0 8px', height: 24, cursor: 'pointer' }}>
           <Icon name="star" size={13} color={C.textBody} />
           <span style={{ ...fw(700), fontSize: 12, color: C.text }}>1,234</span>
         </motion.button>
@@ -134,10 +145,10 @@ function TopNav({ onMenuOpen }) {
 }
 
 // Studio nav — avatar instead of burger/brand
-function StudioNav() {
+function StudioNav({ photo }) {
   return (
     <div style={{ height: 63, background: C.white, borderBottom: `1px solid ${C.borderLight}`, display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
-      <Avatar initial="Z" size={32} showIndicator />
+      <Avatar initial="Z" size={32} showIndicator photo={photo} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <motion.button whileTap={{ scale: 0.92 }} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(66,66,66,0.09)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '0 8px', height: 24, cursor: 'pointer' }}>
           <Icon name="star" size={13} color={C.textBody} />
@@ -155,16 +166,35 @@ function StudioNav() {
 function EmailScreen({ onNext }) {
   const [email, setEmail] = useState('')
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const ssoOptions = [
+    { label: 'Continue with Google', icon: <GoogleIcon /> },
+    { label: 'Continue with TikTok', icon: <TikTokIcon /> },
+    { label: 'Continue with Meta',   icon: <MetaIcon /> },
+  ]
   return (
     <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-      <SignupLogoArea />
-      <div style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: 16, width: 358, display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <p style={{ ...fw(700), fontSize: 20, color: C.text, lineHeight: '28px' }}>Welcome back!</p>
-          <p style={{ ...fw(400), fontSize: 16, color: C.textSecondary, lineHeight: '24px' }}>Enter your email address</p>
+      <SignupLogoArea top={48} />
+      <div style={{ position: 'absolute', top: 192, left: 24, right: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
+        <p style={{ ...fw(700), fontSize: 26, color: C.text, lineHeight: '34px', marginBottom: 8, textAlign: 'center' }}>Welcome back!</p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 32, textAlign: 'center' }}>Choose how you'd like to log in.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+          {ssoOptions.map(({ label, icon }) => (
+            <motion.button key={label} whileTap={{ scale: 0.97 }} onClick={() => onNext('')}
+              style={{ width: '100%', height: 52, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', ...fw(600), fontSize: 15, color: C.text }}>
+              {icon}
+              {label}
+            </motion.button>
+          ))}
         </div>
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" onKeyDown={e => e.key === 'Enter' && valid && onNext(email)} style={{ width: '100%', height: 48, borderRadius: 4, border: `1px solid ${C.border}`, padding: '0 16px', ...fw(400), fontSize: 14, color: C.text, background: C.white, boxSizing: 'border-box' }} />
-        <PrimaryButton onClick={() => valid && onNext(email)} disabled={!valid}>Continue</PrimaryButton>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+          <span style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>or</span>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+        </div>
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address"
+          onKeyDown={e => e.key === 'Enter' && valid && onNext(email)}
+          style={{ width: '100%', height: 52, borderRadius: 12, border: `1px solid ${email ? C.text : C.border}`, padding: '0 16px', ...fw(400), fontSize: 15, color: C.text, background: C.white, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', marginBottom: 12 }} />
+        <PrimaryButton onClick={() => valid && onNext(email)} disabled={!valid}>Continue with email</PrimaryButton>
       </div>
       <SignupFooter />
     </div>
@@ -274,7 +304,7 @@ const TABS = [
 
 // ── TAB: FEED ─────────────────────────────────────────
 
-function FeedTab({ onMenuOpen }) {
+function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange }) {
   const [bookmarked, setBookmarked] = useState(false)
   const [threadOpen, setThreadOpen] = useState(false)
   const [hearted, setHearted] = useState(false)
@@ -282,7 +312,7 @@ function FeedTab({ onMenuOpen }) {
   return (
     <div>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, borderBottom: `1px solid ${C.borderLight}` }}>
-        <TopNav onMenuOpen={onMenuOpen} />
+        <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
       </div>
 
       <div style={{ padding: '20px 16px 32px' }}>
@@ -322,7 +352,7 @@ function FeedTab({ onMenuOpen }) {
           </motion.div>
         </div>
 
-        <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={() => onTabChange('progress')} style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
           <div style={{ width: 52, height: 52, position: 'relative', flexShrink: 0 }}>
             <svg width={52} height={52} viewBox="0 0 52 52">
               <circle cx={26} cy={26} r={21} fill="none" stroke={C.border} strokeWidth={4} />
@@ -339,9 +369,47 @@ function FeedTab({ onMenuOpen }) {
             </div>
             <span style={{ ...fw(400), fontSize: 14, color: C.textSecondary }}>You've earned 180 pts this month</span>
           </div>
-        </div>
+        </motion.button>
 
         <p style={{ ...fw(400), fontSize: 16, color: C.text, marginBottom: 16 }}>From the community</p>
+
+        {/* User's own post */}
+        {userPost && (
+          <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12, marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Avatar initial="Z" size={32} photo={photo} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <span style={{ ...fw(700), fontSize: 14, color: C.text }}>Zara Ahmed</span>
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <Pill bg={C.cardBg}>Advocate</Pill>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '2px 7px', borderRadius: 30, background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)' }}>
+                      <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} style={{ width: 5, height: 5, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+                      <span style={{ ...fw(600), fontSize: 11, color: '#22c55e' }}>Live</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {userPost.photo && (
+              <div style={{ height: 180, borderRadius: 10, overflow: 'hidden', marginBottom: 10 }}>
+                <img src={userPost.photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            )}
+            <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>
+              "The first CT product I ever tried was {userPost.sentence} and I've never looked back."
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>just now</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <span style={{ ...fw(500), fontSize: 12, color: C.text }}>0</span>
+                <div style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name="bookmark" size={14} color={C.textMuted} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Community card 1 */}
         <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12, marginBottom: 16 }}>
@@ -397,7 +465,7 @@ function FeedTab({ onMenuOpen }) {
             </div>
           </div>
           <div style={{ height: 40, border: `1px solid ${C.border}`, borderRadius: 4, display: 'flex', alignItems: 'center', padding: '0 12px', gap: 8, marginBottom: threadOpen ? 12 : 0 }}>
-            <Avatar initial="Z" size={26} showIndicator />
+            <Avatar initial="Z" size={26} showIndicator photo={photo} />
             <span style={{ ...fw(400), fontSize: 13, color: C.textPlaceholder }}>Share your thoughts here</span>
           </div>
           <AnimatePresence>
@@ -663,7 +731,7 @@ function ChallengeDetailScreen({ onBack }) {
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: '0 0 8px', lineHeight: '20px' }}>
-                      Tag products and share affiliate links to earn credits and commission
+                      Tag products and share affiliate links to earn points and commission
                     </p>
                     <div style={{ height: 40, border: `1px solid ${C.border}`, borderRadius: 8, display: 'flex', alignItems: 'center', padding: '0 12px' }}>
                       <Icon name="search" size={14} color={C.textPlaceholder} />
@@ -709,7 +777,7 @@ function ChallengeDetailScreen({ onBack }) {
 
 // ── TAB: CHALLENGES ───────────────────────────────────
 
-function ChallengesTab({ onFilterOpen, onMenuOpen, onChallengeOpen }) {
+function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen }) {
   const [filter, setFilter] = useState('Explore')
   const challenges = [
     { title: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', pts: 120, type: 'Product Review', time: '1h', level: 'Beginner', emoji: '💄', bg: 'linear-gradient(145deg,#faeae4,#e0a090)' },
@@ -720,7 +788,7 @@ function ChallengesTab({ onFilterOpen, onMenuOpen, onChallengeOpen }) {
   return (
     <div>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
-        <TopNav onMenuOpen={onMenuOpen} />
+        <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
         <div style={{ padding: '12px 16px' }}>
           <div style={{ height: 40, border: `1px solid ${C.border}`, borderRadius: 10, display: 'flex', alignItems: 'center', padding: '0 12px', gap: 8, marginBottom: 10, background: C.cardBg }}>
             <Icon name="search" size={15} color={C.textMuted} />
@@ -765,61 +833,434 @@ function ChallengesTab({ onFilterOpen, onMenuOpen, onChallengeOpen }) {
 
 // ── TAB: COMMUNITY ────────────────────────────────────
 
-function CommunityTab({ onMenuOpen }) {
-  const [filter, setFilter] = useState('Inspiring')
-  const [saved, setSaved] = useState([false, false, false])
-  const posts = [
-    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'How beautiful is @charlottetilbury NEW Pillow talk beauty soulmates palette in the shade — Flawless rosewood 🩷✨', saves: 24 },
-    { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'Finally tried the Pillow Talk lip kit 💋 The liner and lipstick combo is so gorgeous. Shade: Original.', saves: 18 },
-    { initial: 'M', name: 'Maya Osei', tier: 'Silver', role: null, time: '2h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried layering the Hollywood Flawless Filter over SPF? Wondering if it affects the glow...', saves: 7 },
-  ]
+function ReplySheet({ post, onClose }) {
+  const [text, setText] = useState('')
+  const [replies, setReplies] = useState([
+    { initial: 'T', name: 'Thea Walsh', time: '12m ago', body: 'Yes! I layer it over SPF50 all the time — the glow still comes through. Lightweight SPF formulas work best as they absorb faster.' },
+    { initial: 'J', name: 'Jade Perry', time: '28m ago', body: 'Just make sure your SPF is fully absorbed first (wait about 5 mins). The filter goes on beautifully over it.' },
+  ])
+  const handlePost = () => {
+    if (!text.trim()) return
+    setReplies(prev => [{ initial: 'Y', name: 'You', time: 'Just now', body: text.trim() }, ...prev])
+    setText('')
+  }
   return (
-    <div>
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
-        <TopNav onMenuOpen={onMenuOpen} />
-        <div style={{ height: 48, display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
-          <span style={{ ...fw(400), fontSize: 18, color: C.text }}>Community</span>
-          <motion.button whileTap={{ scale: 0.94 }} style={{ height: 30, padding: '0 12px', borderRadius: 20, border: `1px solid ${C.border}`, background: 'transparent', ...fw(500), fontSize: 13, color: C.textBody, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Icon name="chart" size={13} color={C.textBody} />
-            Leaderboard
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 20 }} />
+      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 21, maxHeight: '88%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flexShrink: 0, padding: '12px 16px 14px' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 16px' }} />
+          <div style={{ padding: '12px 14px', background: C.cardBg, borderRadius: 10, marginBottom: 4 }}>
+            <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: '0 0 4px' }}>{post.name} asked</p>
+            <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{post.body}</p>
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 16px 12px' }}>
+          <p style={{ ...fw(600), fontSize: 13, color: C.textMuted, margin: '0 0 12px' }}>{replies.length} {replies.length === 1 ? 'reply' : 'replies'}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {replies.map((r, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10 }}>
+                <Avatar initial={r.initial} size={30} />
+                <div style={{ flex: 1, background: C.cardBg, borderRadius: 10, padding: '10px 12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ ...fw(600), fontSize: 13, color: C.text }}>{r.name}</span>
+                    <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{r.time}</span>
+                  </div>
+                  <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{r.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ flexShrink: 0, padding: '12px 16px 32px', borderTop: `1px solid ${C.borderLight}`, display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+          <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Write a reply…"
+            style={{ flex: 1, minHeight: 40, maxHeight: 100, border: `1px solid ${text ? C.text : C.border}`, borderRadius: 10, padding: '10px 12px', fontSize: 14, color: C.text, fontFamily: 'inherit', resize: 'none', outline: 'none', lineHeight: '20px', background: C.white, display: 'block', boxSizing: 'border-box' }} />
+          <motion.button whileTap={{ scale: 0.92 }} onClick={handlePost}
+            style={{ height: 40, padding: '0 16px', borderRadius: 10, border: 'none', background: text.trim() ? C.text : C.cardBg, color: text.trim() ? C.white : C.textMuted, ...fw(600), fontSize: 14, cursor: text.trim() ? 'pointer' : 'default', fontFamily: 'inherit', flexShrink: 0 }}>
+            Post
           </motion.button>
         </div>
-        <div style={{ padding: '0 16px', display: 'flex', gap: 20 }}>
-          {['Inspiring', 'Trending', 'New'].map(f => (
-            <motion.button key={f} whileTap={{ scale: 0.96 }} onClick={() => setFilter(f)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 12px', ...fw(filter === f ? 700 : 400), fontSize: 15, color: filter === f ? C.text : C.textMuted, borderBottom: `2px solid ${filter === f ? C.text : 'transparent'}`, marginBottom: -1 }}>{f}</motion.button>
-          ))}
+      </motion.div>
+    </>
+  )
+}
+
+function CommunityRemixSheet({ post, onClose, savedRemixes, onSave }) {
+  const alreadySaved = savedRemixes.some(r => r.id === post.name + post.body)
+  const IDEAS = [
+    { icon: 'sliders',    title: 'Your setting',      body: "They filmed indoors — try natural window light or an outdoor setting. A different backdrop makes your version instantly distinct." },
+    { icon: 'person',     title: 'Your skin tone',    body: 'Show the same products on your complexion. Shade comparisons are high-value for audiences who struggle to find their match.' },
+    { icon: 'arrowRight', title: 'Before vs after',   body: "Restructure as a transformation reveal instead of a walkthrough. The payoff moment gets significantly more replays." },
+    { icon: 'clock',      title: 'Speed-run version', body: "Recreate the look in under 60 seconds. Quick get-ready versions consistently outperform longer tutorials in completion rate." },
+  ]
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 20 }} />
+      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 21, maxHeight: '88%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flexShrink: 0, padding: '12px 16px 0' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
+          <p style={{ ...fw(700), fontSize: 18, color: C.text, margin: '0 0 14px' }}>Remix this challenge</p>
         </div>
-      </div>
-      <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {posts.map((post, i) => (
-          <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <Avatar initial={post.initial} size={32} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <span style={{ ...fw(700), fontSize: 14, color: C.text }}>{post.name}</span>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <Pill bg={C.cardBg}>{post.tier}</Pill>
-                    {post.role && <Pill bg={C.white}>{post.role}</Pill>}
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 16px 44px' }}>
+          <p style={{ ...fw(600), fontSize: 13, color: C.textMuted, margin: '0 0 10px' }}>Original post</p>
+          <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, marginBottom: 24 }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+              <Avatar initial={post.initial} size={32} />
+              <div>
+                <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>{post.name}</p>
+                <div style={{ display: 'flex', gap: 4, marginTop: 3 }}>
+                  <Pill bg={C.cardBg}>{post.tier}</Pill>
+                </div>
+              </div>
+            </div>
+            {post.photo && (
+              <div style={{ height: 120, borderRadius: 8, background: post.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                <span style={{ fontSize: 36 }}>{post.emoji}</span>
+              </div>
+            )}
+            <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{post.body}</p>
+          </div>
+          <p style={{ ...fw(600), fontSize: 13, color: C.textMuted, margin: '0 0 10px' }}>4 ways to make it yours</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+            {IDEAS.map((idea, i) => (
+              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon name={idea.icon} size={14} color={C.textBody} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 4px' }}>{idea.title}</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{idea.body}</p>
                   </div>
                 </div>
               </div>
-              <Pill icon={<Icon name={post.tag.icon} size={10} color={C.textBody} />} bg={C.white}>{post.tag.label}</Pill>
+            ))}
+          </div>
+          <motion.button whileTap={{ scale: alreadySaved ? 1 : 0.97 }}
+            onClick={() => !alreadySaved && onSave({ id: post.name + post.body, authorName: post.name, authorInitial: post.initial, authorTier: post.tier, body: post.body, photo: post.photo, gradient: post.gradient, emoji: post.emoji, savedAt: 'Today' })}
+            style={{ width: '100%', height: 48, borderRadius: 12, border: `1px solid ${alreadySaved ? C.border : C.text}`, background: alreadySaved ? C.cardBg : C.text, color: alreadySaved ? C.textMuted : C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: alreadySaved ? 'default' : 'pointer', ...fw(700), fontSize: 14, fontFamily: 'inherit' }}>
+            <Icon name={alreadySaved ? 'check' : 'bookmark'} size={16} color={alreadySaved ? C.textMuted : C.white} />
+            {alreadySaved ? 'Saved to My Projects' : 'Save to My Projects'}
+          </motion.button>
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
+function fmtFollowers(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M'
+  if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K'
+  return n.toString()
+}
+
+function AdvocateProfileSheet({ advocate, onClose }) {
+  const totalFollowers = (advocate.instagram?.followers ?? 0) + (advocate.tiktok?.followers ?? 0)
+  const socials = [
+    advocate.instagram && { icon: 'instagram', platform: 'Instagram', handle: advocate.instagram.handle, followers: advocate.instagram.followers },
+    advocate.tiktok    && { icon: 'tiktok',    platform: 'TikTok',    handle: advocate.tiktok.handle,    followers: advocate.tiktok.followers },
+  ].filter(Boolean)
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 20 }} />
+      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 21, maxHeight: '88%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flexShrink: 0, padding: '12px 16px 0' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+            <Avatar initial={advocate.initial} size={56} />
+            <div>
+              <p style={{ ...fw(700), fontSize: 18, color: C.text, margin: '0 0 6px' }}>{advocate.name}</p>
+              <div style={{ display: 'flex', gap: 4 }}>
+                <Pill bg={C.cardBg}>{advocate.tier}</Pill>
+                {advocate.role && <Pill bg={C.white}>{advocate.role}</Pill>}
+              </div>
             </div>
-            {post.photo && (
-              <div style={{ height: 190, borderRadius: 10, background: post.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 46, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))' }}>{post.emoji}</span>
+          </div>
+          {totalFollowers > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 2px' }}>Total followers</p>
+              <p style={{ ...fw(700), fontSize: 28, color: C.text, margin: 0, letterSpacing: '-0.5px' }}>{fmtFollowers(totalFollowers)}</p>
+            </div>
+          )}
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 16px 44px' }}>
+          {socials.length > 0 && (
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 14, marginBottom: 12, overflow: 'hidden' }}>
+              <p style={{ ...fw(600), fontSize: 13, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0, padding: '14px 16px 10px' }}>Socials</p>
+              {socials.map((s, i) => (
+                <div key={i}>
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon name={s.icon} size={16} color={C.textBody} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 1px' }}>{s.handle}</p>
+                      <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{fmtFollowers(s.followers)} followers</p>
+                    </div>
+                    <Icon name="arrowRight" size={14} color={C.textMuted} />
+                  </div>
+                  {i < socials.length - 1 && <div style={{ height: 1, background: C.borderLight, marginLeft: 66 }} />}
+                </div>
+              ))}
+            </div>
+          )}
+          {advocate.achievements?.length > 0 && (
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 14, overflow: 'hidden' }}>
+              <p style={{ ...fw(600), fontSize: 13, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0, padding: '14px 16px 10px' }}>Achievements</p>
+              {advocate.achievements.map((a, i) => (
+                <div key={i}>
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon name={a.icon} size={16} color={C.textBody} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 1px' }}>{a.label}</p>
+                      <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{a.sub}</p>
+                    </div>
+                  </div>
+                  {i < advocate.achievements.length - 1 && <div style={{ height: 1, background: C.borderLight, marginLeft: 66 }} />}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
+const SIMILAR_POSTS_DATA = [
+  { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'My everyday glow routine featuring CT Pillow Talk', saves: 14 },
+  { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'New Pillow Talk shades ranked by undertone', saves: 9 },
+  { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Filter for a no-makeup makeup look', saves: 21 },
+  { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Full Pillow Talk collection — every product reviewed', saves: 6 },
+  { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Charlotte's Magic Cream 7-day skin transformation", saves: 33 },
+  { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', body: 'Summer makeup routine ft. Airbrush Foundation', saves: 18 },
+  { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', body: 'Bold glam look using only CT products', saves: 27 },
+  { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '💙', body: 'Dewy skin prep with Hollywood Flawless Filter', saves: 11 },
+]
+
+const SUGGESTED_ADVOCATES = [
+  { initial: 'T', name: 'Tara Williams', tier: 'Platinum', similarCount: 412, posts: [
+    { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄' },
+    { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨' },
+    { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟' },
+  ]},
+  { initial: 'J', name: 'Jade Parker', tier: 'Gold', similarCount: 287, posts: [
+    { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫' },
+    { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷' },
+    { gradient: 'linear-gradient(135deg,#e0f2fe,#7dd3fc,#38bdf8)', emoji: '💙' },
+  ]},
+  { initial: 'D', name: 'Daniela Cruz', tier: 'Gold', similarCount: 198, posts: [
+    { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '🧴' },
+    { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨' },
+    { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿' },
+  ]},
+  { initial: 'H', name: 'Hannah Scott', tier: 'Silver', similarCount: 134, posts: [
+    { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸' },
+    { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷' },
+    { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💋' },
+  ]},
+]
+
+const CHAMPIONS_DATA = [
+  { icon: 'video',         label: 'Visual Storyteller', initial: 'I', name: 'Isla Thompson',   tier: 'Platinum', desc: '18 challenge posts this season',     gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)' },
+  { icon: 'wallet',        label: 'The Closer',         initial: 'P', name: 'Priya Nair',      tier: 'Gold',    desc: '£840 in attributed sales',            gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)' },
+  { icon: 'flame',         label: 'Streak Keeper',      initial: 'C', name: 'Chloe Nakamura',  tier: 'Gold',    desc: '21 days posting in a row',            gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)' },
+  { icon: 'users',         label: 'Community Hero',     initial: 'L', name: 'Lea Fontaine',    tier: 'Platinum', desc: 'Helped 12 advocates this month',     gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)' },
+  { icon: 'messageSquare', label: 'The Reviewer',       initial: 'S', name: 'Sofia Brennan',   tier: 'Gold',    desc: '14 detailed product reviews',         gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)' },
+]
+
+const RISING_STARS_DATA = [
+  { initial: 'N', name: 'Nina Reeves',    tier: 'Silver', growth: '+284%', metric: 'engagement vs. last month', gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)' },
+  { initial: 'R', name: 'Rachel Kim',     tier: 'Silver', growth: '+156%', metric: 'saves on last post',        gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)' },
+  { initial: 'A', name: 'Amara Diallo',   tier: 'Gold',   growth: '+98%',  metric: 'views this week',           gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)' },
+]
+
+const COMMUNITY_HERO = {
+  initial: 'L', name: 'Lea Fontaine', tier: 'Platinum',
+  reason: 'Answered 5 product questions from newer advocates this week',
+}
+
+const BRAND_SPOTLIGHT = {
+  initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',
+  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷',
+  body: 'Bridal makeup trial done using nothing but Charlotte Tilbury — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍',
+  saves: 53,
+  brandNote: 'Saved by the Charlotte Tilbury team',
+}
+
+function RecognitionSheet({ onClose }) {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 20 }}
+      />
+      <motion.div
+        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+        transition={spring}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 21, maxHeight: '92%', display: 'flex', flexDirection: 'column' }}
+      >
+        <div style={{ flexShrink: 0, padding: '12px 16px 0' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div>
+              <p style={{ ...fw(700), fontSize: 18, color: C.text, margin: 0 }}>Recognition</p>
+              <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: 0 }}>Season 1 · June 2026</p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Icon name="users" size={13} color={C.textMuted} />
+              <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>84 advocates</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 0 44px' }}>
+          {/* Season Impact */}
+          <div style={{ padding: '0 16px 28px' }}>
+            <div style={{ background: C.text, borderRadius: 14, padding: '20px 20px 16px' }}>
+              <p style={{ ...fw(500), fontSize: 11, color: 'rgba(255,255,255,0.55)', marginBottom: 16, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Community this season</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 0 }}>
+                {[
+                  { value: '2.4M',  label: 'total views' },
+                  { value: '847',   label: 'challenges' },
+                  { value: '£12.6K', label: 'sales driven' },
+                ].map((stat, i) => (
+                  <div key={i} style={{ textAlign: 'center', padding: '0 4px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.15)' : 'none' }}>
+                    <p style={{ ...fw(700), fontSize: 22, color: C.white, margin: '0 0 3px', letterSpacing: '-0.5px' }}>{stat.value}</p>
+                    <p style={{ ...fw(400), fontSize: 11, color: 'rgba(255,255,255,0.5)', margin: 0 }}>{stat.label}</p>
+                  </div>
+                ))}
               </div>
-            )}
-            <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>{post.body}</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>{post.time}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <span style={{ ...fw(500), fontSize: 12, color: C.text }}>{post.saves + (saved[i] ? 1 : 0)}</span>
-                <motion.button whileTap={{ scale: 0.82 }} onClick={() => setSaved(prev => prev.map((v, idx) => idx === i ? !v : v))} style={{ width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name={saved[i] ? 'bookmarkFilled' : 'bookmark'} size={14} color={saved[i] ? C.text : C.textMuted} />
-                </motion.button>
+              <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.12)', borderRadius: 6, height: 5, overflow: 'hidden' }}>
+                <div style={{ width: '71%', height: '100%', background: C.lime, borderRadius: 6 }} />
               </div>
+              <p style={{ ...fw(400), fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 6 }}>71% toward the season goal</p>
+            </div>
+          </div>
+          {/* This Month's Champions */}
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ padding: '0 16px', marginBottom: 12 }}>
+              <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 2px' }}>This Month's Champions</p>
+              <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: 0 }}>Recognised for different kinds of contribution</p>
+            </div>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '2px 16px 4px', scrollbarWidth: 'none' }}>
+              {CHAMPIONS_DATA.map((c, i) => (
+                <div key={i} style={{ flexShrink: 0, width: 158, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                  <div style={{ height: 76, background: c.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ ...fw(800), fontSize: 17, color: C.text }}>{c.initial}</span>
+                    </div>
+                  </div>
+                  <div style={{ padding: '10px 12px 12px' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: C.cardBg, borderRadius: 6, padding: '3px 7px', marginBottom: 8 }}>
+                      <Icon name={c.icon} size={10} color={C.textMuted} />
+                      <span style={{ ...fw(500), fontSize: 10, color: C.textMuted }}>{c.label}</span>
+                    </div>
+                    <p style={{ ...fw(700), fontSize: 13, color: C.text, margin: '0 0 3px' }}>{c.name}</p>
+                    <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, margin: 0, lineHeight: '15px' }}>{c.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Brand Spotlight */}
+          <div style={{ padding: '0 16px', marginBottom: 28 }}>
+            <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 2px' }}>Brand Spotlight</p>
+            <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 12px' }}>Picked this week by the Charlotte Tilbury team</p>
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ aspectRatio: '16/9', background: BRAND_SPOTLIGHT.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <span style={{ fontSize: 52, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }}>{BRAND_SPOTLIGHT.emoji}</span>
+                <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 20, padding: '4px 10px' }}>
+                  <span style={{ ...fw(600), fontSize: 11, color: C.white }}>✦ CT Pick</span>
+                </div>
+              </div>
+              <div style={{ padding: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <Avatar initial={BRAND_SPOTLIGHT.initial} size={28} />
+                  <div>
+                    <p style={{ ...fw(700), fontSize: 13, color: C.text, margin: 0 }}>{BRAND_SPOTLIGHT.name}</p>
+                    <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, margin: 0 }}>{BRAND_SPOTLIGHT.tier}</p>
+                  </div>
+                </div>
+                <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 10px' }}>{BRAND_SPOTLIGHT.body}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 10px', background: C.cardBg, borderRadius: 8 }}>
+                  <Icon name="heart" size={12} color={C.textMuted} />
+                  <span style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>{BRAND_SPOTLIGHT.brandNote}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Rising Stars */}
+          <div>
+            <div style={{ padding: '0 16px', marginBottom: 12 }}>
+              <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 2px' }}>Rising Stars</p>
+              <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: 0 }}>Biggest growth vs. their own previous period</p>
+            </div>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '2px 16px 4px', scrollbarWidth: 'none' }}>
+              {RISING_STARS_DATA.map((r, i) => (
+                <div key={i} style={{ flexShrink: 0, width: 158, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <Avatar initial={r.initial} size={36} />
+                    <div>
+                      <p style={{ ...fw(700), fontSize: 13, color: C.text, margin: '0 0 3px' }}>{r.name}</p>
+                      <Pill bg={C.cardBg}>{r.tier}</Pill>
+                    </div>
+                  </div>
+                  <div style={{ background: C.cardBg, borderRadius: 8, padding: '8px 10px' }}>
+                    <p style={{ ...fw(800), fontSize: 20, color: C.text, margin: '0 0 2px', letterSpacing: '-0.5px' }}>{r.growth}</p>
+                    <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, margin: 0, lineHeight: '14px' }}>{r.metric}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
+function CreatorsYouMightLike() {
+  const [followed, setFollowed] = useState([])
+  return (
+    <div>
+      <div style={{ marginBottom: 12 }}>
+        <p style={{ ...fw(600), fontSize: 14, color: C.text, marginBottom: 2 }}>Creators you might like</p>
+        <p style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>Based on your activity</p>
+      </div>
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', margin: '0 -16px', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
+        {SUGGESTED_ADVOCATES.map((a, i) => (
+          <div key={i} style={{ flexShrink: 0, width: 200, border: `1px solid ${C.border}`, borderRadius: 10, padding: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                <Avatar initial={a.initial} size={32} />
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</p>
+                  <Pill bg={C.cardBg}>{a.tier}</Pill>
+                </div>
+              </div>
+              <motion.button whileTap={{ scale: 0.88 }} onClick={() => setFollowed(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])}
+                style={{ flexShrink: 0, width: 30, height: 30, borderRadius: '50%', border: `1px solid ${followed.includes(i) ? C.border : C.text}`, background: followed.includes(i) ? C.cardBg : C.text, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginLeft: 8 }}>
+                <Icon name={followed.includes(i) ? 'userCheck' : 'userPlus'} size={14} color={followed.includes(i) ? C.textMuted : C.white} strokeWidth={2} />
+              </motion.button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, marginBottom: 10 }}>
+              {a.posts.map((p, j) => (
+                <div key={j} style={{ height: 56, borderRadius: 6, background: p.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 18 }}>{p.emoji}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Icon name="users" size={11} color={C.textMuted} />
+              <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{a.similarCount} advocates with similar reach</span>
             </div>
           </div>
         ))}
@@ -828,19 +1269,585 @@ function CommunityTab({ onMenuOpen }) {
   )
 }
 
+function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, onRemixOpen, onRecognitionOpen }) {
+  const [filter, setFilter] = useState('Inspiring')
+  const [saved, setSaved] = useState(Array(9).fill(false))
+  const [theme, setTheme] = useState('Bridal')
+  const tabRef = useRef(null)
+  useEffect(() => {
+    let el = tabRef.current?.parentElement
+    while (el) {
+      if (el.scrollHeight > el.clientHeight && el.scrollTop > 0) { el.scrollTop = 0; break }
+      el = el.parentElement
+    }
+  }, [filter])
+  const THEME_DATA = {
+    Bridal: { desc: 'Advocate-approved looks for your big day', posts: [
+      { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '💍', name: 'Sofia Brennan', saves: 34 },
+      { gradient: 'linear-gradient(135deg,#f0e8ff,#e9d5ff,#c4b5fd)', emoji: '🤍', name: 'Isla Thompson', saves: 28 },
+      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fdba74)', emoji: '🌸', name: 'Tara Williams', saves: 19 },
+      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '💐', name: 'Lea Fontaine', saves: 41 },
+    ]},
+    'Natural Glow': { desc: 'Clean, effortless beauty from the community', posts: [
+      { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', name: 'Priya Nair', saves: 22 },
+      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#fcd34d)', emoji: '☀️', name: 'Maya Osei', saves: 17 },
+      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '🍃', name: 'Amara Diallo', saves: 31 },
+      { gradient: 'linear-gradient(135deg,#faeae4,#fdd5c8,#fbb09a)', emoji: '✨', name: 'Rachel Kim', saves: 14 },
+    ]},
+    'Bold & Glam': { desc: 'Show-stopping looks from our top advocates', posts: [
+      { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', name: 'Lea Fontaine', saves: 48 },
+      { gradient: 'linear-gradient(135deg,#ffe4e6,#fecdd3,#fb7185)', emoji: '💋', name: 'Chloe Nakamura', saves: 37 },
+      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '✨', name: 'Isla Thompson', saves: 52 },
+      { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', name: 'Sofia Brennan', saves: 29 },
+    ]},
+    Summer: { desc: 'Sun-kissed looks for the warmer months', posts: [
+      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', name: 'Priya Nair', saves: 26 },
+      { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '🌊', name: 'Nina Reeves', saves: 18 },
+      { gradient: 'linear-gradient(135deg,#fef9c3,#fef08a,#facc15)', emoji: '🌻', name: 'Tara Williams', saves: 33 },
+      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#4ade80)', emoji: '🍉', name: 'Maya Osei', saves: 21 },
+    ]},
+    Streaks: { desc: 'Advocates on an active posting streak right now', posts: [
+      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🔥', name: 'Chloe Nakamura', streakDays: 21 },
+      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '✨', name: 'Isla Thompson',  streakDays: 14 },
+      { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', name: 'Priya Nair',     streakDays: 9 },
+      { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '💫', name: 'Lea Fontaine',   streakDays: 7 },
+    ]},
+  }
+  const posts = [
+    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'How beautiful is @charlottetilbury NEW Pillow talk beauty soulmates palette in the shade — Flawless rosewood 🩷✨', saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
+    { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'Finally tried the Pillow Talk lip kit 💋 The liner and lipstick combo is so gorgeous. Shade: Original.', saves: 18, instagram: { handle: '@sofia.brennan', followers: 22400 }, tiktok: { handle: '@sofiabeauty_', followers: 31600 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '5 challenges in a row' }, { icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }] },
+    { initial: 'M', name: 'Maya Osei', tier: 'Silver', role: null, time: '2h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried layering the Hollywood Flawless Filter over SPF? Wondering if it affects the glow...', saves: 7, instagram: { handle: '@maya.osei', followers: 8900 }, tiktok: { handle: '@mayaosei_', followers: 14500 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
+    { initial: 'P', name: 'Priya Nair', tier: 'Gold', role: null, time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the Magic Cream 7-day test and wow — my skin has never looked better. The hydration is genuinely unreal 🧴✨", saves: 31, instagram: { handle: '@priya.nair', followers: 19600 }, tiktok: { handle: '@priyanairbeauty', followers: 44200 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '3 in a row' }] },
+    { initial: 'R', name: 'Rachel Kim', tier: 'Silver', role: null, time: '3h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "Does anyone know if the Airbrush Flawless Foundation works well for oily skin? My T-zone gets really shiny by midday and I'm worried it'll slide off...", saves: 12, instagram: { handle: '@rachelkim.beauty', followers: 6200 }, tiktok: { handle: '@rachelkimbeauty', followers: 9800 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
+    { initial: 'I', name: 'Isla Thompson', tier: 'Platinum', role: 'Guide', time: '4h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Flawless Filter in shade 4 — my go-to for every shoot this season. That lit-from-within glow is just unmatched 📸', saves: 47, instagram: { handle: '@isla.thompson', followers: 87400 }, tiktok: { handle: '@islathompson', followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#1 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 12 members' }] },
+    { initial: 'A', name: 'Amara Diallo', tier: 'Gold', role: null, time: '5h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "What's the best way to remove the Magic Cream without stripping your skin? I've been using a basic cleanser but I feel like I'm missing something...", saves: 9, instagram: { handle: '@amara.diallo', followers: 11300 }, tiktok: { handle: '@amaradiallo_', followers: 18700 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '4 in a row' }] },
+    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Bridal makeup trial done using nothing but Charlotte Tilbury — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkbeauty', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
+    { initial: 'N', name: 'Nina Reeves', tier: 'Silver', role: null, time: '7h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Is the Pillow Talk Original or Matte Revolution better for fair skin? I keep going back and forth and can\'t decide before I complete the challenge 😅', saves: 5, instagram: { handle: '@nina.reeves', followers: 4400 }, tiktok: { handle: '@ninareevesbeauty', followers: 7100 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
+  ]
+  return (
+    <div ref={tabRef}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
+        <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
+        <div style={{ height: 48, display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
+          <span style={{ ...fw(400), fontSize: 18, color: C.text }}>Community</span>
+          <motion.button whileTap={{ scale: 0.94 }} onClick={onRecognitionOpen} style={{ height: 30, padding: '0 12px', borderRadius: 20, border: `1px solid ${C.border}`, background: 'transparent', ...fw(500), fontSize: 13, color: C.textBody, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Icon name="award" size={13} color={C.textBody} />
+            Recognition
+          </motion.button>
+        </div>
+        <div style={{ padding: '10px 16px 12px', display: 'flex', gap: 8 }}>
+          {[{ label: 'Inspiring', icon: 'star' }, { label: 'Trending', icon: 'flame' }, { label: 'New', icon: 'clock' }, { label: 'Following', icon: 'users' }].map(({ label, icon }) => {
+            const active = filter === label
+            return (
+              <motion.button key={label} whileTap={{ scale: 0.96 }} onClick={() => setFilter(label)} style={{ display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 14px', borderRadius: 100, border: `1px solid ${active ? C.text : C.border}`, background: active ? C.text : 'transparent', cursor: 'pointer', ...fw(500), fontSize: 14, color: active ? C.white : C.textBody, fontFamily: 'inherit' }}>
+                <Icon name={icon} size={12} color={active ? C.white : C.textBody} />
+                {label}
+              </motion.button>
+            )
+          })}
+        </div>
+      </div>
+      {filter === 'Following' ? (
+        <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+            { initial: 'T', name: 'Tara Williams', tier: 'Platinum', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'This Pillow Talk Blush Balm is everything — the pigment is unreal for an everyday look 🌸', saves: 19 },
+            { initial: 'J', name: 'Jade Parker', tier: 'Gold', time: '34m ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone layered the Hollywood Flawless Filter with the Airbrush Foundation? Wondering which goes on first...', saves: 8 },
+            { initial: 'D', name: 'Daniela Cruz', tier: 'Gold', time: '2h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', body: "Day 3 of the Magic Cream challenge and my skin has never felt this hydrated. Genuinely shocked 🧴✨", saves: 26 },
+            { initial: 'H', name: 'Hannah Scott', tier: 'Silver', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Bridal trial done ✅ Used the full Pillow Talk collection and I am OBSESSED. This is the one 💍', saves: 41 },
+          ].map((post, i) => (
+            <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <Avatar initial={post.initial} size={32} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <span style={{ ...fw(700), fontSize: 14, color: C.text }}>{post.name}</span>
+                    <Pill bg={C.cardBg}>{post.tier}</Pill>
+                  </div>
+                </div>
+                <Pill icon={<Icon name={post.tag.icon} size={10} color={C.textBody} />} bg={C.white}>{post.tag.label}</Pill>
+              </div>
+              {post.photo && (
+                <div style={{ aspectRatio: '4/5', borderRadius: 10, background: post.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 46, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))' }}>{post.emoji}</span>
+                </div>
+              )}
+              <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>{post.body}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>{post.time}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <span style={{ ...fw(500), fontSize: 12, color: C.text }}>{post.saves}</span>
+                  <div style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name="bookmark" size={14} color={C.textMuted} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filter === 'Trending' ? (
+        <div style={{ padding: '16px 16px 32px' }}>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, scrollbarWidth: 'none' }}>
+            {['Bridal', 'Natural Glow', 'Bold & Glam', 'Summer', 'Streaks'].map(t => {
+              const on = theme === t
+              return (
+                <motion.button key={t} whileTap={{ scale: 0.94 }} onClick={() => setTheme(t)}
+                  style={{ flexShrink: 0, height: 32, padding: '0 16px', borderRadius: 20, border: `1px solid ${on ? C.text : C.border}`, background: on ? C.text : 'transparent', ...fw(on ? 600 : 400), fontSize: 13, color: on ? C.white : C.textBody, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  {t}
+                </motion.button>
+              )
+            })}
+          </div>
+          <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, marginBottom: 14 }}>{THEME_DATA[theme].desc}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {THEME_DATA[theme].posts.map((p, j) => (
+              <motion.div key={j} whileTap={{ scale: 0.97 }} style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden', cursor: 'pointer' }}>
+                <div style={{ height: 130, background: p.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 32, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.12))' }}>{p.emoji}</span>
+                </div>
+                <div style={{ padding: '8px 10px 10px' }}>
+                  <p style={{ ...fw(500), fontSize: 12, color: C.text, marginBottom: 4 }}>{p.name}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    {theme === 'Streaks' ? (
+                      <>
+                        <Icon name="flame" size={10} color={C.textMuted} />
+                        <span style={{ ...fw(500), fontSize: 11, color: C.textMuted }}>{p.streakDays} days</span>
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="bookmark" size={10} color={C.textMuted} />
+                        <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{p.saves}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {posts.map((post, i) => [
+            <div key={`post-${i}`} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <Avatar initial={post.initial} size={32} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <motion.span whileTap={{ opacity: 0.6 }} onClick={() => onAdvocateOpen(post)} style={{ ...fw(700), fontSize: 14, color: C.text, cursor: 'pointer' }}>{post.name}</motion.span>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <Pill bg={C.cardBg}>{post.tier}</Pill>
+                      {post.role && <Pill bg={C.white}>{post.role}</Pill>}
+                    </div>
+                  </div>
+                </div>
+                <Pill icon={<Icon name={post.tag.icon} size={10} color={C.textBody} />} bg={C.white}>{post.tag.label}</Pill>
+              </div>
+              {post.photo && (
+                <div style={{ aspectRatio: '4/5', borderRadius: 10, background: post.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 46, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))' }}>{post.emoji}</span>
+                </div>
+              )}
+              <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>{post.body}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>{post.time}</span>
+                  {post.tag.label === 'Question' && (
+                    <motion.button whileTap={{ scale: 0.94 }} onClick={() => onReplyOpen(post)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 4, height: 26, padding: '0 10px', borderRadius: 100, border: `1px solid ${C.border}`, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', ...fw(500), fontSize: 12, color: C.textBody }}>
+                      <Icon name="messageSquare" size={11} color={C.textBody} />
+                      Reply
+                    </motion.button>
+                  )}
+                  {post.tag.label === 'Challenge' && (
+                    <motion.button whileTap={{ scale: 0.94 }} onClick={() => onRemixOpen(post)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 4, height: 26, padding: '0 10px', borderRadius: 100, border: `1px solid ${C.border}`, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', ...fw(500), fontSize: 12, color: C.textBody }}>
+                      <Icon name="scissors" size={11} color={C.textBody} />
+                      Remix
+                    </motion.button>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <span style={{ ...fw(500), fontSize: 12, color: C.text }}>{post.saves + (saved[i] ? 1 : 0)}</span>
+                  <motion.button whileTap={{ scale: 0.82 }} onClick={() => setSaved(prev => prev.map((v, idx) => idx === i ? !v : v))} style={{ width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name={saved[i] ? 'bookmarkFilled' : 'bookmark'} size={14} color={saved[i] ? C.text : C.textMuted} />
+                  </motion.button>
+                </div>
+              </div>
+            </div>,
+            (i === 0 || i === 3) && (
+              <div key={`similar-${i}`} style={{ margin: '0 -16px' }}>
+                <p style={{ ...fw(500), fontSize: 13, color: C.textMuted, margin: '0 0 10px 16px' }}>More like this</p>
+                <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
+                  {SIMILAR_POSTS_DATA.map((sp, j) => (
+                    <motion.div key={j} whileTap={{ scale: 0.97 }} style={{ flexShrink: 0, width: 120, borderRadius: 10, border: `1px solid ${C.border}`, overflow: 'hidden', cursor: 'pointer' }}>
+                      <div style={{ aspectRatio: '4/5', background: sp.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: 26 }}>{sp.emoji}</span>
+                      </div>
+                      <div style={{ padding: '7px 9px 9px' }}>
+                        <p style={{ ...fw(400), fontSize: 11, color: C.textBody, lineHeight: '15px', margin: '0 0 5px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{sp.body}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <Icon name="bookmark" size={10} color={C.textMuted} />
+                          <span style={{ ...fw(500), fontSize: 10, color: C.textMuted }}>{sp.saves}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            ),
+            i === 1 && (
+              <div key="community-hero" style={{ background: 'rgba(66,66,66,0.04)', borderRadius: 12, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <Avatar initial={COMMUNITY_HERO.initial} size={40} />
+                  <div style={{ position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, background: C.lime, borderRadius: '50%', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name="star" size={8} color={C.text} strokeWidth={2.5} />
+                  </div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ ...fw(500), fontSize: 10, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 3px' }}>Community Hero · This week</p>
+                  <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: '0 0 3px' }}>{COMMUNITY_HERO.name}</p>
+                  <p style={{ ...fw(400), fontSize: 13, color: C.textBody, margin: '0 0 10px', lineHeight: '18px' }}>{COMMUNITY_HERO.reason}</p>
+                  <motion.button whileTap={{ scale: 0.94 }} style={{ display: 'flex', alignItems: 'center', gap: 5, height: 28, padding: '0 12px', borderRadius: 100, border: `1px solid ${C.border}`, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', ...fw(500), fontSize: 12, color: C.textBody }}>
+                    See their posts
+                    <Icon name="arrowRight" size={11} color={C.textBody} />
+                  </motion.button>
+                </div>
+              </div>
+            ),
+            i === 4 && <CreatorsYouMightLike key="creators" />,
+          ])}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── CONTENT ANALYSER SCREEN ───────────────────────────
+
+function ContentAnalyserScreen({ onBack }) {
+  const [step, setStep] = useState(0) // 0: input, 1: loading, 2: results
+  const [media, setMedia] = useState(null)
+  const [mediaType, setMediaType] = useState(null)
+  const [caption, setCaption] = useState('')
+  const fileRef = useRef(null)
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setMediaType(file.type.startsWith('video') ? 'video' : 'image')
+    const reader = new FileReader()
+    reader.onload = ev => setMedia(ev.target.result)
+    reader.readAsDataURL(file)
+  }
+
+  const handleAnalyse = () => {
+    setStep(1)
+    setTimeout(() => setStep(2), 2200)
+  }
+
+  const goBack = () => {
+    if (step === 0) onBack()
+    else setStep(0)
+  }
+
+  const Header = () => (
+    <div style={{ height: 52, borderBottom: `1px solid ${C.borderLight}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0, background: C.white }}>
+      <motion.button whileTap={{ scale: 0.88 }} onClick={goBack} style={{ position: 'absolute', left: 12, width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={18} color={C.textBody} />
+      </motion.button>
+      <span style={{ ...fw(500), fontSize: 15, color: C.text }}>Analyse content</span>
+    </div>
+  )
+
+  if (step === 1) return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <Header />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '0 40px' }}>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {[0, 1, 2].map(i => (
+            <motion.div key={i} animate={{ opacity: [0.3, 1, 0.3], y: [0, -6, 0] }} transition={{ duration: 0.9, delay: i * 0.18, repeat: Infinity }} style={{ width: 8, height: 8, borderRadius: '50%', background: C.text }} />
+          ))}
+        </div>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, textAlign: 'center' }}>Analysing your content…</p>
+      </div>
+    </div>
+  )
+
+  if (step === 2) {
+    const RECS = [
+      { icon: 'clock',        category: 'Hook',            title: 'Strengthen your opening',       body: 'Viewers decide within 3 seconds. Start with the product in action or a bold statement — not a wide establishing shot.' },
+      { icon: 'pencilRuler',  category: 'Caption',         title: 'Name the product specifically', body: "Mention the exact product and shade. 'Pillow Talk Blush Balm' performs better than generic descriptions in both search and engagement." },
+      { icon: 'sliders',      category: 'Lighting',        title: 'Even out your lighting',        body: 'The left side of the frame is slightly dim. Filming near a window or with a ring light will give a more polished finish.' },
+      { icon: 'flag',         category: 'Discoverability', title: 'Add the required hashtags',     body: '#CharlotteTilbury and #MagicBeautyStars are required for challenge submission. Your caption is missing both.' },
+    ]
+    return (
+      <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '20px 16px 40px' }}>
+
+          {/* Content preview */}
+          <div style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-start' }}>
+            <div style={{ width: 72, height: 72, borderRadius: 10, background: C.cardBg, border: `1px solid ${C.border}`, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {media && mediaType === 'image' && <img src={media} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+              {media && mediaType === 'video' && <Icon name="video" size={24} color={C.textMuted} />}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ ...fw(500), fontSize: 13, color: C.text, margin: '0 0 4px' }}>Your content</p>
+              <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, lineHeight: '19px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
+                {caption || 'No caption added'}
+              </p>
+            </div>
+          </div>
+
+          {/* Recommendations */}
+          <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>{RECS.length} suggestions</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+            {RECS.map((rec, i) => (
+              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                    <Icon name={rec.icon} size={14} color={C.textBody} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ ...fw(500), fontSize: 11, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 3 }}>{rec.category}</span>
+                    <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 4px' }}>{rec.title}</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{rec.body}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Music check */}
+          <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>Music check</p>
+          <div style={{ border: '1px solid rgba(249,115,22,0.3)', borderRadius: 12, padding: 14, background: 'rgba(249,115,22,0.04)' }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                <Icon name="music" size={14} color="#f97316" />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                  <span style={{ ...fw(600), fontSize: 14, color: C.text }}>Flowers — Miley Cyrus</span>
+                  <span style={{ ...fw(600), fontSize: 11, color: '#f97316', background: 'rgba(249,115,22,0.1)', padding: '2px 8px', borderRadius: 20, flexShrink: 0 }}>Copyrighted</span>
+                </div>
+                <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>Not cleared for commercial use. Switch to a royalty-free track to avoid your content being muted or removed.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <Header />
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div>
+          <p style={{ ...fw(400), fontSize: 22, color: C.text, lineHeight: '30px', margin: '0 0 6px' }}>Analyse your content</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, lineHeight: '20px', margin: 0 }}>Upload your post and caption. We'll flag improvements and check for copyright issues before you submit.</p>
+        </div>
+
+        <input type="file" accept="image/*,video/*" ref={fileRef} style={{ display: 'none' }} onChange={handleFileChange} />
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={() => fileRef.current?.click()}
+          style={{ width: '100%', height: 180, border: `1px dashed ${media ? 'transparent' : C.border}`, borderRadius: 14, background: media ? 'transparent' : C.cardBg, cursor: 'pointer', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, position: 'relative', fontFamily: 'inherit' }}
+        >
+          {media && mediaType === 'image' && (
+            <img src={media} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: 14 }} />
+          )}
+          {media && mediaType === 'video' && (
+            <div style={{ position: 'absolute', inset: 0, background: C.cardBg, borderRadius: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <Icon name="video" size={28} color={C.textMuted} />
+              <span style={{ ...fw(400), fontSize: 13, color: C.textMuted, fontFamily: 'inherit' }}>Video selected</span>
+            </div>
+          )}
+          {!media && (
+            <>
+              <div style={{ width: 40, height: 40, borderRadius: 10, border: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                  <line x1="12" y1="19" x2="12" y2="5" stroke={C.textMuted} strokeWidth={1.5} strokeLinecap="round" />
+                  <polyline points="5,12 12,5 19,12" stroke={C.textMuted} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <span style={{ ...fw(400), fontSize: 14, color: C.textMuted, fontFamily: 'inherit' }}>Upload photo or video</span>
+              <span style={{ ...fw(400), fontSize: 12, color: C.textPlaceholder, fontFamily: 'inherit' }}>MP4, MOV, JPG, PNG</span>
+            </>
+          )}
+          {media && (
+            <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(0,0,0,0.55)', borderRadius: 8, padding: '4px 10px' }}>
+              <span style={{ ...fw(500), fontSize: 12, color: C.white }}>Tap to change</span>
+            </div>
+          )}
+        </motion.button>
+
+        <textarea
+          value={caption}
+          onChange={e => setCaption(e.target.value)}
+          placeholder="Paste your caption here…"
+          style={{ width: '100%', height: 100, border: `1px solid ${caption ? C.text : C.border}`, borderRadius: 10, padding: '12px 14px', fontSize: 15, color: C.text, fontFamily: 'inherit', resize: 'none', outline: 'none', lineHeight: '22px', background: C.white, display: 'block', boxSizing: 'border-box' }}
+        />
+
+        <PrimaryButton onClick={handleAnalyse} disabled={!media}>Analyse content</PrimaryButton>
+      </div>
+    </div>
+  )
+}
+
+// ── REMIX SCREEN ──────────────────────────────────────
+
+function RemixScreen({ onBack }) {
+  const [step, setStep] = useState(0) // 0: input, 1: loading, 2: results
+  const [url, setUrl] = useState('')
+
+  const handleFind = () => {
+    setStep(1)
+    setTimeout(() => setStep(2), 2000)
+  }
+
+  const goBack = () => {
+    if (step === 0) onBack()
+    else setStep(0)
+  }
+
+  const Header = () => (
+    <div style={{ height: 52, borderBottom: `1px solid ${C.borderLight}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0, background: C.white }}>
+      <motion.button whileTap={{ scale: 0.88 }} onClick={goBack} style={{ position: 'absolute', left: 12, width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={18} color={C.textBody} />
+      </motion.button>
+      <span style={{ ...fw(500), fontSize: 15, color: C.text }}>Remix content</span>
+    </div>
+  )
+
+  if (step === 1) return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <Header />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '0 40px' }}>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {[0, 1, 2].map(i => (
+            <motion.div key={i} animate={{ opacity: [0.3, 1, 0.3], y: [0, -6, 0] }} transition={{ duration: 0.9, delay: i * 0.18, repeat: Infinity }} style={{ width: 8, height: 8, borderRadius: '50%', background: C.text }} />
+          ))}
+        </div>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, textAlign: 'center' }}>Finding content…</p>
+      </div>
+    </div>
+  )
+
+  if (step === 2) {
+    const IDEAS = [
+      { icon: 'sliders',      title: 'Your setting',        body: "They filmed in a studio — try natural window light or an outdoor setting. A different backdrop makes your version instantly distinct." },
+      { icon: 'person',       title: 'Your skin tone',      body: 'Show the same products on your complexion. Shade comparisons are high-value for audiences who struggle to find their match.' },
+      { icon: 'arrowRight',   title: 'Before vs after',     body: "Restructure as a transformation reveal instead of a walkthrough. The payoff moment gets significantly more replays." },
+      { icon: 'clock',        title: 'Speed-run version',   body: "Recreate their routine in under 60 seconds. '3-minute Charlotte Tilbury get-ready' outperforms longer tutorials in completion rate." },
+    ]
+    return (
+      <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '20px 16px 40px' }}>
+
+          {/* Original post card */}
+          <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>Original post</p>
+          <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, marginBottom: 24 }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.cardBg, border: `1px solid ${C.border}`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="person" size={16} color={C.textMuted} />
+              </div>
+              <div>
+                <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>@beautybyella</p>
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>47.2K views · 3 days ago</p>
+              </div>
+            </div>
+            <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>
+              My everyday Charlotte Tilbury routine ✨ The Pillow Talk look never gets old. #MagicBeautyStars #CharlotteTilbury
+            </p>
+          </div>
+
+          {/* Remix ideas */}
+          <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>4 ways to remix this</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {IDEAS.map((idea, i) => (
+              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                    <Icon name={idea.icon} size={14} color={C.textBody} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 4px' }}>{idea.title}</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{idea.body}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <Header />
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div>
+          <p style={{ ...fw(400), fontSize: 22, color: C.text, lineHeight: '30px', margin: '0 0 6px' }}>Remix content</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, lineHeight: '20px', margin: 0 }}>Paste a link to another creator's post. We'll suggest ways to put your own spin on it.</p>
+        </div>
+
+        <div>
+          <input
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            placeholder="Paste a TikTok or Instagram URL…"
+            style={{ width: '100%', height: 48, border: `1px solid ${url ? C.text : C.border}`, borderRadius: 10, padding: '0 14px', fontSize: 15, color: C.text, fontFamily: 'inherit', outline: 'none', background: C.white, boxSizing: 'border-box' }}
+          />
+        </div>
+
+        <div>
+          <p style={{ ...fw(500), fontSize: 13, color: C.textMuted, margin: '0 0 10px' }}>Or choose from trending posts</p>
+          {[
+            { handle: '@beautybyella',   caption: 'My everyday Charlotte Tilbury routine ✨', views: '47.2K' },
+            { handle: '@glossandglow',   caption: 'Pillow Talk everything — the full collection', views: '31.8K' },
+            { handle: '@makeupwithrose', caption: 'Charlotte Tilbury morning glow in 5 mins',    views: '28.4K' },
+          ].map((post, i) => (
+            <motion.button
+              key={i}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => { setUrl(post.handle); handleFind() }}
+              style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, background: C.white, cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, fontFamily: 'inherit', textAlign: 'left' }}
+            >
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.cardBg, border: `1px solid ${C.border}`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="person" size={16} color={C.textMuted} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: '0 0 2px' }}>{post.handle}</p>
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.caption}</p>
+              </div>
+              <span style={{ ...fw(400), fontSize: 12, color: C.textMuted, flexShrink: 0 }}>{post.views}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        <PrimaryButton onClick={handleFind} disabled={!url.trim()}>Find content</PrimaryButton>
+      </div>
+    </div>
+  )
+}
+
 // ── TAB: STUDIO ───────────────────────────────────────
 
-function StudioTab({ onMenuOpen, onChallengeCreate }) {
+function StudioTab({ onMenuOpen, onWalletOpen, onChallengeCreate, onContentAnalyse, onRemix, savedRemixes }) {
   const [tab, setTab] = useState('New Project')
   const cards = [
-    { label: 'Analyse my content for a challenge',    action: null },
+    { label: 'Analyse my content for a challenge',    action: onContentAnalyse },
     { label: 'I have an idea for a new challenge/content', action: onChallengeCreate },
-    { label: "Remix someone else's content",          action: null },
+    { label: "Remix someone else's content",          action: onRemix },
   ]
   return (
     <div>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, borderBottom: `1px solid ${C.borderLight}` }}>
-        <TopNav onMenuOpen={onMenuOpen} />
+        <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
       </div>
       <div style={{ padding: '20px 16px 32px' }}>
         <p style={{ ...fw(400), fontSize: 22, color: C.text, marginBottom: 16 }}>Studio</p>
@@ -849,15 +1856,58 @@ function StudioTab({ onMenuOpen, onChallengeCreate }) {
             <motion.button key={t} whileTap={{ scale: 0.94 }} onClick={() => setTab(t)} style={{ height: 32, padding: '0 16px', borderRadius: 20, border: `1px solid ${tab === t ? C.text : C.border}`, background: tab === t ? C.text : 'transparent', ...fw(tab === t ? 600 : 400), fontSize: 13, color: tab === t ? C.white : C.textBody, cursor: 'pointer' }}>{t}</motion.button>
           ))}
         </div>
-        <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px', marginBottom: 6 }}>Let's start creating</p>
-        <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, marginBottom: 24 }}>Open a new project and jump in</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {cards.map(({ label, action }, i) => (
-            <motion.button key={i} whileTap={{ scale: 0.97 }} onClick={action || undefined} style={{ width: '100%', height: 160, border: `1px solid ${C.border}`, borderRadius: 14, background: C.white, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
-              <span style={{ ...fw(400), fontSize: 16, color: C.text, textAlign: 'center', lineHeight: '24px' }}>{label}</span>
-            </motion.button>
-          ))}
-        </div>
+        {tab === 'New Project' ? (
+          <>
+            <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px', marginBottom: 6 }}>Let's start creating</p>
+            <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, marginBottom: 24 }}>Open a new project and jump in</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {cards.map(({ label, action }, i) => (
+                <motion.button key={i} whileTap={{ scale: 0.97 }} onClick={action || undefined} style={{ width: '100%', height: 160, border: `1px solid ${C.border}`, borderRadius: 14, background: C.white, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
+                  <span style={{ ...fw(400), fontSize: 16, color: C.text, textAlign: 'center', lineHeight: '24px' }}>{label}</span>
+                </motion.button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px', marginBottom: 6 }}>My projects</p>
+            {savedRemixes.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', gap: 10 }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
+                  <Icon name="scissors" size={20} color={C.textMuted} />
+                </div>
+                <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: 0 }}>No projects yet</p>
+                <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, textAlign: 'center', margin: 0, lineHeight: '20px' }}>Save a remix idea from the community to find it here.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
+                {savedRemixes.map((r, i) => (
+                  <motion.button key={i} whileTap={{ scale: 0.98 }}
+                    style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 14, padding: 14, background: C.white, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+                      <Avatar initial={r.authorInitial} size={32} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: '0 0 3px' }}>{r.authorName}</p>
+                        <Pill bg={C.cardBg}>{r.authorTier}</Pill>
+                      </div>
+                      <span style={{ ...fw(400), fontSize: 11, color: C.textMuted, flexShrink: 0 }}>{r.savedAt}</span>
+                    </div>
+                    {r.photo && (
+                      <div style={{ height: 80, borderRadius: 8, background: r.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                        <span style={{ fontSize: 28 }}>{r.emoji}</span>
+                      </div>
+                    )}
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{r.body}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Icon name="scissors" size={12} color={C.textMuted} />
+                      <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>4 remix ideas</span>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   )
@@ -998,12 +2048,12 @@ function RewardsContent() {
   )
 }
 
-function ProgressTab({ onMenuOpen }) {
+function ProgressTab({ onMenuOpen, onWalletOpen }) {
   const [subTab, setSubTab] = useState('Progress')
   return (
     <div>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
-        <TopNav onMenuOpen={onMenuOpen} />
+        <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
         <div style={{ padding: '0 16px 12px', display: 'flex', gap: 20 }}>
           {['Progress', 'Rewards'].map(t => (
             <motion.button key={t} whileTap={{ scale: 0.96 }} onClick={() => setSubTab(t)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 2px', ...fw(subTab === t ? 700 : 400), fontSize: 16, color: subTab === t ? C.text : C.textMuted, borderBottom: `2px solid ${subTab === t ? C.text : 'transparent'}` }}>{t}</motion.button>
@@ -1092,6 +2142,59 @@ function OnboardingCommunityScreen({ onNext }) {
   )
 }
 
+function OnboardingDisplayNameScreen({ firstName, onNext }) {
+  const [name, setName] = useState(firstName || '')
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', padding: '0 24px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 32 }}>
+        <p style={{ ...fw(700), fontSize: 26, color: C.text, lineHeight: '34px', margin: 0 }}>
+          What should the community call you?
+        </p>
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          style={{
+            width: '100%', height: 52, borderRadius: 8,
+            border: `1px solid ${name ? C.text : C.border}`,
+            padding: '0 16px', ...fw(400), fontSize: 17,
+            color: C.text, background: C.white, boxSizing: 'border-box',
+            outline: 'none', fontFamily: 'inherit',
+          }}
+        />
+      </div>
+      <div style={{ paddingBottom: 52 }}>
+        <PrimaryButton onClick={() => name.trim() && onNext(name.trim())} disabled={!name.trim()}>
+          Continue
+        </PrimaryButton>
+      </div>
+    </div>
+  )
+}
+
+function OnboardingMarkScreen({ onNext }) {
+  useEffect(() => {
+    const t = setTimeout(onNext, 2500)
+    return () => clearTimeout(t)
+  }, []) // eslint-disable-line
+
+  return (
+    <div style={{ width: 390, height: 844, background: C.text, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, textAlign: 'center', padding: '0 40px', animation: 'ob-fade-up 0.65s 0.3s ease-out both' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="check" size={28} color={C.white} strokeWidth={2.5} />
+        </div>
+        <p style={{ ...fw(500), fontSize: 28, color: C.white, letterSpacing: '-0.5px', lineHeight: 1.2, margin: 0 }}>
+          You just made your mark.
+        </p>
+        <p style={{ ...fw(400), fontSize: 16, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 240, margin: 0 }}>
+          The community can see it. You'll hear back soon.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function OnboardingLandingScreen({ onNext }) {
   useEffect(() => {
     const t = setTimeout(onNext, 2500)
@@ -1133,8 +2236,7 @@ function OnboardingFrequencyScreen({ onNext }) {
   ]
   return (
     <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
-      <SignupLogoArea />
-      <div style={{ position: 'absolute', top: 192, left: 16, right: 16 }}>
+      <div style={{ position: 'absolute', top: 100, left: 16, right: 16 }}>
         <p style={{ ...fw(700), fontSize: 20, color: C.text, marginBottom: 28, lineHeight: '28px', textAlign: 'center' }}>How often can you show up?</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
           {options.map((opt, i) => (
@@ -1211,13 +2313,14 @@ function OnboardingTiersScreen({ onNext }) {
 }
 
 function OnboardingNotificationsScreen({ onNext }) {
+  const [showDialog, setShowDialog] = useState(false)
   const benefits = [
     ['replyIcon',     'Find out when Charlotte Tilbury reshares your content'],
     ['messageSquare', 'Hear when your community replies to your posts'],
     ['gift',          'Get notified when you unlock something new.'],
   ]
   return (
-    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 52, overflow: 'hidden' }}>
 
         {/* Phone mockup + notification card */}
@@ -1269,7 +2372,7 @@ function OnboardingNotificationsScreen({ onNext }) {
 
       {/* CTAs */}
       <div style={{ padding: '0 20px 48px', flexShrink: 0 }}>
-        <PrimaryButton onClick={onNext}>Turn on notifications</PrimaryButton>
+        <PrimaryButton onClick={() => setShowDialog(true)}>Turn on notifications</PrimaryButton>
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={onNext}
@@ -1278,6 +2381,42 @@ function OnboardingNotificationsScreen({ onNext }) {
           I'll check back manually
         </motion.button>
       </div>
+
+      {/* iOS system permission dialog */}
+      <AnimatePresence>
+        {showDialog && (
+          <motion.div
+            key="ios-dialog"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}
+          >
+            <motion.div
+              initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.88, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+              style={{ width: 270, background: 'rgba(242,242,247,0.99)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.32)' }}
+            >
+              <div style={{ padding: '20px 16px 16px', textAlign: 'center' }}>
+                <p style={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 17, color: '#000', lineHeight: '22px', margin: '0 0 6px' }}>
+                  "Charlotte Tilbury" Would Like to Send You Notifications
+                </p>
+                <p style={{ fontFamily: 'inherit', fontWeight: 400, fontSize: 13, color: '#3c3c43', lineHeight: '18px', margin: 0 }}>
+                  We'll notify you when a challenge drops, Charlotte Tilbury reshares your content, or you unlock something new.
+                </p>
+              </div>
+              <div style={{ height: 0.5, background: 'rgba(60,60,67,0.29)' }} />
+              <div style={{ display: 'flex', height: 44 }}>
+                <button onClick={onNext} style={{ flex: 1, background: 'none', border: 'none', borderRight: '0.5px solid rgba(60,60,67,0.29)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 17, fontWeight: 400, color: '#007AFF' }}>
+                  Don't Allow
+                </button>
+                <button onClick={onNext} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 17, fontWeight: 600, color: '#007AFF' }}>
+                  Allow
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -1529,7 +2668,7 @@ function ChallengeCreationScreen({ onBack }) {
                     <span style={{ ...fw(600), fontSize: 12, color: C.textBody }}>2</span>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: '0 0 8px', lineHeight: '20px' }}>Tag products and share affiliate links to earn credits and commission</p>
+                    <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: '0 0 8px', lineHeight: '20px' }}>Tag products and share affiliate links to earn points and commission</p>
                     <div style={{ height: 40, border: `1px solid ${C.border}`, borderRadius: 8, display: 'flex', alignItems: 'center', padding: '0 12px' }}>
                       <Icon name="search" size={14} color={C.textPlaceholder} />
                       <span style={{ ...fw(400), fontSize: 14, color: C.textPlaceholder, marginLeft: 8 }}>Start typing to search...</span>
@@ -1586,7 +2725,7 @@ function ChallengeCreationScreen({ onBack }) {
 
 // ── SIDE DRAWER ───────────────────────────────────────
 
-function SideDrawer({ onClose }) {
+function SideDrawer({ onClose, photo }) {
   const communities = ['Charlotte Tilbury', 'Huda Beauty', "Paula's Choice"]
   return (
     <motion.div
@@ -1608,7 +2747,7 @@ function SideDrawer({ onClose }) {
       >
         <div style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 48 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Avatar initial="Z" size={48} />
+            <Avatar initial="Z" size={48} photo={photo} />
             <span style={{ ...fw(400), fontSize: 18, color: C.text }}>Zara Ahmed</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1641,19 +2780,323 @@ function SideDrawer({ onClose }) {
   )
 }
 
+// ── INTRO SHEET ───────────────────────────────────────
+
+function IntroSheet({ onSetProfilePhoto, onPost }) {
+  const [sentence, setSentence] = useState('')
+  const [localPhoto, setLocalPhoto] = useState(null)
+  const fileRef = useRef(null)
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      setLocalPhoto(ev.target.result)
+      onSetProfilePhoto(ev.target.result)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  return (
+    <>
+      <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
+      <p style={{ ...fw(700), fontSize: 20, color: C.text, lineHeight: '28px', margin: '0 0 20px' }}>
+        One last thing — this one's for the community, not us.
+      </p>
+      <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 8px' }}>Finish this:</p>
+      <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 14, marginBottom: 16 }}>
+        <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '22px', margin: '0 0 8px' }}>
+          The first CT product I ever tried was
+        </p>
+        <input
+          value={sentence}
+          onChange={e => setSentence(e.target.value)}
+          placeholder="the Pillow Talk lipstick..."
+          style={{ width: '100%', border: 'none', borderBottom: `1px solid ${C.border}`, padding: '4px 0', fontSize: 14, color: C.text, fontFamily: 'inherit', background: 'transparent', outline: 'none', marginBottom: 8, display: 'block', boxSizing: 'border-box' }}
+        />
+        <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '22px', margin: 0 }}>
+          and I've never looked back.
+        </p>
+      </div>
+      <input type="file" accept="image/*" ref={fileRef} style={{ display: 'none' }} onChange={handleFileChange} />
+      <motion.button
+        whileTap={{ scale: 0.98 }}
+        onClick={() => fileRef.current?.click()}
+        style={{ width: '100%', height: 84, border: `1px dashed ${localPhoto ? 'transparent' : C.border}`, borderRadius: 10, background: localPhoto ? 'transparent' : C.cardBg, cursor: 'pointer', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontFamily: 'inherit', position: 'relative' }}
+      >
+        {localPhoto
+          ? <img src={localPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <span style={{ ...fw(400), fontSize: 13, color: C.textMuted, textAlign: 'center', padding: '0 24px', lineHeight: '20px' }}>Add a photo with your favourite CT product — or just a selfie</span>
+        }
+      </motion.button>
+      <PrimaryButton onClick={() => onPost(sentence)}>Post now</PrimaryButton>
+    </>
+  )
+}
+
+// ── POINT EARNINGS SCREEN ─────────────────────────────
+
+function PointEarningsScreen({ onBack }) {
+  const [period, setPeriod] = useState('30d')
+
+  const PERIODS = [
+    { key: '7d',  label: '7 days'  },
+    { key: '30d', label: '30 days' },
+    { key: '90d', label: '90 days' },
+    { key: 'all', label: 'All time' },
+  ]
+
+  const SECTIONS = [
+    {
+      key: 'completions',
+      title: 'Challenge Completions',
+      totalValue: '345 points',
+      totalDelta: '+24.5%',
+      rows: [
+        { icon: 'flag',  label: 'Challenge Completions', value: '12' },
+      ],
+      cta: 'See Completed Challenges',
+    },
+    {
+      key: 'performance',
+      title: 'Challenge Performance',
+      totalValue: '150 points',
+      totalDelta: '+18.2%',
+      rows: [
+        { icon: 'video', label: 'Post Views',  value: '7,593' },
+        { icon: 'heart', label: 'Engagement',  value: '7,593' },
+      ],
+      cta: 'See Challenge Performance',
+    },
+    {
+      key: 'storefront',
+      title: 'Storefront',
+      totalValue: '150 points',
+      totalDelta: '+11.0%',
+      rows: [
+        { icon: 'package', label: 'Products Sold',    value: '75' },
+        { icon: 'search',  label: 'Storefront Views', value: '7,593' },
+      ],
+      cta: 'See Top Selling Content',
+    },
+    {
+      key: 'referrals',
+      title: 'Referrals',
+      totalValue: '150 points',
+      totalDelta: '+32.1%',
+      rows: [
+        { icon: 'users', label: 'Signups', value: '5' },
+      ],
+      cta: 'See Referrals',
+    },
+    {
+      key: 'affiliate',
+      title: 'Affiliate Link Earnings',
+      totalValue: '150 points',
+      totalDelta: '+9.7%',
+      rows: [
+        { icon: 'package', label: 'Products Sold', value: '75' },
+        { icon: 'link',    label: 'Link Clicks',   value: '4,800' },
+      ],
+      cta: null,
+    },
+  ]
+
+  return (
+    <motion.div
+      initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      style={{ position: 'absolute', inset: 0, background: C.white, zIndex: 30, display: 'flex', flexDirection: 'column' }}
+    >
+      {/* Sticky header: title row + period picker row */}
+      <div style={{ flexShrink: 0, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
+        <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ position: 'absolute', left: 12, width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="arrowLeft" size={18} color={C.textBody} />
+          </motion.button>
+          <span style={{ ...fw(400), fontSize: 16, color: C.text }}>Point Earnings</span>
+        </div>
+        <div style={{ display: 'flex', gap: 6, padding: '0 16px 12px' }}>
+          {PERIODS.map(p => (
+            <motion.button key={p.key} whileTap={{ scale: 0.94 }} onClick={() => setPeriod(p.key)}
+              style={{ height: 30, padding: '0 14px', borderRadius: 20, border: `1px solid ${period === p.key ? C.text : C.border}`, background: period === p.key ? C.text : 'transparent', ...fw(period === p.key ? 600 : 400), fontSize: 13, color: period === p.key ? C.white : C.textBody, cursor: 'pointer', fontFamily: 'inherit' }}>
+              {p.label}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '20px 16px 44px' }}>
+
+        {/* Summary card */}
+        <div style={{ background: C.cardBg, borderRadius: 12, padding: 16, marginBottom: 28 }}>
+          <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: '0 0 6px' }}>Total earned this period</p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
+            <span style={{ ...fw(700), fontSize: 32, color: C.text, lineHeight: 1, letterSpacing: '-0.5px' }}>1,234</span>
+            <span style={{ ...fw(400), fontSize: 14, color: C.textMuted }}>points</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ ...fw(600), fontSize: 13, color: '#22c55e' }}>+24.5%</span>
+            <span style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>·</span>
+            <span style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>$617.00</span>
+          </div>
+        </div>
+
+        {SECTIONS.map((section) => (
+          <div key={section.key} style={{ marginBottom: 28 }}>
+            <p style={{ ...fw(600), fontSize: 16, color: C.text, margin: '0 0 14px' }}>{section.title}</p>
+
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+              {/* Total row — highlighted */}
+              <div style={{ display: 'flex', alignItems: 'center', padding: '12px 14px', gap: 10, background: C.cardBg }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name="starFilled" size={14} color={C.textBody} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: 0 }}>Total earnings</p>
+                  <p style={{ ...fw(500), fontSize: 11, color: '#22c55e', margin: 0 }}>{section.totalDelta}</p>
+                </div>
+                <span style={{ ...fw(700), fontSize: 16, color: C.text, flexShrink: 0 }}>{section.totalValue}</span>
+              </div>
+
+              {/* Metric rows — no delta */}
+              {section.rows.map((row, i) => (
+                <div key={i}>
+                  <div style={{ height: 1, background: C.borderLight }} />
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '12px 14px', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon name={row.icon} size={14} color={C.textBody} />
+                    </div>
+                    <p style={{ ...fw(400), fontSize: 14, color: C.text, margin: 0, flex: 1 }}>{row.label}</p>
+                    <span style={{ ...fw(600), fontSize: 16, color: C.text, flexShrink: 0 }}>{row.value}</span>
+                  </div>
+                </div>
+              ))}
+
+              {/* CTA row — heavier separator to distinguish from data rows */}
+              {section.cta && (
+                <>
+                  <div style={{ height: 1, background: C.border }} />
+                  <motion.button whileTap={{ scale: 0.98 }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 14px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <span style={{ ...fw(600), fontSize: 14, color: C.text }}>{section.cta}</span>
+                    <Icon name="arrowRight" size={16} color={C.textMuted} />
+                  </motion.button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+// ── WALLET BOTTOM SHEET ───────────────────────────────
+
+function WalletBottomSheet({ onClose, onSeeAllEarnings }) {
+  const earningRows = [
+    { icon: 'flag',  label: 'Completed Challenges',  sub: '2 posts approved',  amount: '120.00' },
+    { icon: 'heart', label: 'Challenge Performance', sub: '5,145 post views',  amount: '80.00'  },
+    { icon: 'store', label: 'Storefront',            sub: '13 sales',          amount: '32.40'  },
+    { icon: 'users', label: 'Referrals',             sub: '2 referrals',       amount: '100.00' },
+    { icon: 'link',  label: 'Affiliate Link',        sub: '2 sales',           amount: '100.00' },
+  ]
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 20 }}
+      />
+      <motion.div
+        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+        transition={spring}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 21, maxHeight: '90%', display: 'flex', flexDirection: 'column' }}
+      >
+        <div style={{ flexShrink: 0, padding: '12px 16px 0' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, marginBottom: 8 }}>Your Points</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 6 }}>
+              <Icon name="star" size={26} color={C.text} />
+              <span style={{ ...fw(700), fontSize: 48, color: C.text, lineHeight: 1, letterSpacing: '-1px' }}>1,234</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              <span style={{ ...fw(400), fontSize: 15, color: C.textMuted }}>$617.00</span>
+              <div style={{ width: 18, height: 18, borderRadius: '50%', border: `1.5px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ ...fw(700), fontSize: 10, color: C.textMuted, lineHeight: 1 }}>i</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 16px 44px' }}>
+          <div style={{ border: `1px solid ${C.border}`, borderRadius: 14, marginBottom: 12, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 16px 4px' }}>
+              <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: 0 }}>How You Earned This</p>
+            </div>
+            {earningRows.map((row, i) => (
+              <div key={i}>
+                <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: '50%', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon name={row.icon} size={16} color={C.textBody} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: 0 }}>{row.label}</p>
+                    <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{row.sub}</p>
+                  </div>
+                  <span style={{ ...fw(700), fontSize: 16, color: C.text, flexShrink: 0 }}>{row.amount}</span>
+                </div>
+                <div style={{ height: 1, background: C.borderLight, marginLeft: 66 }} />
+              </div>
+            ))}
+            <motion.button whileTap={{ scale: 0.98 }} onClick={onSeeAllEarnings} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+              <span style={{ ...fw(600), fontSize: 14, color: C.text }}>See all earnings</span>
+              <Icon name="arrowRight" size={16} color={C.textMuted} />
+            </motion.button>
+          </div>
+          {[
+            { symbol: '+', label: 'Redeem as Store Credit', sub: '$617.00' },
+            { symbol: '$', label: 'Cash Out to Bank',       sub: '$617.00' },
+          ].map((action, i) => (
+            <motion.button key={i} whileTap={{ scale: 0.98 }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', border: `1px solid ${C.border}`, borderRadius: 14, background: C.white, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', marginBottom: 10, boxSizing: 'border-box' }}>
+              <div style={{ width: 42, height: 42, borderRadius: '50%', background: C.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ ...fw(700), fontSize: 20, color: C.white, lineHeight: 1 }}>{action.symbol}</span>
+              </div>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <p style={{ ...fw(700), fontSize: 15, color: C.text, margin: '0 0 2px' }}>{action.label}</p>
+                <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: 0 }}>{action.sub}</p>
+              </div>
+              <Icon name="arrowRight" size={16} color={C.textMuted} />
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
 // ── HOME SCREEN ───────────────────────────────────────
 
-function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onChallengeCreate }) {
+function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onChallengeCreate, onContentAnalyse, onRemix, profilePhoto, onSetProfilePhoto, showIntroSheet, onIntroPost, userPost }) {
   const [filterOpen, setFilterOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [walletOpen, setWalletOpen] = useState(false)
+  const [earningsOpen, setEarningsOpen] = useState(false)
+  const [openAdvocate, setOpenAdvocate] = useState(null)
+  const [openReply, setOpenReply] = useState(null)
+  const [openCommunityRemix, setOpenCommunityRemix] = useState(null)
+  const [recognitionOpen, setRecognitionOpen] = useState(false)
+  const [savedRemixes, setSavedRemixes] = useState([])
   const openMenu = () => setMenuOpen(true)
+  const openWallet = () => setWalletOpen(true)
   const renderTab = () => {
     switch (activeTab) {
-      case 'feed':        return <FeedTab onMenuOpen={openMenu} />
-      case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} onMenuOpen={openMenu} onChallengeOpen={onChallengeOpen} />
-      case 'community':   return <CommunityTab onMenuOpen={openMenu} />
-      case 'studio':      return <StudioTab onMenuOpen={openMenu} onChallengeCreate={onChallengeCreate} />
-      case 'progress':    return <ProgressTab onMenuOpen={openMenu} />
+      case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} />
+      case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeOpen={onChallengeOpen} />
+      case 'community':   return <CommunityTab onMenuOpen={openMenu} onWalletOpen={openWallet} onAdvocateOpen={setOpenAdvocate} onReplyOpen={setOpenReply} onRemixOpen={setOpenCommunityRemix} onRecognitionOpen={() => setRecognitionOpen(true)} />
+      case 'studio':      return <StudioTab onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeCreate={onChallengeCreate} onContentAnalyse={onContentAnalyse} onRemix={onRemix} savedRemixes={savedRemixes} />
+      case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} />
       default:            return null
     }
   }
@@ -1686,7 +3129,43 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onChallengeCreate
         {filterOpen && <ChallengesFilterPanel onClose={() => setFilterOpen(false)} />}
       </AnimatePresence>
       <AnimatePresence>
-        {menuOpen && <SideDrawer onClose={() => setMenuOpen(false)} />}
+        {openAdvocate && <AdvocateProfileSheet advocate={openAdvocate} onClose={() => setOpenAdvocate(null)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {openReply && <ReplySheet post={openReply} onClose={() => setOpenReply(null)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {openCommunityRemix && <CommunityRemixSheet post={openCommunityRemix} onClose={() => setOpenCommunityRemix(null)} savedRemixes={savedRemixes} onSave={r => setSavedRemixes(prev => [...prev, r])} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {menuOpen && <SideDrawer onClose={() => setMenuOpen(false)} photo={profilePhoto} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {recognitionOpen && <RecognitionSheet onClose={() => setRecognitionOpen(false)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {walletOpen && <WalletBottomSheet onClose={() => setWalletOpen(false)} onSeeAllEarnings={() => { setWalletOpen(false); setEarningsOpen(true) }} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {earningsOpen && <PointEarningsScreen onBack={() => setEarningsOpen(false)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showIntroSheet && (
+          <div key="intro" style={{ position: 'absolute', inset: 0, zIndex: 50 }}>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)' }}
+            />
+            <motion.div
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={spring}
+              style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', padding: '24px 20px 44px', boxShadow: '0 -8px 40px rgba(0,0,0,0.12)' }}
+            >
+              <IntroSheet onSetProfilePhoto={onSetProfilePhoto} onPost={onIntroPost} />
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   )
@@ -1774,6 +3253,25 @@ function FbIcon() {
   )
 }
 
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  )
+}
+
+function MetaIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M6.5 12c0-2.8 1.6-5 3.2-5 1.1 0 2.1 1 3.3 3.5 1.2-2.5 2.2-3.5 3.3-3.5 1.6 0 3.2 2.2 3.2 5s-1.6 5-3.2 5c-1.1 0-2.1-1-3.3-3.5-1.2 2.5-2.2 3.5-3.3 3.5-1.6 0-3.2-2.2-3.2-5z" fill="#0866FF"/>
+    </svg>
+  )
+}
+
 function SocialInput({ label, required, placeholder, icon, value, onChange }) {
   return (
     <div>
@@ -1804,9 +3302,9 @@ function SignupFooter() {
   )
 }
 
-function SignupLogoArea() {
+function SignupLogoArea({ top = 85 }) {
   return (
-    <div style={{ position: 'absolute', top: 85, left: '50%', transform: 'translateX(-50%)', width: 120, height: 60, background: 'rgba(66,66,66,0.07)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+    <div style={{ position: 'absolute', top, left: '50%', transform: 'translateX(-50%)', width: 120, height: 60, background: 'rgba(66,66,66,0.07)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
       <span style={{ ...fw(600), fontSize: 10, color: 'rgba(66,66,66,0.3)', letterSpacing: 2 }}>LOGO AREA</span>
     </div>
   )
@@ -1826,25 +3324,22 @@ function SignupMotivationScreen({ onNext }) {
       <div style={{ position: 'absolute', top: 192, left: 16, right: 16 }}>
         <p style={{ ...fw(700), fontSize: 24, color: C.text, marginBottom: 28, lineHeight: '32px' }}>What brought you here?</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
-          {options.map((opt, i) => {
-            const interactive = i === 0
-            return (
-              <motion.button key={i}
-                whileTap={interactive ? { scale: 0.985 } : {}}
-                onClick={interactive ? () => setSelected(i) : undefined}
-                style={{
-                  width: '100%', padding: '16px', textAlign: 'left', borderRadius: 8,
-                  cursor: interactive ? 'pointer' : 'default',
-                  border: `${selected === i ? '1.5px' : '1px'} solid ${selected === i ? C.text : C.border}`,
-                  background: C.white, ...fw(400), fontSize: 15, color: interactive ? C.text : C.textMuted,
-                  fontFamily: 'inherit',
-                }}>
-                {opt}
-              </motion.button>
-            )
-          })}
+          {options.map((opt, i) => (
+            <motion.button key={i}
+              whileTap={{ scale: 0.985 }}
+              onClick={() => setSelected(i)}
+              style={{
+                width: '100%', padding: '16px', textAlign: 'left', borderRadius: 8,
+                cursor: 'pointer',
+                border: `${selected === i ? '1.5px' : '1px'} solid ${selected === i ? C.text : C.border}`,
+                background: C.white, ...fw(400), fontSize: 15, color: C.text,
+                fontFamily: 'inherit',
+              }}>
+              {opt}
+            </motion.button>
+          ))}
         </div>
-        <PrimaryButton onClick={() => selected !== null && onNext()} disabled={selected === null}>
+        <PrimaryButton onClick={() => selected !== null && onNext(selected)} disabled={selected === null}>
           Show me what's possible
         </PrimaryButton>
       </div>
@@ -1884,11 +3379,185 @@ function SignupBenefitsScreen({ onNext }) {
   )
 }
 
+function SignupBenefitsGrowthScreen({ onNext, onBack }) {
+  const benefits = [
+    { title: 'Real social proof',        sub: '[Brand] reshares the content you\'re already making.' },
+    { title: 'Watch your reach grow',    sub: 'Every post, tracked. Every result, yours to keep.' },
+    { title: 'An audience that trusts you', sub: 'Because you\'re recommending something you actually love.' },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
+      <SignupLogoArea />
+      <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ position: 'absolute', top: 52, left: 16, width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={20} color={C.text} />
+      </motion.button>
+      <div style={{ position: 'absolute', top: 192, left: 16, right: 16 }}>
+        <p style={{ ...fw(700), fontSize: 24, color: C.text, marginBottom: 28, lineHeight: '32px' }}>
+          Here's how [Brand] helps you grow.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+          {benefits.map((b, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '16px', borderRadius: 8, border: `1px solid ${C.border}` }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(66,66,66,0.1)', flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <p style={{ ...fw(700), fontSize: 15, color: C.text, marginBottom: 4 }}>{b.title}</p>
+                <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, lineHeight: '20px' }}>{b.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <PrimaryButton onClick={onNext}>Continue</PrimaryButton>
+      </div>
+      <SignupFooter />
+    </div>
+  )
+}
+
+function SignupBenefitsCommunityScreen({ onNext, onBack }) {
+  const benefits = [
+    { title: 'A community that gets it',       sub: 'Meet advocates who love [brand] as much as you do — and show up for each other.' },
+    { title: 'Moments worth being part of',    sub: 'Events, launches, and experiences built for the people who care most.' },
+    { title: 'Your voice, amplified',          sub: 'When you speak, [brand] listens — and so does everyone else in here.' },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
+      <SignupLogoArea />
+      <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ position: 'absolute', top: 52, left: 16, width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={20} color={C.text} />
+      </motion.button>
+      <div style={{ position: 'absolute', top: 192, left: 16, right: 16 }}>
+        <p style={{ ...fw(700), fontSize: 24, color: C.text, marginBottom: 28, lineHeight: '32px' }}>
+          You'll find your people here.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+          {benefits.map((b, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '16px', borderRadius: 8, border: `1px solid ${C.border}` }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(66,66,66,0.1)', flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <p style={{ ...fw(700), fontSize: 15, color: C.text, marginBottom: 4 }}>{b.title}</p>
+                <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, lineHeight: '20px' }}>{b.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <PrimaryButton onClick={onNext}>Continue</PrimaryButton>
+      </div>
+      <SignupFooter />
+    </div>
+  )
+}
+
+function SignupBenefitsFriendScreen({ onNext, onBack }) {
+  const benefits = [
+    { title: 'See what your friend already knows', sub: 'This is what it looks like when a brand actually values the people who love it.' },
+    { title: 'Join them in here',                  sub: 'Your friend is already part of this community — now you can be too.' },
+    { title: 'And bring others when you\'re ready', sub: 'The best things spread person to person. You\'ll see why.' },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
+      <SignupLogoArea />
+      <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ position: 'absolute', top: 52, left: 16, width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={20} color={C.text} />
+      </motion.button>
+      <div style={{ position: 'absolute', top: 192, left: 16, right: 16 }}>
+        <p style={{ ...fw(700), fontSize: 24, color: C.text, marginBottom: 28, lineHeight: '32px' }}>
+          Your friend knew what they were doing.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+          {benefits.map((b, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '16px', borderRadius: 8, border: `1px solid ${C.border}` }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(66,66,66,0.1)', flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <p style={{ ...fw(700), fontSize: 15, color: C.text, marginBottom: 4 }}>{b.title}</p>
+                <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, lineHeight: '20px' }}>{b.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <PrimaryButton onClick={onNext}>Continue</PrimaryButton>
+      </div>
+      <SignupFooter />
+    </div>
+  )
+}
+
+function SignupRequirementsScreen({ onNext, onBack }) {
+  const requirements = [
+    'Based in the UK, US, or Europe',
+    '18 years or older',
+    'Public profile on at least one platform',
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
+      <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ position: 'absolute', top: 52, left: 16, width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={20} color={C.text} />
+      </motion.button>
+      <div style={{ position: 'absolute', top: 116, left: 24, right: 24 }}>
+        <p style={{ ...fw(700), fontSize: 26, color: C.text, lineHeight: '34px', marginBottom: 8 }}>Before you start</p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 36 }}>You'll need to meet these requirements to join.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginBottom: 44 }}>
+          {requirements.map((req, i) => (
+            <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name="check" size={14} color={C.white} strokeWidth={2.5} />
+              </div>
+              <span style={{ ...fw(400), fontSize: 16, color: C.text, lineHeight: '22px' }}>{req}</span>
+            </div>
+          ))}
+        </div>
+        <PrimaryButton onClick={onNext}>I meet all of these</PrimaryButton>
+        <motion.button whileTap={{ scale: 0.96 }} onClick={onBack}
+          style={{ width: '100%', marginTop: 18, background: 'none', border: 'none', cursor: 'pointer', ...fw(400), fontSize: 14, color: C.textMuted, fontFamily: 'inherit', padding: '4px 0', textDecoration: 'underline' }}>
+          I don't meet these requirements
+        </motion.button>
+      </div>
+    </div>
+  )
+}
+
+function SignupSSOScreen({ onNext, onBack }) {
+  const [email, setEmail] = useState('')
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const ssoOptions = [
+    { label: 'Continue with Google', icon: <GoogleIcon /> },
+    { label: 'Continue with TikTok', icon: <TikTokIcon /> },
+    { label: 'Continue with Meta',   icon: <MetaIcon /> },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
+      <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ position: 'absolute', top: 52, left: 16, width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={20} color={C.text} />
+      </motion.button>
+      <div style={{ position: 'absolute', top: 116, left: 24, right: 24 }}>
+        <p style={{ ...fw(700), fontSize: 26, color: C.text, lineHeight: '34px', marginBottom: 8 }}>Create your account</p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 32 }}>Choose how you'd like to sign up. Takes about 2 minutes.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+          {ssoOptions.map(({ label, icon }) => (
+            <motion.button key={label} whileTap={{ scale: 0.97 }} onClick={() => onNext('')}
+              style={{ width: '100%', height: 52, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', ...fw(600), fontSize: 15, color: C.text }}>
+              {icon}
+              {label}
+            </motion.button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+          <span style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>or</span>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+        </div>
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address"
+          style={{ width: '100%', height: 52, borderRadius: 12, border: `1px solid ${email ? C.text : C.border}`, padding: '0 16px', ...fw(400), fontSize: 15, color: C.text, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', marginBottom: 12 }} />
+        <PrimaryButton onClick={() => valid && onNext(email)} disabled={!valid}>Continue with email</PrimaryButton>
+      </div>
+      <TermsFooter />
+    </div>
+  )
+}
+
 function SignupBasicInfoScreen({ onNext }) {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const valid = firstName.trim() && lastName.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const valid = firstName.trim() && lastName.trim()
   const inp = { height: 48, borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 14, color: C.text, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', backgroundColor: C.white }
   return (
     <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
@@ -1908,8 +3577,7 @@ function SignupBasicInfoScreen({ onNext }) {
             </div>
             <p style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>Use your legal name. You can add a preferred name later.</p>
           </div>
-          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={{ ...inp, width: '100%', padding: '0 16px' }} />
-          <PrimaryButton onClick={() => valid && onNext({ firstName, lastName, email })} disabled={!valid}>Continue to Details</PrimaryButton>
+          <PrimaryButton onClick={() => valid && onNext({ firstName, lastName })} disabled={!valid}>Continue to Details</PrimaryButton>
         </div>
       </div>
       <TermsFooter />
@@ -2067,7 +3735,7 @@ function SignupQueueScreen() {
         <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(66,66,66,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
           <span style={{ fontSize: 20 }}>🎉</span>
         </div>
-        <p style={{ ...fw(400), fontSize: 22, color: C.text, marginBottom: 12 }}>You're in the queue!</p>
+        <p style={{ ...fw(700), fontSize: 22, color: C.text, marginBottom: 12 }}>You're in the queue!</p>
         <p style={{ ...fw(400), fontSize: 15, color: C.textSecondary, lineHeight: '22px' }}>
           We're reviewing your application and will be in touch within 3–5 business days. Keep an eye on your inbox.
         </p>
@@ -2132,21 +3800,27 @@ function SideNav({ activeIndex, onNavigate }) {
 export default function App() {
   const [screen, setScreen] = useState(0)
   const [dir, setDir] = useState(1)
+  const [slowTransition, setSlowTransition] = useState(false)
   const [email, setEmail] = useState('')
   const [activeTab, setActiveTab] = useState('feed')
   const [signupInfo, setSignupInfo] = useState({ email: '' })
+  const [profilePhoto, setProfilePhoto] = useState(null)
+  const [postSentence, setPostSentence] = useState('')
+  const [showIntroSheet, setShowIntroSheet] = useState(false)
+  const [showMarkScreen, setShowMarkScreen] = useState(false)
 
-  const go = (toScreen, tab = null, forceDir = null) => {
+  const go = (toScreen, tab = null, forceDir = null, slow = false) => {
     if (toScreen !== screen) {
       setDir(forceDir !== null ? forceDir : (toScreen > screen ? 1 : -1))
       setScreen(toScreen)
+      setSlowTransition(slow)
     }
     if (tab !== null) setActiveTab(tab)
   }
 
   const getActiveNavIndex = () => {
-    if (screen === 12 || screen === 13 || screen === 14 || screen === 16 || screen === 17) return 2
-    if (screen === 18) return 6
+    if (screen === 12 || screen === 13 || screen === 14 || screen === 16 || screen === 17 || screen === 19) return 2
+    if (screen === 18 || screen === 25 || screen === 26) return 6
 if (screen >= 4) return 0
     if (screen <= 2) return 1
     if (screen === 3) {
@@ -2160,22 +3834,30 @@ if (screen >= 4) return 0
     <EmailScreen key="email" onNext={(e) => { setEmail(e); go(1) }} />,
     <InboxScreen key="inbox" email={email} onNext={() => go(2)} />,
     <EmailClientScreen key="email-client" onNext={() => go(12)} />,
-    <HomeScreen key="home" activeTab={activeTab} onTabChange={setActiveTab} onChallengeOpen={() => go(15)} onChallengeCreate={() => go(18)} />,
-    <SignupMotivationScreen key="su-motivation" onNext={() => go(5)} />,
-    <SignupBenefitsScreen key="su-benefits" onNext={() => go(6)} />,
-    <SignupBasicInfoScreen key="su-basic" onNext={(info) => { setSignupInfo(info); go(7) }} />,
+    <HomeScreen key="home" activeTab={activeTab} onTabChange={setActiveTab} onChallengeOpen={() => go(15)} onChallengeCreate={() => go(18)} onContentAnalyse={() => go(25)} onRemix={() => go(26)} profilePhoto={profilePhoto} onSetProfilePhoto={setProfilePhoto} showIntroSheet={showIntroSheet} onIntroPost={(s) => { setPostSentence(s); setShowIntroSheet(false); setShowMarkScreen(true) }} userPost={postSentence ? { sentence: postSentence, photo: profilePhoto } : null} />,
+    <SignupMotivationScreen key="su-motivation" onNext={(sel) => ({ 1: () => go(22), 2: () => go(23), 3: () => go(24) }[sel] || (() => go(5)))()} />,
+    <SignupBenefitsScreen key="su-benefits" onNext={() => go(20, null, 1)} />,
+    <SignupBasicInfoScreen key="su-basic" onNext={(info) => { setSignupInfo(prev => ({ ...prev, ...info })); go(7) }} />,
     <SignupDetailsScreen key="su-details" onNext={() => go(8)} />,
     <SignupSocialsScreen key="su-socials" onNext={() => go(9)} />,
     <SignupInboxScreen key="su-inbox" email={signupInfo.email} onOpenEmail={() => go(11)} />,
     <SignupQueueScreen key="su-queue" />,
-    <EmailClientScreen key="su-email-client" onNext={() => go(10)} />,
-    <OnboardingLandingScreen key="ob-landing" onNext={() => go(16)} />,
+    <EmailClientScreen key="su-email-client" onNext={() => go(10, null, 1)} />,
+    <OnboardingLandingScreen key="ob-landing" onNext={() => go(19)} />,
     <OnboardingTiersScreen key="ob-tiers" onNext={() => go(17)} />,
     <OnboardingFrequencyScreen key="ob-frequency" onNext={() => go(13, null, 1)} />,
     <ChallengeDetailScreen key="challenge-detail" onBack={() => go(3, 'challenges')} />,
     <OnboardingCommunityScreen key="ob-community" onNext={() => go(14, null, 1)} />,
-    <OnboardingNotificationsScreen key="ob-notifications" onNext={() => go(3, 'feed')} />,
+    <OnboardingNotificationsScreen key="ob-notifications" onNext={() => { setShowIntroSheet(true); go(3, 'feed', 1, true) }} />,
     <ChallengeCreationScreen key="challenge-create" onBack={() => go(3, 'studio')} />,
+    <OnboardingDisplayNameScreen key="ob-display-name" firstName={signupInfo.firstName || ''} onNext={() => go(16, null, 1)} />,
+    <SignupRequirementsScreen key="su-requirements" onNext={() => go(21)} onBack={() => go(5, null, -1)} />,
+    <SignupSSOScreen key="su-sso" onNext={(e) => { setSignupInfo(prev => ({ ...prev, email: e })); go(6, null, 1) }} onBack={() => go(20, null, -1)} />,
+    <SignupBenefitsGrowthScreen key="su-benefits-growth" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
+    <SignupBenefitsCommunityScreen key="su-benefits-community" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
+    <SignupBenefitsFriendScreen key="su-benefits-friend" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
+    <ContentAnalyserScreen key="content-analyser" onBack={() => go(3, 'studio')} />,
+    <RemixScreen key="remix" onBack={() => go(3, 'studio')} />,
   ]
 
   const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 500
@@ -2204,9 +3886,21 @@ if (screen >= 4) return 0
           flexShrink: 0,
         }}>
           <AnimatePresence initial={false} custom={dir} mode="popLayout">
-            <motion.div key={screen} custom={dir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={spring} style={{ position: 'absolute', inset: 0, background: C.white }}>
+            <motion.div key={screen} custom={dir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={slowTransition ? slowSpring : spring} style={{ position: 'absolute', inset: 0, background: C.white }}>
               {screens[screen]}
             </motion.div>
+          </AnimatePresence>
+          <AnimatePresence>
+            {showMarkScreen && (
+              <motion.div
+                key="mark"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                transition={{ duration: 0.45 }}
+                style={{ position: 'absolute', inset: 0, zIndex: 200 }}
+              >
+                <OnboardingMarkScreen onNext={() => setShowMarkScreen(false)} />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
         {!isMobileViewport && screen < 4 && (
