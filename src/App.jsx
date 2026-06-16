@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const C = {
@@ -74,6 +74,8 @@ function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.5 }) {
     flame:     <path d="M12 2c0 0-5 5-5 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-3 3-1 0-2-1-2-2 0-1 1-2 2-3z" {...s}/>,
     instagram: <><rect x="2" y="2" width="20" height="20" rx="5" {...s}/><circle cx="12" cy="12" r="4" {...s}/><circle cx="17.5" cy="6.5" r="1.2" fill={color} stroke="none"/></>,
     tiktok:    <><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" {...s}/></>,
+    lock:      <><rect x="3" y="11" width="18" height="11" rx="2" {...s}/><path d="M7 11V7a5 5 0 0 1 10 0v4" {...s}/></>,
+    crown:     <><path d="M2 17h20" {...s}/><path d="M4 17L2 6l5.5 4L12 2l4.5 8L22 6l-2 11H4z" {...s}/></>,
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0, display: 'block' }}>
@@ -294,20 +296,66 @@ function EmailClientScreen({ onNext }) {
 
 // ── SCREEN 4 TABS ─────────────────────────────────────
 
-const TABS = [
-  { id: 'feed',       icon: 'house',    label: 'Home'       },
-  { id: 'challenges', icon: 'flag',     label: 'Challenges' },
-  { id: 'community',  icon: 'users',    label: 'Community'  },
-  { id: 'studio',     icon: 'pencilRuler', label: 'Studio'   },
-  { id: 'progress',   icon: 'chart',    label: 'Progress'   },
-]
+const TABS_BY_MODE = {
+  advocate: [
+    { id: 'feed',       icon: 'house',       label: 'Home'       },
+    { id: 'challenges', icon: 'flag',         label: 'Challenges' },
+    { id: 'community',  icon: 'users',        label: 'Community'  },
+    { id: 'studio',     icon: 'pencilRuler',  label: 'Studio'     },
+    { id: 'progress',   icon: 'chart',        label: 'Progress'   },
+  ],
+  loyalty: [
+    { id: 'feed',    icon: 'house',    label: 'Home'    },
+    { id: 'rewards', icon: 'gift',     label: 'Rewards' },
+    { id: 'account', icon: 'person',   label: 'Account' },
+  ],
+  employee: [
+    { id: 'feed',       icon: 'house',       label: 'Home'       },
+    { id: 'challenges', icon: 'flag',         label: 'Challenges' },
+    { id: 'community',  icon: 'users',        label: 'Community'  },
+    { id: 'studio',     icon: 'pencilRuler',  label: 'Studio'     },
+    { id: 'progress',   icon: 'chart',        label: 'Progress'   },
+  ],
+}
 
 // ── TAB: FEED ─────────────────────────────────────────
 
-function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange }) {
+function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode = 'advocate' }) {
   const [bookmarked, setBookmarked] = useState(false)
   const [threadOpen, setThreadOpen] = useState(false)
   const [hearted, setHearted] = useState(false)
+
+  if (mode === 'loyalty') {
+    const loyaltyProducts = [
+      { name: 'Pillow Talk Blush Balm Lip Tint', price: '£24.00', desc: 'Bestseller' },
+      { name: 'Hollywood Flawless Filter 30ml', price: '£46.00', desc: 'New arrival' },
+      { name: "Charlotte's Magic Cream 50ml", price: '£90.00', desc: 'Fan favourite' },
+      { name: 'Airbrush Flawless Foundation', price: '£38.00', desc: 'Top rated' },
+    ]
+    return (
+      <div>
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, borderBottom: `1px solid ${C.borderLight}` }}>
+          <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
+        </div>
+        <div style={{ padding: '20px 16px 32px' }}>
+          <p style={{ ...fw(400), fontSize: 18, color: C.text, lineHeight: '24px', marginBottom: 4 }}>Hi Lea!</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, marginBottom: 24 }}>Recommended for you</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {loyaltyProducts.map((p, i) => (
+              <motion.div key={i} whileTap={{ scale: 0.97 }} style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', background: C.white }}>
+                <div style={{ height: 100, background: C.cardBg, borderRadius: '8px 8px 0 0' }} />
+                <div style={{ padding: '10px 10px 12px' }}>
+                  <p style={{ ...fw(600), fontSize: 13, color: C.text, lineHeight: '18px', marginBottom: 3 }}>{p.name}</p>
+                  <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, marginBottom: 6 }}>{p.desc}</p>
+                  <p style={{ ...fw(600), fontSize: 13, color: C.text }}>{p.price}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -775,16 +823,114 @@ function ChallengeDetailScreen({ onBack }) {
   )
 }
 
+// ── GROUP CHALLENGE DETAIL SCREEN ────────────────────
+
+function GroupChallengeDetailScreen({ onBack }) {
+  const challenge = {
+    title: 'Team Glow Challenge', goal: 15, done: 9, pts: 300, daysLeft: 3,
+    members: [
+      { initial: 'L', name: 'Lea Fontaine',  posts: 3 },
+      { initial: 'S', name: 'Sofia Brennan', posts: 4 },
+      { initial: 'P', name: 'Priya Nair',    posts: 2 },
+    ],
+  }
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+      <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ position: 'absolute', top: 14, left: 16, width: 32, height: 32, border: `1px solid ${C.border}`, borderRadius: 12, background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 2 }}>
+        <Icon name="arrowLeft" size={14} color={C.textBody} />
+      </motion.button>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ height: 193, background: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', borderRadius: '0 0 12px 12px' }}>
+          <span style={{ ...fw(500), fontSize: 16, color: C.text, position: 'absolute', top: 20 }}>Group Challenge</span>
+          <div style={{ display: 'flex' }}>
+            {challenge.members.map((m, i) => (
+              <div key={i} style={{ marginLeft: i > 0 ? -10 : 0, width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,255,255,0.8)', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: challenge.members.length - i }}>
+                <span style={{ ...fw(700), fontSize: 18, color: C.text }}>{m.initial}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(255,255,255,0.92)', borderRadius: 20, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Icon name="starFilled" size={12} color={C.text} />
+            <span style={{ ...fw(700), fontSize: 12, color: C.text }}>{challenge.pts} pts</span>
+          </div>
+        </div>
+        <div style={{ padding: '16px 16px 24px' }}>
+          <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px', marginBottom: 16 }}>{challenge.title}</p>
+          <div style={{ background: C.cardBg, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ ...fw(600), fontSize: 14, color: C.text }}>Group progress</span>
+              <span style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>{challenge.done} / {challenge.goal} posts</span>
+            </div>
+            <div style={{ height: 6, background: C.borderLight, borderRadius: 3, marginBottom: 8 }}>
+              <div style={{ height: '100%', width: `${(challenge.done / challenge.goal) * 100}%`, background: C.text, borderRadius: 3 }} />
+            </div>
+            <span style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>{challenge.daysLeft} days left · You're in this together</span>
+          </div>
+          <p style={{ ...fw(400), fontSize: 15, color: C.text, marginBottom: 12 }}>Your team</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {challenge.members.map((m, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 14px' }}>
+                <Avatar initial={m.initial} size={36} />
+                <span style={{ ...fw(600), fontSize: 14, color: C.text, flex: 1 }}>{m.name}</span>
+                <span style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>{m.posts} post{m.posts !== 1 ? 's' : ''}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div style={{ height: 70, background: C.white, borderTop: `1px solid ${C.borderLight}`, flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+        <motion.button whileTap={{ scale: 0.97 }} style={{ width: '100%', height: 48, border: 'none', borderRadius: 12, background: C.text, ...fw(700), fontSize: 14, color: C.white, cursor: 'pointer', fontFamily: 'inherit' }}>
+          Post to this challenge
+        </motion.button>
+      </div>
+    </div>
+  )
+}
+
 // ── TAB: CHALLENGES ───────────────────────────────────
 
-function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen }) {
-  const [filter, setFilter] = useState('Explore')
+function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen, onGroupChallengeOpen, mode = 'advocate' }) {
+  const [filter, setFilter] = useState(mode === 'employee' ? 'Group' : 'Explore')
   const challenges = [
     { title: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', pts: 120, type: 'Product Review', time: '1h', level: 'Beginner', emoji: '💄', bg: 'linear-gradient(145deg,#faeae4,#e0a090)' },
     { title: 'Hollywood Flawless Filter: 5 Ways to Wear It', pts: 85, type: 'Tutorial', time: '45m', level: 'Intermediate', emoji: '✨', bg: 'linear-gradient(145deg,#f0e8ff,#b498d8)' },
     { title: "Charlotte's Magic Cream: Your 7-Day Skin Test", pts: 200, type: 'Review', time: '2h', level: 'Advanced', emoji: '🌟', bg: 'linear-gradient(145deg,#e8f4e8,#90c890)' },
     { title: 'Airbrush Flawless Foundation First Look', pts: 60, type: 'Product Review', time: '30m', level: 'Beginner', emoji: '🧴', bg: 'linear-gradient(145deg,#fff4e0,#e8c870)' },
   ]
+
+  if (mode === 'loyalty') {
+    const earnActivities = [
+      { icon: 'pencilRuler', label: 'Write a Review',  sub: 'Review any product',         pts: '+25 pts' },
+      { icon: 'package',     label: 'Make a Purchase', sub: 'Any order qualifies',         pts: '+15 pts per £10' },
+      { icon: 'users',       label: 'Refer a Friend',  sub: 'Friend makes a purchase',     pts: '+100 pts' },
+      { icon: 'gift',        label: 'Birthday Bonus',  sub: 'On your birthday month',      pts: '+200 pts' },
+    ]
+    return (
+      <div>
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
+          <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
+          <div style={{ padding: '12px 16px 12px' }}>
+            <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: 0 }}>Ways to Earn</p>
+          </div>
+        </div>
+        <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {earnActivities.map((a, i) => (
+            <motion.div key={i} whileTap={{ scale: 0.98 }} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', background: C.white }}>
+              <div style={{ width: 42, height: 42, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name={a.icon} size={18} color={C.textBody} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 2px' }}>{a.label}</p>
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{a.sub}</p>
+              </div>
+              <span style={{ ...fw(700), fontSize: 13, color: C.text, flexShrink: 0 }}>{a.pts}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
@@ -795,7 +941,7 @@ function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen
             <span style={{ ...fw(400), fontSize: 14, color: C.textPlaceholder }}>Search challenges</span>
           </div>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            {['Explore', 'Review', 'Tutorial'].map(f => (
+            {['Explore', 'Review', 'Tutorial', 'Group'].map(f => (
               <motion.button key={f} whileTap={{ scale: 0.94 }} onClick={() => setFilter(f)} style={{ height: 30, padding: '0 14px', borderRadius: 20, border: `1px solid ${filter === f ? C.text : C.border}`, background: filter === f ? C.text : 'transparent', ...fw(filter === f ? 600 : 400), fontSize: 13, color: filter === f ? C.white : C.textBody, cursor: 'pointer' }}>{f}</motion.button>
             ))}
             <motion.button whileTap={{ scale: 0.9 }} onClick={onFilterOpen} style={{ width: 30, height: 30, borderRadius: 20, border: `1px solid ${C.border}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
@@ -804,29 +950,61 @@ function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen
           </div>
         </div>
       </div>
-      <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {challenges.map((c, i) => (
-          <motion.div key={i} whileTap={{ scale: 0.985 }} onClick={onChallengeOpen} style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', background: C.white }}>
-            <div style={{ height: 150, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              <div style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.35)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 26 }}>{c.emoji}</span>
+      {filter === 'Group' ? (
+        <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+            { title: 'Team Glow Challenge', goal: 15, done: 9, members: ['L','S','P'], daysLeft: 3, pts: 300, bg: 'linear-gradient(145deg,#f0e8ff,#d4b8f0)' },
+            { title: 'Summer Looks Sprint', goal: 20, done: 14, members: ['I','C','M'], daysLeft: 6, pts: 450, bg: 'linear-gradient(145deg,#e8f4e8,#a8d8a8)' },
+          ].map((c, i) => (
+            <motion.div key={i} whileTap={{ scale: 0.985 }} onClick={onGroupChallengeOpen} style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', background: C.white }}>
+              <div style={{ height: 150, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <div style={{ display: 'flex' }}>
+                  {c.members.map((m, j) => (
+                    <div key={j} style={{ marginLeft: j > 0 ? -10 : 0, width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.8)', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: c.members.length - j }}>
+                      <span style={{ ...fw(700), fontSize: 16, color: C.text }}>{m}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 20, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Icon name="starFilled" size={11} color={C.text} />
+                  <span style={{ ...fw(700), fontSize: 11, color: C.text }}>{c.pts} pts</span>
+                </div>
               </div>
-              <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 20, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 3 }}>
-                <Icon name="starFilled" size={11} color={C.text} />
-                <span style={{ ...fw(700), fontSize: 11, color: C.text }}>{c.pts} pts</span>
+              <div style={{ padding: '12px 14px 14px' }}>
+                <p style={{ ...fw(400), fontSize: 15, color: C.text, lineHeight: '21px', marginBottom: 8 }}>{c.title}</p>
+                <div style={{ height: 4, background: C.borderLight, borderRadius: 2, marginBottom: 6 }}>
+                  <div style={{ height: '100%', width: `${(c.done / c.goal) * 100}%`, background: C.text, borderRadius: 2 }} />
+                </div>
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>{c.done} / {c.goal} posts · {c.daysLeft} days left</p>
               </div>
-            </div>
-            <div style={{ padding: '12px 14px 14px' }}>
-              <p style={{ ...fw(400), fontSize: 15, color: C.text, lineHeight: '21px', marginBottom: 8 }}>{c.title}</p>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                <Pill icon={<Icon name="package" size={10} color={C.textBody} />}>{c.type}</Pill>
-                <Pill icon={<Icon name="clock" size={10} color={C.textBody} />}>{c.time}</Pill>
-                <Pill>{c.level}</Pill>
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {challenges.map((c, i) => (
+            <motion.div key={i} whileTap={{ scale: 0.985 }} onClick={onChallengeOpen} style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', background: C.white }}>
+              <div style={{ height: 150, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <div style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.35)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 26 }}>{c.emoji}</span>
+                </div>
+                <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 20, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Icon name="starFilled" size={11} color={C.text} />
+                  <span style={{ ...fw(700), fontSize: 11, color: C.text }}>{c.pts} pts</span>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+              <div style={{ padding: '12px 14px 14px' }}>
+                <p style={{ ...fw(400), fontSize: 15, color: C.text, lineHeight: '21px', marginBottom: 8 }}>{c.title}</p>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  <Pill icon={<Icon name="package" size={10} color={C.textBody} />}>{c.type}</Pill>
+                  <Pill icon={<Icon name="clock" size={10} color={C.textBody} />}>{c.time}</Pill>
+                  <Pill>{c.level}</Pill>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -980,6 +1158,9 @@ function AdvocateProfileSheet({ advocate, onClose }) {
                 <Pill bg={C.cardBg}>{advocate.tier}</Pill>
                 {advocate.role && <Pill bg={C.white}>{advocate.role}</Pill>}
               </div>
+              {advocate.tenure && (
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: '4px 0 0' }}>{advocate.tenure}</p>
+              )}
             </div>
           </div>
           {totalFollowers > 0 && (
@@ -1269,11 +1450,40 @@ function CreatorsYouMightLike() {
   )
 }
 
-function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, onRemixOpen, onRecognitionOpen }) {
+function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, onRemixOpen, onRecognitionOpen, mode = 'advocate' }) {
   const [filter, setFilter] = useState('Inspiring')
   const [saved, setSaved] = useState(Array(9).fill(false))
   const [theme, setTheme] = useState('Bridal')
   const tabRef = useRef(null)
+
+  if (mode === 'loyalty') {
+    const brandPosts = [
+      { gradient: 'linear-gradient(145deg,#faeae4,#f0c8b8,#e0a090)', caption: 'Introducing the new Pillow Talk Blush Balm. Effortless colour, all day.' },
+      { gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', caption: 'Hollywood Flawless Filter: your skin, but better. Shop the look.' },
+      { gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', caption: "Charlotte's Magic Cream — 27 years of skincare expertise in one pot." },
+      { gradient: 'linear-gradient(145deg,#fff4e0,#fde68a,#f59e0b)', caption: 'The Edit: our most-loved products of the season, curated for you.' },
+    ]
+    return (
+      <div>
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
+          <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
+          <div style={{ height: 48, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+            <span style={{ ...fw(400), fontSize: 18, color: C.text }}>From the Brand</span>
+          </div>
+        </div>
+        <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {brandPosts.map((p, i) => (
+            <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ height: 160, background: p.gradient }} />
+              <div style={{ padding: '12px 14px 14px' }}>
+                <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px' }}>{p.caption}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
   useEffect(() => {
     let el = tabRef.current?.parentElement
     while (el) {
@@ -1314,14 +1524,14 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
     ]},
   }
   const posts = [
-    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'How beautiful is @charlottetilbury NEW Pillow talk beauty soulmates palette in the shade — Flawless rosewood 🩷✨', saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
-    { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'Finally tried the Pillow Talk lip kit 💋 The liner and lipstick combo is so gorgeous. Shade: Original.', saves: 18, instagram: { handle: '@sofia.brennan', followers: 22400 }, tiktok: { handle: '@sofiabeauty_', followers: 31600 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '5 challenges in a row' }, { icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }] },
+    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'How beautiful is @charlottetilbury NEW Pillow talk beauty soulmates palette in the shade — Flawless rosewood 🩷✨', saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
+    { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'May 2025', time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'Finally tried the Pillow Talk lip kit 💋 The liner and lipstick combo is so gorgeous. Shade: Original.', saves: 18, instagram: { handle: '@sofia.brennan', followers: 22400 }, tiktok: { handle: '@sofiabeauty_', followers: 31600 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '5 challenges in a row' }, { icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }] },
     { initial: 'M', name: 'Maya Osei', tier: 'Silver', role: null, time: '2h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried layering the Hollywood Flawless Filter over SPF? Wondering if it affects the glow...', saves: 7, instagram: { handle: '@maya.osei', followers: 8900 }, tiktok: { handle: '@mayaosei_', followers: 14500 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
-    { initial: 'P', name: 'Priya Nair', tier: 'Gold', role: null, time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the Magic Cream 7-day test and wow — my skin has never looked better. The hydration is genuinely unreal 🧴✨", saves: 31, instagram: { handle: '@priya.nair', followers: 19600 }, tiktok: { handle: '@priyanairbeauty', followers: 44200 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '3 in a row' }] },
+    { initial: 'P', name: 'Priya Nair', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'June 2025', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the Magic Cream 7-day test and wow — my skin has never looked better. The hydration is genuinely unreal 🧴✨", saves: 31, instagram: { handle: '@priya.nair', followers: 19600 }, tiktok: { handle: '@priyanairbeauty', followers: 44200 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '3 in a row' }] },
     { initial: 'R', name: 'Rachel Kim', tier: 'Silver', role: null, time: '3h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "Does anyone know if the Airbrush Flawless Foundation works well for oily skin? My T-zone gets really shiny by midday and I'm worried it'll slide off...", saves: 12, instagram: { handle: '@rachelkim.beauty', followers: 6200 }, tiktok: { handle: '@rachelkimbeauty', followers: 9800 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
-    { initial: 'I', name: 'Isla Thompson', tier: 'Platinum', role: 'Guide', time: '4h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Flawless Filter in shade 4 — my go-to for every shoot this season. That lit-from-within glow is just unmatched 📸', saves: 47, instagram: { handle: '@isla.thompson', followers: 87400 }, tiktok: { handle: '@islathompson', followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#1 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 12 members' }] },
-    { initial: 'A', name: 'Amara Diallo', tier: 'Gold', role: null, time: '5h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "What's the best way to remove the Magic Cream without stripping your skin? I've been using a basic cleanser but I feel like I'm missing something...", saves: 9, instagram: { handle: '@amara.diallo', followers: 11300 }, tiktok: { handle: '@amaradiallo_', followers: 18700 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '4 in a row' }] },
-    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Bridal makeup trial done using nothing but Charlotte Tilbury — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkbeauty', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
+    { initial: 'I', name: 'Isla Thompson', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'March 2024', time: '4h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Flawless Filter in shade 4 — my go-to for every shoot this season. That lit-from-within glow is just unmatched 📸', saves: 47, instagram: { handle: '@isla.thompson', followers: 87400 }, tiktok: { handle: '@islathompson', followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#1 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 12 members' }] },
+    { initial: 'A', name: 'Amara Diallo', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'August 2025', time: '5h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "What's the best way to remove the Magic Cream without stripping your skin? I've been using a basic cleanser but I feel like I'm missing something...", saves: 9, instagram: { handle: '@amara.diallo', followers: 11300 }, tiktok: { handle: '@amaradiallo_', followers: 18700 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '4 in a row' }] },
+    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'July 2025', time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Bridal makeup trial done using nothing but Charlotte Tilbury — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkbeauty', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
     { initial: 'N', name: 'Nina Reeves', tier: 'Silver', role: null, time: '7h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Is the Pillow Talk Original or Matte Revolution better for fair skin? I keep going back and forth and can\'t decide before I complete the challenge 😅', saves: 5, instagram: { handle: '@nina.reeves', followers: 4400 }, tiktok: { handle: '@ninareevesbeauty', followers: 7100 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
   ]
   return (
@@ -1350,9 +1560,9 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
       {filter === 'Following' ? (
         <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
-            { initial: 'T', name: 'Tara Williams', tier: 'Platinum', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'This Pillow Talk Blush Balm is everything — the pigment is unreal for an everyday look 🌸', saves: 19 },
-            { initial: 'J', name: 'Jade Parker', tier: 'Gold', time: '34m ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone layered the Hollywood Flawless Filter with the Airbrush Foundation? Wondering which goes on first...', saves: 8 },
-            { initial: 'D', name: 'Daniela Cruz', tier: 'Gold', time: '2h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', body: "Day 3 of the Magic Cream challenge and my skin has never felt this hydrated. Genuinely shocked 🧴✨", saves: 26 },
+            { initial: 'T', name: 'Tara Williams', tier: 'Platinum', tenure: '2-year advocate', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'This Pillow Talk Blush Balm is everything — the pigment is unreal for an everyday look 🌸', saves: 19 },
+            { initial: 'J', name: 'Jade Parker', tier: 'Gold', tenure: '1-year advocate', time: '34m ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone layered the Hollywood Flawless Filter with the Airbrush Foundation? Wondering which goes on first...', saves: 8 },
+            { initial: 'D', name: 'Daniela Cruz', tier: 'Gold', tenure: '1-year advocate', time: '2h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', body: "Day 3 of the Magic Cream challenge and my skin has never felt this hydrated. Genuinely shocked 🧴✨", saves: 26 },
             { initial: 'H', name: 'Hannah Scott', tier: 'Silver', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Bridal trial done ✅ Used the full Pillow Talk collection and I am OBSESSED. This is the one 💍', saves: 41 },
           ].map((post, i) => (
             <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
@@ -1362,6 +1572,9 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <span style={{ ...fw(700), fontSize: 14, color: C.text }}>{post.name}</span>
                     <Pill bg={C.cardBg}>{post.tier}</Pill>
+                    {post.tenure && (
+                      <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{post.tenure}</span>
+                    )}
                   </div>
                 </div>
                 <Pill icon={<Icon name={post.tag.icon} size={10} color={C.textBody} />} bg={C.white}>{post.tag.label}</Pill>
@@ -1437,6 +1650,9 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
                       <Pill bg={C.cardBg}>{post.tier}</Pill>
                       {post.role && <Pill bg={C.white}>{post.role}</Pill>}
                     </div>
+                    {post.tenure && (
+                      <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{post.tenure}</span>
+                    )}
                   </div>
                 </div>
                 <Pill icon={<Icon name={post.tag.icon} size={10} color={C.textBody} />} bg={C.white}>{post.tag.label}</Pill>
@@ -1915,27 +2131,66 @@ function StudioTab({ onMenuOpen, onWalletOpen, onChallengeCreate, onContentAnaly
 
 // ── TAB: PROGRESS + REWARDS ───────────────────────────
 
-function ProgressContent() {
+function ProgressContent({ mode = 'advocate' }) {
   const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
   const streakState = ['none', 'active', 'none', 'today', 'none', 'none', 'none']
-  const subBars = [
-    { label: 'Challenges', pts: 108, pct: 0.72 },
-    { label: 'Affiliate Sales', pts: 60, pct: 0.40 },
-    { label: 'Other', pts: 12, pct: 0.08 },
-  ]
-  const achievements = [
-    { label: 'Streak Keeper', desc: 'Maintaining a streak for 7 days' },
-    { label: 'Guide', desc: 'Helped 5 community members' },
-    { label: 'First Challenge', desc: 'Completed your first challenge' },
-  ]
+  const subBars = mode === 'loyalty'
+    ? [
+        { label: 'Purchases',      pts: 60,  pct: 0.40 },
+        { label: 'Reviews',        pts: 75,  pct: 0.50 },
+        { label: 'Referrals',      pts: 100, pct: 0.67 },
+        { label: 'Birthday Bonus', pts: 200, pct: 1.00 },
+      ]
+    : mode === 'employee'
+    ? [
+        { label: 'Content Posts',   pts: 108, pct: 0.72 },
+        { label: 'Team Challenges', pts: 60,  pct: 0.40 },
+        { label: 'Purchases',       pts: 24,  pct: 0.16 },
+        { label: 'Other',           pts: 12,  pct: 0.08 },
+        { label: 'Member Bonus',    pts: 50,  pct: 0.33 },
+      ]
+    : [
+        { label: 'Challenges',    pts: 108, pct: 0.72 },
+        { label: 'Affiliate Sales', pts: 60, pct: 0.40 },
+        { label: 'Purchases',     pts: 24,  pct: 0.16 },
+        { label: 'Other',         pts: 12,  pct: 0.08 },
+        { label: 'Member Bonus',  pts: 50,  pct: 0.33 },
+      ]
+  const achievements = mode === 'loyalty'
+    ? [
+        { label: 'Loyal Customer',    desc: '2 years of purchases' },
+        { label: 'Reviewer',          desc: '3 product reviews written' },
+        { label: 'Referral Champion', desc: 'Referred 1 friend' },
+        { label: 'Birthday Club',     desc: 'Birthday bonus redeemed' },
+      ]
+    : mode === 'employee'
+    ? [
+        { label: 'Team Player',     desc: 'Joined 3 group challenges' },
+        { label: '2-Year Advocate', desc: 'Member since April 2024' },
+        { label: '1-Year Advocate', desc: 'First anniversary reached' },
+        { label: 'Streak Keeper',   desc: 'Maintaining a streak for 7 days' },
+        { label: 'Guide',           desc: 'Helped 5 community members' },
+      ]
+    : [
+        { label: '2-Year Advocate', desc: 'Member since April 2024' },
+        { label: '1-Year Advocate', desc: 'First anniversary reached' },
+        { label: 'Streak Keeper',   desc: 'Maintaining a streak for 7 days' },
+        { label: 'Guide',           desc: 'Helped 5 community members' },
+        { label: 'First Challenge', desc: 'Completed your first challenge' },
+      ]
+  const tierLabel = mode === 'loyalty' ? 'Gold Member' : mode === 'employee' ? 'Champion' : 'Silver Tier'
+  const sinceLabel = mode === 'loyalty' ? 'Customer since April 2024' : 'Member since April 2024'
   return (
     <div style={{ padding: '20px 16px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Points Summary */}
       <div>
         <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, marginBottom: 10 }}>Points Summary</p>
         <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+          <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, textAlign: 'center', marginBottom: 6 }}>
+            {sinceLabel}
+          </p>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-            <Pill bg={C.cardBg}>Silver Tier</Pill>
+            <Pill bg={C.cardBg}>{tierLabel}</Pill>
           </div>
           {/* Radial chart */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
@@ -1969,7 +2224,7 @@ function ProgressContent() {
       </div>
 
       {/* Streak */}
-      <div>
+      {mode !== 'loyalty' && <div>
         <p style={{ ...fw(400), fontSize: 15, color: C.text, marginBottom: 12 }}>Streak</p>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           {days.map((day, i) => {
@@ -1989,7 +2244,7 @@ function ProgressContent() {
             )
           })}
         </div>
-      </div>
+      </div>}
 
       {/* Achievements */}
       <div>
@@ -2007,6 +2262,64 @@ function ProgressContent() {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function ActivityTimeline({ mode = 'advocate' }) {
+  const entries = mode === 'loyalty'
+    ? [
+        { icon: 'package',     action: 'Purchase recognised',  detail: 'Hollywood Filter 30ml',  pts: '+15 pts',  date: 'Today' },
+        { icon: 'pencilRuler', action: 'Review approved',      detail: 'Hollywood Filter',        pts: '+25 pts',  date: '2 days ago' },
+        { icon: 'users',       action: 'Referral confirmed',   detail: 'Sophie made a purchase', pts: '+100 pts', date: 'Jun 10' },
+        { icon: 'gift',        action: 'Birthday Bonus',       detail: 'Happy birthday month!',  pts: '+200 pts', date: 'Apr 1' },
+      ]
+    : [
+        { icon: 'flag',    action: 'Challenge completed',         detail: 'Natural Glow Routine',    pts: '+50 pts',  date: 'Today' },
+        { icon: 'users',   action: 'Referral confirmed',          detail: 'Sophie joined your link', pts: '+100 pts', date: 'Yesterday' },
+        { icon: 'package', action: 'Purchase recognised',         detail: 'Hollywood Filter 30ml',   pts: '+15 pts',  date: '3 days ago' },
+        { icon: 'award',   action: '1-Year Advocacy Anniversary', detail: 'Thank you for a year!',   pts: '+500 pts', date: 'Jun 8' },
+        { icon: 'store',   action: 'Storefront sale',             detail: '2 items via your link',   pts: '+22 pts',  date: 'Jun 7' },
+      ]
+  return (
+    <div style={{ padding: '20px 16px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {entries.map((e, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px' }}>
+          <div style={{ width: 38, height: 38, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icon name={e.icon} size={16} color={C.textMuted} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>{e.action}</p>
+            <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{e.detail}</p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0 }}>
+            <span style={{ ...fw(600), fontSize: 13, color: C.text }}>{e.pts}</span>
+            <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{e.date}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function MilestoneCelebrationOverlay({ name, yearsCount, onClose }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 3500)
+    return () => clearTimeout(t)
+  }, []) // eslint-disable-line
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: C.text, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, textAlign: 'center', padding: '0 40px', animation: 'ob-fade-up 0.65s 0.3s ease-out both' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="award" size={28} color={C.white} strokeWidth={2} />
+        </div>
+        <p style={{ ...fw(500), fontSize: 28, color: C.white, letterSpacing: '-0.5px', lineHeight: 1.2, margin: 0 }}>
+          Happy anniversary, {name}.
+        </p>
+        <p style={{ ...fw(400), fontSize: 16, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 260, margin: 0 }}>
+          You've been one of our advocates for {yearsCount} {yearsCount === 1 ? 'year' : 'years'}. 500 points added to say thank you.
+        </p>
       </div>
     </div>
   )
@@ -2048,24 +2361,114 @@ function RewardsContent() {
   )
 }
 
-function ProgressTab({ onMenuOpen, onWalletOpen }) {
+function ProgressTab({ onMenuOpen, onWalletOpen, mode = 'advocate' }) {
   const [subTab, setSubTab] = useState('Progress')
   return (
     <div>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
         <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
         <div style={{ padding: '0 16px 12px', display: 'flex', gap: 20 }}>
-          {['Progress', 'Rewards'].map(t => (
+          {['Progress', 'Journey', 'Rewards'].map(t => (
             <motion.button key={t} whileTap={{ scale: 0.96 }} onClick={() => setSubTab(t)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 2px', ...fw(subTab === t ? 700 : 400), fontSize: 16, color: subTab === t ? C.text : C.textMuted, borderBottom: `2px solid ${subTab === t ? C.text : 'transparent'}` }}>{t}</motion.button>
           ))}
         </div>
       </div>
       <AnimatePresence mode="wait">
         {subTab === 'Progress'
-          ? <motion.div key="progress" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ProgressContent /></motion.div>
+          ? <motion.div key="progress" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ProgressContent mode={mode} /></motion.div>
+          : subTab === 'Journey'
+          ? <motion.div key="journey" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ActivityTimeline mode={mode} /></motion.div>
           : <motion.div key="rewards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><RewardsContent /></motion.div>
         }
       </AnimatePresence>
+    </div>
+  )
+}
+
+function RewardsTab({ mode, onMenuOpen, onWalletOpen }) {
+  return <ProgressTab onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} mode={mode} />
+}
+
+function AccountTab() {
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
+        <div style={{ height: 63, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+          <span style={{ ...fw(400), fontSize: 18, color: C.text }}>Account</span>
+        </div>
+      </div>
+      <div style={{ flex: 1, padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Avatar initial="L" size={52} />
+          <div>
+            <p style={{ ...fw(600), fontSize: 17, color: C.text, margin: 0 }}>Lea Fontaine</p>
+            <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: 0 }}>lea@example.com</p>
+          </div>
+        </div>
+        <div style={{ background: C.cardBg, borderRadius: 14, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, margin: '0 0 6px' }}>Membership tier</p>
+            <Pill bg={C.cardBg}>Gold Member</Pill>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, margin: '0 0 2px' }}>Member since</p>
+            <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>April 2024</p>
+          </div>
+        </div>
+        {['Notifications', 'Privacy', 'Help & Support', 'Sign out'].map((label, i) => (
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: `1px solid ${C.borderLight}` }}>
+            <span style={{ ...fw(400), fontSize: 15, color: i === 3 ? 'rgba(200,50,50,0.85)' : C.text }}>{label}</span>
+            {i < 3 && <Icon name="arrowRight" size={14} color={C.textMuted} />}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ManagerViewScreen({ onBack }) {
+  const team = [
+    { initial: 'L', name: 'Lea Fontaine',   posts: 14, pts: 680,  active: true  },
+    { initial: 'S', name: 'Sofia Brennan',  posts: 11, pts: 540,  active: true  },
+    { initial: 'P', name: 'Priya Nair',     posts: 8,  pts: 390,  active: true  },
+    { initial: 'C', name: 'Chloe Nakamura', posts: 5,  pts: 210,  active: false },
+    { initial: 'A', name: 'Amara Diallo',   posts: 9,  pts: 430,  active: true  },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: `1px solid ${C.borderLight}`, flexShrink: 0 }}>
+        <motion.button whileTap={{ scale: 0.88 }} onClick={onBack} style={{ width: 32, height: 32, border: `1px solid ${C.border}`, borderRadius: 12, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <Icon name="arrowLeft" size={14} color={C.textBody} />
+        </motion.button>
+        <p style={{ ...fw(600), fontSize: 16, color: C.text, margin: 0 }}>Manager View</p>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px' }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+          {[
+            { label: 'Total Posts',        value: '47'    },
+            { label: 'Points Distributed', value: '2,400' },
+            { label: 'Participation',      value: '78%'   },
+          ].map((s, i) => (
+            <div key={i} style={{ flex: 1, background: C.cardBg, borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
+              <p style={{ ...fw(700), fontSize: 18, color: C.text, margin: '0 0 2px' }}>{s.value}</p>
+              <p style={{ ...fw(400), fontSize: 10, color: C.textMuted, margin: 0, lineHeight: 1.3 }}>{s.label}</p>
+            </div>
+          ))}
+        </div>
+        <p style={{ ...fw(600), fontSize: 14, color: C.text, marginBottom: 10 }}>Your team</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {team.map((m, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
+              <Avatar initial={m.initial} size={36} />
+              <div style={{ flex: 1 }}>
+                <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: 0 }}>{m.name}</p>
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{m.posts} posts · {m.pts} pts</p>
+              </div>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: m.active ? '#34c759' : C.borderLight }} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -2994,14 +3397,42 @@ function PointEarningsScreen({ onBack }) {
 
 // ── WALLET BOTTOM SHEET ───────────────────────────────
 
-function WalletBottomSheet({ onClose, onSeeAllEarnings }) {
-  const earningRows = [
-    { icon: 'flag',  label: 'Completed Challenges',  sub: '2 posts approved',  amount: '120.00' },
-    { icon: 'heart', label: 'Challenge Performance', sub: '5,145 post views',  amount: '80.00'  },
-    { icon: 'store', label: 'Storefront',            sub: '13 sales',          amount: '32.40'  },
-    { icon: 'users', label: 'Referrals',             sub: '2 referrals',       amount: '100.00' },
-    { icon: 'link',  label: 'Affiliate Link',        sub: '2 sales',           amount: '100.00' },
-  ]
+function WalletBottomSheet({ onClose, onSeeAllEarnings, mode = 'advocate' }) {
+  const earningRows = mode === 'loyalty'
+    ? [
+        { icon: 'package',     label: 'Purchases',      sub: '4 orders',               amount: '60.00'  },
+        { icon: 'pencilRuler', label: 'Reviews',        sub: '3 product reviews',       amount: '75.00'  },
+        { icon: 'gift',        label: 'Birthday Bonus', sub: 'April 2026',              amount: '200.00' },
+        { icon: 'users',       label: 'Referrals',      sub: '1 friend joined',         amount: '100.00' },
+      ]
+    : mode === 'employee'
+    ? [
+        { icon: 'flag',    label: 'Challenges & Social',  sub: '2 posts approved · 5,145 views', amount: '200.00' },
+        { icon: 'package', label: 'Purchases',            sub: '3 purchases',                    amount: '45.00'  },
+        { icon: 'users',   label: 'Referrals',            sub: '2 referrals',                    amount: '100.00' },
+        { icon: 'gift',    label: 'Participation Bonus',  sub: 'June 2026 · active member',      amount: '50.00'  },
+      ]
+    : [
+        { icon: 'flag',    label: 'Challenges & Social',   sub: '2 posts approved · 5,145 views', amount: '200.00' },
+        { icon: 'store',   label: 'Storefront & Affiliate', sub: '13 storefront · 2 affiliate',   amount: '132.40' },
+        { icon: 'package', label: 'Purchases',              sub: '3 purchases',                   amount: '45.00'  },
+        { icon: 'users',   label: 'Referrals',             sub: '2 referrals',                    amount: '100.00' },
+        { icon: 'gift',    label: 'Active Member Bonus',   sub: 'June 2026 · active member',      amount: '50.00'  },
+      ]
+  const actionButtons = mode === 'loyalty'
+    ? [
+        { symbol: '+',  label: 'Redeem for Rewards', sub: '435 pts available' },
+        { symbol: '🛍', label: 'Shop with Points',   sub: '$217.50 value' },
+      ]
+    : mode === 'employee'
+    ? [
+        { symbol: '+',  label: 'Redeem for Perks',   sub: '395 pts available' },
+        { symbol: '🎁', label: 'Gift a Colleague',   sub: 'Send points as a gift' },
+      ]
+    : [
+        { symbol: '+', label: 'Redeem as Store Credit', sub: '$617.00' },
+        { symbol: '$', label: 'Cash Out to Bank',       sub: '$617.00' },
+      ]
   return (
     <>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -3054,10 +3485,7 @@ function WalletBottomSheet({ onClose, onSeeAllEarnings }) {
               <Icon name="arrowRight" size={16} color={C.textMuted} />
             </motion.button>
           </div>
-          {[
-            { symbol: '+', label: 'Redeem as Store Credit', sub: '$617.00' },
-            { symbol: '$', label: 'Cash Out to Bank',       sub: '$617.00' },
-          ].map((action, i) => (
+          {actionButtons.map((action, i) => (
             <motion.button key={i} whileTap={{ scale: 0.98 }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', border: `1px solid ${C.border}`, borderRadius: 14, background: C.white, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', marginBottom: 10, boxSizing: 'border-box' }}>
               <div style={{ width: 42, height: 42, borderRadius: '50%', background: C.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -3078,7 +3506,7 @@ function WalletBottomSheet({ onClose, onSeeAllEarnings }) {
 
 // ── HOME SCREEN ───────────────────────────────────────
 
-function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onChallengeCreate, onContentAnalyse, onRemix, profilePhoto, onSetProfilePhoto, showIntroSheet, onIntroPost, userPost }) {
+function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeOpen, onChallengeCreate, onContentAnalyse, onRemix, profilePhoto, onSetProfilePhoto, showIntroSheet, onIntroPost, userPost, milestoneOpen, onMilestoneClose, mode = 'advocate' }) {
   const [filterOpen, setFilterOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [walletOpen, setWalletOpen] = useState(false)
@@ -3092,11 +3520,13 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onChallengeCreate
   const openWallet = () => setWalletOpen(true)
   const renderTab = () => {
     switch (activeTab) {
-      case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} />
-      case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeOpen={onChallengeOpen} />
-      case 'community':   return <CommunityTab onMenuOpen={openMenu} onWalletOpen={openWallet} onAdvocateOpen={setOpenAdvocate} onReplyOpen={setOpenReply} onRemixOpen={setOpenCommunityRemix} onRecognitionOpen={() => setRecognitionOpen(true)} />
+      case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} mode={mode} />
+      case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeOpen={onChallengeOpen} onGroupChallengeOpen={onGroupChallengeOpen} mode={mode} />
+      case 'community':   return <CommunityTab onMenuOpen={openMenu} onWalletOpen={openWallet} onAdvocateOpen={setOpenAdvocate} onReplyOpen={setOpenReply} onRemixOpen={setOpenCommunityRemix} onRecognitionOpen={() => setRecognitionOpen(true)} mode={mode} />
       case 'studio':      return <StudioTab onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeCreate={onChallengeCreate} onContentAnalyse={onContentAnalyse} onRemix={onRemix} savedRemixes={savedRemixes} />
-      case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} />
+      case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} mode={mode} />
+      case 'rewards':     return <RewardsTab mode={mode} onMenuOpen={openMenu} onWalletOpen={openWallet} />
+      case 'account':     return <AccountTab mode={mode} />
       default:            return null
     }
   }
@@ -3111,7 +3541,7 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onChallengeCreate
       </div>
       <div style={{ height: 63, background: C.white, borderTop: `1px solid ${C.borderLight}`, flexShrink: 0 }}>
         <div style={{ height: 48, display: 'flex', alignItems: 'center' }}>
-          {TABS.map(tab => {
+          {TABS_BY_MODE[mode].map(tab => {
             const active = activeTab === tab.id
             return (
               <motion.button key={tab.id} whileTap={{ scale: 0.88 }} onClick={() => onTabChange(tab.id)} style={{ flex: 1, height: 48, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
@@ -3144,10 +3574,17 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onChallengeCreate
         {recognitionOpen && <RecognitionSheet onClose={() => setRecognitionOpen(false)} />}
       </AnimatePresence>
       <AnimatePresence>
-        {walletOpen && <WalletBottomSheet onClose={() => setWalletOpen(false)} onSeeAllEarnings={() => { setWalletOpen(false); setEarningsOpen(true) }} />}
+        {walletOpen && <WalletBottomSheet onClose={() => setWalletOpen(false)} onSeeAllEarnings={() => { setWalletOpen(false); setEarningsOpen(true) }} mode={mode} />}
       </AnimatePresence>
       <AnimatePresence>
         {earningsOpen && <PointEarningsScreen onBack={() => setEarningsOpen(false)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {milestoneOpen && (
+          <motion.div key="milestone" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }} style={{ position: 'absolute', inset: 0, zIndex: 50 }}>
+            <MilestoneCelebrationOverlay name="Lea" yearsCount={2} onClose={onMilestoneClose} />
+          </motion.div>
+        )}
       </AnimatePresence>
       <AnimatePresence>
         {showIntroSheet && (
@@ -3746,51 +4183,100 @@ function SignupQueueScreen() {
 
 // ── SIDE NAV ──────────────────────────────────────────
 
-const NAV_ITEMS = [
-  { label: 'Sign Up',    toScreen: 4,    tab: null },
-  { label: 'Log In',     toScreen: 0, tab: null },
-  { label: 'Onboarding', toScreen: 12,   tab: null },
-  { label: 'Dashboard',  toScreen: 3, tab: 'feed' },
-  { label: 'Challenges', toScreen: 3, tab: 'challenges' },
-  { label: 'Community',  toScreen: 3, tab: 'community' },
-  { label: 'Studio',     toScreen: 3, tab: 'studio' },
-  { label: 'Progress',   toScreen: 3, tab: 'progress' },
+const NAV_SECTIONS = [
+  {
+    label: 'Journeys',
+    items: [
+      { key: 'signup',     label: 'Sign up',    toScreen: 4,  tab: null   },
+      { key: 'onboarding', label: 'Onboarding', toScreen: 12, tab: null   },
+      { key: 'login',      label: 'Log in',     toScreen: 3,  tab: 'feed', triggerMilestone: true },
+    ],
+  },
+  {
+    label: 'App',
+    items: [
+      { key: 'dashboard',  label: 'Dashboard',  toScreen: 3, tab: 'feed'       },
+      { key: 'challenges', label: 'Challenges', toScreen: 3, tab: 'challenges' },
+      { key: 'community',  label: 'Community',  toScreen: 3, tab: 'community'  },
+      { key: 'studio',     label: 'Studio',     toScreen: 3, tab: 'studio'     },
+      { key: 'progress',   label: 'Progress',   toScreen: 3, tab: 'progress'   },
+    ],
+  },
 ]
 
-function SideNav({ activeIndex, onNavigate }) {
+function ModeTabs({ mode, onChange }) {
+  const tabs = [
+    { id: 'advocate', label: 'Social Advocate' },
+    { id: 'loyalty',  label: 'Customer Advocate' },
+    { id: 'employee', label: 'Employee' },
+  ]
   return (
-    <div style={{ width: 160, display: 'flex', flexDirection: 'column', gap: 1 }}>
-      <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(0,0,0,0.28)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8, paddingLeft: 10 }}>Pages</p>
-      {NAV_ITEMS.map((item, i) => {
-        const active = activeIndex === i
-        return (
-          <motion.button
-            key={i}
-            whileTap={item.toScreen !== null ? { scale: 0.96 } : {}}
-            onClick={() => item.toScreen !== null && onNavigate(item.toScreen, item.tab)}
-            style={{
-              width: '100%', height: 34, padding: '0 10px',
-              textAlign: 'left', border: 'none',
-              cursor: item.toScreen !== null ? 'pointer' : 'default',
-              borderRadius: 7,
-              background: active ? 'rgba(0,0,0,0.07)' : 'transparent',
-              fontFamily: 'Inter, -apple-system, sans-serif',
-              fontSize: 13,
-              fontWeight: active ? 600 : 400,
-              color: item.toScreen === null ? 'rgba(0,0,0,0.18)' : active ? '#101010' : 'rgba(0,0,0,0.4)',
-              display: 'flex', alignItems: 'center', gap: 9,
-            }}
-          >
-            <span style={{
-              fontSize: 10.5,
-              color: item.toScreen === null ? 'rgba(0,0,0,0.12)' : active ? 'rgba(0,0,0,0.38)' : 'rgba(0,0,0,0.18)',
-              minWidth: 14, textAlign: 'right',
-              fontVariantNumeric: 'tabular-nums',
-            }}>{i + 1}</span>
-            {item.label}
-          </motion.button>
-        )
-      })}
+    <div style={{ display: 'flex', background: 'rgba(0,0,0,0.08)', borderRadius: 10, padding: 3, gap: 2 }}>
+      {tabs.map(t => (
+        <motion.button key={t.id} whileTap={{ scale: 0.97 }} onClick={() => onChange(t.id)}
+          style={{ height: 30, padding: '0 14px', border: 'none', borderRadius: 8, cursor: 'pointer',
+            background: mode === t.id ? C.white : 'transparent',
+            boxShadow: mode === t.id ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+            fontFamily: 'Inter, -apple-system, sans-serif', fontSize: 12,
+            fontWeight: mode === t.id ? 600 : 400,
+            color: mode === t.id ? C.text : 'rgba(0,0,0,0.45)',
+          }}>
+          {t.label}
+        </motion.button>
+      ))}
+    </div>
+  )
+}
+
+function SideNav({ activeKey, onNavigate, onLoginNav, mode = 'advocate' }) {
+  const appItems = mode === 'loyalty'
+    ? [
+        { key: 'dashboard', label: 'Home',    toScreen: 3, tab: 'feed'    },
+        { key: 'rewards',   label: 'Rewards', toScreen: 3, tab: 'rewards' },
+        { key: 'account',   label: 'Account', toScreen: 3, tab: 'account' },
+      ]
+    : mode === 'employee'
+    ? [
+        ...NAV_SECTIONS[1].items,
+        { key: 'managerview', label: 'Manager View', toScreen: 29, tab: null },
+      ]
+    : NAV_SECTIONS[1].items
+  const sections = [NAV_SECTIONS[0], { label: 'App', items: appItems }]
+  return (
+    <div style={{ width: 160, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {sections.map(section => (
+        <div key={section.label}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(0,0,0,0.28)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4, paddingLeft: 10 }}>
+            {section.label}
+          </p>
+          {section.items.map(item => {
+            const active = activeKey === item.key
+            const handleClick = () => {
+              if (item.triggerMilestone) { onLoginNav() }
+              else { onNavigate(item.toScreen, item.tab) }
+            }
+            return (
+              <motion.button
+                key={item.key}
+                whileTap={{ scale: 0.96 }}
+                onClick={handleClick}
+                style={{
+                  width: '100%', height: 34, padding: '0 10px',
+                  textAlign: 'left', border: 'none',
+                  cursor: 'pointer', borderRadius: 7,
+                  background: active ? 'rgba(0,0,0,0.07)' : 'transparent',
+                  fontFamily: 'Inter, -apple-system, sans-serif',
+                  fontSize: 13, fontWeight: active ? 600 : 400,
+                  color: active ? '#101010' : 'rgba(0,0,0,0.4)',
+                  display: 'flex', alignItems: 'center', gap: 9,
+                }}
+              >
+                {item.label}
+              </motion.button>
+            )
+          })}
+        </div>
+      ))}
     </div>
   )
 }
@@ -3808,6 +4294,8 @@ export default function App() {
   const [postSentence, setPostSentence] = useState('')
   const [showIntroSheet, setShowIntroSheet] = useState(false)
   const [showMarkScreen, setShowMarkScreen] = useState(false)
+  const [milestoneOpen, setMilestoneOpen] = useState(false)
+  const [mode, setMode] = useState('advocate')
 
   const go = (toScreen, tab = null, forceDir = null, slow = false) => {
     if (toScreen !== screen) {
@@ -3818,23 +4306,27 @@ export default function App() {
     if (tab !== null) setActiveTab(tab)
   }
 
-  const getActiveNavIndex = () => {
-    if (screen === 12 || screen === 13 || screen === 14 || screen === 16 || screen === 17 || screen === 19) return 2
-    if (screen === 18 || screen === 25 || screen === 26) return 6
-if (screen >= 4) return 0
-    if (screen <= 2) return 1
+  const loginNav = () => { go(3, 'feed'); setMilestoneOpen(true) }
+
+  const getActiveNavKey = () => {
+    if (screen >= 4 && screen <= 11) return 'signup'
+    if (screen === 12 || screen === 13 || screen === 14 || screen === 16 || screen === 17 || screen === 19) return 'onboarding'
+    if (screen <= 2) return 'login'
+    if (screen === 15 || screen === 27) return 'challenges'
+    if (screen === 18 || screen === 25 || screen === 26) return 'studio'
+    if (screen === 28) return 'managerview'
     if (screen === 3) {
-      const map = { feed: 3, challenges: 4, community: 5, studio: 6, progress: 7 }
-      return map[activeTab] ?? 3
+      const map = { feed: 'dashboard', challenges: 'challenges', community: 'community', studio: 'studio', progress: 'progress', rewards: 'rewards', account: 'account' }
+      return map[activeTab] ?? 'dashboard'
     }
-    return -1
+    return null
   }
 
   const screens = [
     <EmailScreen key="email" onNext={(e) => { setEmail(e); go(1) }} />,
     <InboxScreen key="inbox" email={email} onNext={() => go(2)} />,
     <EmailClientScreen key="email-client" onNext={() => go(12)} />,
-    <HomeScreen key="home" activeTab={activeTab} onTabChange={setActiveTab} onChallengeOpen={() => go(15)} onChallengeCreate={() => go(18)} onContentAnalyse={() => go(25)} onRemix={() => go(26)} profilePhoto={profilePhoto} onSetProfilePhoto={setProfilePhoto} showIntroSheet={showIntroSheet} onIntroPost={(s) => { setPostSentence(s); setShowIntroSheet(false); setShowMarkScreen(true) }} userPost={postSentence ? { sentence: postSentence, photo: profilePhoto } : null} />,
+    <HomeScreen key="home" activeTab={activeTab} onTabChange={setActiveTab} onChallengeOpen={() => go(15)} onGroupChallengeOpen={() => go(27)} onChallengeCreate={() => go(18)} onContentAnalyse={() => go(25)} onRemix={() => go(26)} profilePhoto={profilePhoto} onSetProfilePhoto={setProfilePhoto} showIntroSheet={showIntroSheet} onIntroPost={(s) => { setPostSentence(s); setShowIntroSheet(false); setShowMarkScreen(true) }} userPost={postSentence ? { sentence: postSentence, photo: profilePhoto } : null} milestoneOpen={milestoneOpen} onMilestoneClose={() => setMilestoneOpen(false)} mode={mode} />,
     <SignupMotivationScreen key="su-motivation" onNext={(sel) => ({ 1: () => go(22), 2: () => go(23), 3: () => go(24) }[sel] || (() => go(5)))()} />,
     <SignupBenefitsScreen key="su-benefits" onNext={() => go(20, null, 1)} />,
     <SignupBasicInfoScreen key="su-basic" onNext={(info) => { setSignupInfo(prev => ({ ...prev, ...info })); go(7) }} />,
@@ -3858,6 +4350,8 @@ if (screen >= 4) return 0
     <SignupBenefitsFriendScreen key="su-benefits-friend" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
     <ContentAnalyserScreen key="content-analyser" onBack={() => go(3, 'studio')} />,
     <RemixScreen key="remix" onBack={() => go(3, 'studio')} />,
+    <GroupChallengeDetailScreen key="group-challenge-detail" onBack={() => go(3, 'challenges')} />,
+    <ManagerViewScreen key="manager-view" onBack={() => go(3, 'progress')} />,
   ]
 
   const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 500
@@ -3874,9 +4368,12 @@ if (screen >= 4) return 0
       padding: isMobileViewport ? 0 : 32,
     }}>
       {!isMobileViewport && (
-        <SideNav activeIndex={getActiveNavIndex()} onNavigate={go} />
+        <SideNav activeKey={getActiveNavKey()} onNavigate={go} onLoginNav={loginNav} mode={mode} />
       )}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+        {!isMobileViewport && (
+          <ModeTabs mode={mode} onChange={setMode} />
+        )}
         <div style={{
           width: 390, height: 844,
           borderRadius: isMobileViewport ? 0 : 44,
@@ -3903,13 +4400,6 @@ if (screen >= 4) return 0
             )}
           </AnimatePresence>
         </div>
-        {!isMobileViewport && screen < 4 && (
-          <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>
-            {[0, 1, 2, 3].map(i => (
-              <motion.div key={i} animate={{ width: i === screen ? 22 : 7, background: i === screen ? '#1c1c1e' : 'rgba(0,0,0,0.2)' }} transition={{ type: 'spring', stiffness: 400, damping: 28 }} style={{ height: 7, borderRadius: 4 }} />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   )
