@@ -467,10 +467,10 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
 
   if (mode === 'loyalty') {
     const loyaltyProducts = [
-      { name: 'Pillow Talk Blush Balm Lip Tint', price: '£24.00', desc: 'Bestseller' },
-      { name: 'Hollywood Flawless Filter 30ml', price: '£46.00', desc: 'New arrival' },
-      { name: "Charlotte's Magic Cream 50ml", price: '£90.00', desc: 'Fan favourite' },
-      { name: 'Airbrush Flawless Foundation', price: '£38.00', desc: 'Top rated' },
+      { name: 'Crossover Flare Leg Jean', price: '$85.00', desc: 'Bestseller' },
+      { name: 'Cloud Hoodie', price: '$65.00', desc: 'New arrival' },
+      { name: 'Real Me Legging', price: '$45.00', desc: 'Fan favourite' },
+      { name: 'AirFlex+ Slim Jean', price: '$59.00', desc: 'Top rated' },
     ]
     return (
       <div>
@@ -509,9 +509,9 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
 
         {(() => {
           const challenges = [
-            { emoji: '💄', gradient: 'linear-gradient(145deg,#faeae4,#f0c8b8,#e0a090,#c88070)', title: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', type: 'Product Review', time: '1h', level: 'Beginner', pts: 120 },
-            { emoji: '✨', gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', title: 'Hollywood Flawless Filter: Your Lit-From-Within Look', type: 'Photo Post', time: '30m', level: 'Beginner', pts: 80 },
-            { emoji: '🧴', gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', title: "Charlotte's Magic Cream 7-Day Skin Challenge", type: 'Video', time: '2h', level: 'Intermediate', pts: 200 },
+            { emoji: '👖', gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', title: 'Crossover Flare Leg Jean: Style It 3 Ways', type: 'Photo Post', time: '1h', level: 'Beginner', pts: 120 },
+            { emoji: '🤍', gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', title: 'Cloud Hoodie: Your Go-To Layer Look', type: 'Photo Post', time: '30m', level: 'Beginner', pts: 80 },
+            { emoji: '✨', gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', title: 'AirFlex+ Slim Jean: 7-Day Wear Test', type: 'Video', time: '2h', level: 'Intermediate', pts: 200 },
           ]
           const c = challenges[challengeIndex]
           const remaining = challenges.length - challengeIndex - 1
@@ -648,7 +648,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
           <div style={{ height: 200, borderRadius: 10, background: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#b498d8,#9880c0)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
             <span style={{ fontSize: 52, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }}>✨</span>
           </div>
-          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>How beautiful is <span style={{ ...fw(500), textDecoration: 'underline' }}>{BRAND_HANDLE}</span> NEW Pillow talk beauty soulmates palette in the shade- Flawless rosewood 🩷✨</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>The <span style={{ ...fw(500), textDecoration: 'underline' }}>{BRAND_HANDLE}</span> Crossover Flare Leg Jean is everything right now — styled it 3 ways and every single one goes hard 👖✨</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>45m ago</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -672,8 +672,8 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
             </div>
             <Pill icon={<Icon name="help" size={10} color={C.textBody} />} bg={C.white}>Question</Pill>
           </div>
-          <p style={{ ...fw(400), fontSize: 17, color: C.text, lineHeight: '24px', marginBottom: 8 }}>Does the Hollywood Flawless Filter oxidise throughout the day?</p>
-          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 12 }}>I'm shade 3 and it looks perfect on application but by lunchtime it's pulling slightly warmer. Anyone else getting this?</p>
+          <p style={{ ...fw(400), fontSize: 17, color: C.text, lineHeight: '24px', marginBottom: 8 }}>Do the AirFlex+ jeans stretch out after a few wears?</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 12 }}>Mine fit perfectly on day 1 but feel noticeably looser by day 3. Wondering if I should size down or if it's normal for this fabric?</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <Avatar initial="C" size={22} />
@@ -706,7 +706,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
                     </div>
                   </div>
                   <div style={{ paddingLeft: 30 }}>
-                    <p style={{ ...fw(400), fontSize: 13, color: 'rgba(66,66,66,0.9)', lineHeight: '19px' }}>It's the primer — I had the same issue with silicone-based ones. Switch to the American Eagle Wonderglow and it stays true all day. Shade 3 here too.</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: 'rgba(66,66,66,0.9)', lineHeight: '19px' }}>Yes, totally normal — the AirFlex fabric relaxes with body heat. Size down and they'll feel perfect after the first wash. Same in the slim fit here.</p>
                   </div>
                 </div>
               </motion.div>
@@ -817,7 +817,7 @@ function ChallengesFilterPanel({ onClose }) {
 
         <FilterSection title="Product Type">
           <div style={{ display: 'flex', gap: 8 }}>
-            {[{ key: 'makeup', icon: 'heart', label: 'Make up' }, { key: 'skin', icon: 'star', label: 'Skin' }, { key: 'fragrance', icon: 'gift', label: 'Fragrance' }].map(({ key, icon, label }) => {
+            {[{ key: 'denim', icon: 'heart', label: 'Denim' }, { key: 'tops', icon: 'star', label: 'Tops' }, { key: 'active', icon: 'gift', label: 'Active' }].map(({ key, icon, label }) => {
               const on = productTypes.includes(key)
               return (
                 <motion.button key={key} whileTap={{ scale: 0.96 }} onClick={() => toggle(productTypes, setProductTypes, key)}
@@ -849,11 +849,11 @@ function ChallengeDetailScreen({ onBack }) {
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 1500) }
 
   const steps = [
-    'Announce the NEW Pillow Talk Blush Balm Lip Tint launch with a scroll-stopping hook',
-    'Create content showcasing your shade, highlighting the glow and effortless application',
-    'Style it for bridal, romantic, or everyday looks to show its versatility',
+    'Show the Crossover Flare Leg Jean styled 3 different ways in one post or reel',
+    'Highlight the fit, rise, and versatility — casual, date night, and elevated basics',
+    'Share how you sized and why — this is the #1 question your audience will have',
     'Share your affiliate code and link',
-    `Tag ${BRAND_HANDLE} and include #AD #${BRAND.replace(/\s+/g, '')} #MagicBeautyStars`,
+    `Tag ${BRAND_HANDLE} and include #AD #${BRAND.replace(/\s+/g, '')} #AEStyle`,
   ]
 
   return (
@@ -877,15 +877,15 @@ function ChallengeDetailScreen({ onBack }) {
         {/* Content */}
         <div style={{ padding: '16px 16px 24px' }}>
           <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px', marginBottom: 8 }}>
-            Pillow Talk Blush Balm Lip Tint: One Swipe Glow
+            Crossover Flare Leg Jean: Style It 3 Ways
           </p>
           <div style={{ display: 'flex', gap: 4, marginBottom: 16, flexWrap: 'wrap' }}>
-            <Pill icon={<Icon name="package" size={10} color={C.textBody} />}>Product Review</Pill>
+            <Pill icon={<Icon name="package" size={10} color={C.textBody} />}>Photo Post</Pill>
             <Pill icon={<Icon name="clock" size={10} color={C.textBody} />}>1h</Pill>
             <Pill>Beginner</Pill>
           </div>
           <p style={{ ...fw(400), fontSize: 16, color: C.textBody, lineHeight: '20px', marginBottom: 24 }}>
-            Promote American Eagle's NEW Pillow Talk Blush Balm Lip Tint — a 3-in-1 lipstick, balm, and tint that creates a customised, blushed-from-within glow. Create scroll-stopping content showcasing your shade and share via your affiliate link.
+            Show off the Crossover Flare Leg Jean styled three different ways — casual, date night, and elevated basics. Capture the fit and versatility, and share via your affiliate link.
           </p>
 
           <div style={{ background: C.cardBg, borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -928,7 +928,7 @@ function ChallengeDetailScreen({ onBack }) {
               <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
 
               <p style={{ ...fw(700), fontSize: 20, textAlign: 'center', color: C.text, margin: '0 0 4px' }}>Share Your Challenge</p>
-              <p style={{ ...fw(400), fontSize: 14, textAlign: 'center', color: C.textMuted, margin: '0 0 24px' }}>Pillow Talk Blush Balm Lip Tint: One Swipe Glow</p>
+              <p style={{ ...fw(400), fontSize: 14, textAlign: 'center', color: C.textMuted, margin: '0 0 24px' }}>Crossover Flare Leg Jean: Style It 3 Ways</p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 24 }}>
                 {/* Step 1 */}
@@ -938,7 +938,7 @@ function ChallengeDetailScreen({ onBack }) {
                   </div>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                     <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '20px' }}>
-                      Include the required hashtag{'\n'}#CharlotteTilbury #MagicBeautyStars
+                      Include the required hashtag{'\n'}#AmericanEagle #AEStyle
                     </p>
                     <motion.button whileTap={{ scale: 0.95 }} onClick={handleCopy} style={{ flexShrink: 0, height: 32, padding: '0 14px', border: `1px solid ${C.border}`, borderRadius: 8, background: copied ? C.text : C.white, ...fw(600), fontSize: 13, color: copied ? C.white : C.text, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s,color 0.2s' }}>
                       {copied ? 'Copied' : 'Copy'}
@@ -1066,10 +1066,10 @@ function GroupChallengeDetailScreen({ onBack }) {
 function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen, onGroupChallengeOpen, mode = 'advocate' }) {
   const [filter, setFilter] = useState(mode === 'employee' ? 'Group' : 'Explore')
   const challenges = [
-    { title: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', pts: 120, type: 'Product Review', time: '1h', level: 'Beginner', emoji: '💄', bg: 'linear-gradient(145deg,#faeae4,#e0a090)' },
-    { title: 'Hollywood Flawless Filter: 5 Ways to Wear It', pts: 85, type: 'Tutorial', time: '45m', level: 'Intermediate', emoji: '✨', bg: 'linear-gradient(145deg,#f0e8ff,#b498d8)' },
-    { title: "Charlotte's Magic Cream: Your 7-Day Skin Test", pts: 200, type: 'Review', time: '2h', level: 'Advanced', emoji: '🌟', bg: 'linear-gradient(145deg,#e8f4e8,#90c890)' },
-    { title: 'Airbrush Flawless Foundation First Look', pts: 60, type: 'Product Review', time: '30m', level: 'Beginner', emoji: '🧴', bg: 'linear-gradient(145deg,#fff4e0,#e8c870)' },
+    { title: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120, type: 'Photo Post', time: '1h', level: 'Beginner', emoji: '👖', bg: 'linear-gradient(145deg,#dbe8ff,#6090d0)' },
+    { title: 'Cloud Hoodie: Cosy Season Campaign', pts: 85, type: 'Photo Post', time: '45m', level: 'Intermediate', emoji: '🤍', bg: 'linear-gradient(145deg,#f0e8ff,#b498d8)' },
+    { title: 'AirFlex+ Slim Jean: 7-Day Wear Test', pts: 200, type: 'Video', time: '2h', level: 'Advanced', emoji: '✨', bg: 'linear-gradient(145deg,#e8f4e8,#90c890)' },
+    { title: 'Real Me Legging: Move With Me', pts: 60, type: 'Photo Post', time: '30m', level: 'Beginner', emoji: '🏃', bg: 'linear-gradient(145deg,#fff4e0,#e8c870)' },
   ]
 
   if (mode === 'loyalty') {
@@ -1188,8 +1188,8 @@ function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen
 function ReplySheet({ post, onClose }) {
   const [text, setText] = useState('')
   const [replies, setReplies] = useState([
-    { initial: 'T', name: 'Thea Walsh', time: '12m ago', body: 'Yes! I layer it over SPF50 all the time — the glow still comes through. Lightweight SPF formulas work best as they absorb faster.' },
-    { initial: 'J', name: 'Jade Perry', time: '28m ago', body: 'Just make sure your SPF is fully absorbed first (wait about 5 mins). The filter goes on beautifully over it.' },
+    { initial: 'T', name: 'Thea Walsh', time: '12m ago', body: 'Totally normal! Size down one and they hold their shape much better. I do it with every AirFlex style now.' },
+    { initial: 'J', name: 'Jade Perry', time: '28m ago', body: 'Wash them inside out on cold and they keep their fit way longer. Game changer for the stretch denim.' },
   ])
   const handlePost = () => {
     if (!text.trim()) return
@@ -1391,14 +1391,14 @@ function AdvocateProfileSheet({ advocate, onClose }) {
 }
 
 const SIMILAR_POSTS_DATA = [
-  { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: `My everyday glow routine featuring ${BRAND} Pillow Talk`, saves: 14 },
-  { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'New Pillow Talk shades ranked by undertone', saves: 9 },
-  { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Filter for a no-makeup makeup look', saves: 21 },
-  { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Full Pillow Talk collection — every product reviewed', saves: 6 },
-  { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Charlotte's Magic Cream 7-day skin transformation", saves: 33 },
-  { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', body: 'Summer makeup routine ft. Airbrush Foundation', saves: 18 },
-  { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', body: `Bold glam look using only ${BRAND} products`, saves: 27 },
-  { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '💙', body: 'Dewy skin prep with Hollywood Flawless Filter', saves: 11 },
+  { gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: `My everyday OOTD ft. ${BRAND} Crossover Flare`, saves: 14 },
+  { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Cloud Hoodie 3 ways — casual to elevated', saves: 9 },
+  { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'AirFlex+ jeans — worth the hype?', saves: 21 },
+  { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Full AE denim lineup — every wash reviewed', saves: 6 },
+  { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: 'Real Me Legging 7-day wear test results', saves: 33 },
+  { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', body: 'Summer outfit ft. AE Denim Shorts + Graphic Tee', saves: 18 },
+  { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', body: `Going out fit using only ${BRAND} pieces`, saves: 27 },
+  { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '💙', body: 'Day to night: Dream Jean styled 2 ways', saves: 11 },
 ]
 
 const SUGGESTED_ADVOCATES = [
@@ -1446,7 +1446,7 @@ const COMMUNITY_HERO = {
 const BRAND_SPOTLIGHT = {
   initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',
   gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷',
-  body: 'Bridal makeup trial done using nothing but American Eagle — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍',
+  body: 'Styled the Crossover Flare Jean three ways for the challenge — casual, date night, and elevated basics. AE denim does it all 👖✨',
   saves: 53,
   brandNote: 'Saved by the American Eagle team',
 }
@@ -1627,15 +1627,15 @@ function CreatorsYouMightLike() {
 function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, onRemixOpen, onRecognitionOpen, mode = 'advocate' }) {
   const [filter, setFilter] = useState('Inspiring')
   const [saved, setSaved] = useState(Array(9).fill(false))
-  const [theme, setTheme] = useState('Bridal')
+  const [theme, setTheme] = useState('Date Night')
   const tabRef = useRef(null)
 
   if (mode === 'loyalty') {
     const brandPosts = [
-      { gradient: 'linear-gradient(145deg,#faeae4,#f0c8b8,#e0a090)', caption: 'Introducing the new Pillow Talk Blush Balm. Effortless colour, all day.' },
-      { gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', caption: 'Hollywood Flawless Filter: your skin, but better. Shop the look.' },
-      { gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', caption: "Charlotte's Magic Cream — 27 years of skincare expertise in one pot." },
-      { gradient: 'linear-gradient(145deg,#fff4e0,#fde68a,#f59e0b)', caption: 'The Edit: our most-loved products of the season, curated for you.' },
+      { gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', caption: 'Introducing the new Crossover Flare Leg Jean. The fit that works for everyone.' },
+      { gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', caption: 'Cloud Hoodie: your go-to layer, all season long.' },
+      { gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', caption: 'AirFlex+ Denim — the most comfortable jeans we\'ve ever made.' },
+      { gradient: 'linear-gradient(145deg,#fff4e0,#fde68a,#f59e0b)', caption: 'The Edit: our most-loved styles of the season, curated for you.' },
     ]
     return (
       <div>
@@ -1666,25 +1666,25 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
     }
   }, [filter])
   const THEME_DATA = {
-    Bridal: { desc: 'Advocate-approved looks for your big day', posts: [
-      { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '💍', name: 'Sofia Brennan', saves: 34 },
-      { gradient: 'linear-gradient(135deg,#f0e8ff,#e9d5ff,#c4b5fd)', emoji: '🤍', name: 'Isla Thompson', saves: 28 },
-      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fdba74)', emoji: '🌸', name: 'Tara Williams', saves: 19 },
-      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '💐', name: 'Lea Fontaine', saves: 41 },
+    'Date Night': { desc: 'Advocate-approved fits for your next evening out', posts: [
+      { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌙', name: 'Sofia Brennan', saves: 34 },
+      { gradient: 'linear-gradient(135deg,#f0e8ff,#e9d5ff,#c4b5fd)', emoji: '✨', name: 'Isla Thompson', saves: 28 },
+      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fdba74)', emoji: '🌟', name: 'Tara Williams', saves: 19 },
+      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '💫', name: 'Lea Fontaine', saves: 41 },
     ]},
-    'Natural Glow': { desc: 'Clean, effortless beauty from the community', posts: [
+    'Off-Duty Looks': { desc: 'Easy, effortless style from the community', posts: [
       { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', name: 'Priya Nair', saves: 22 },
       { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#fcd34d)', emoji: '☀️', name: 'Maya Osei', saves: 17 },
       { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '🍃', name: 'Amara Diallo', saves: 31 },
       { gradient: 'linear-gradient(135deg,#faeae4,#fdd5c8,#fbb09a)', emoji: '✨', name: 'Rachel Kim', saves: 14 },
     ]},
-    'Bold & Glam': { desc: 'Show-stopping looks from our top advocates', posts: [
+    'Going Out Fits': { desc: 'Show-stopping looks from our top advocates', posts: [
       { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', name: 'Lea Fontaine', saves: 48 },
-      { gradient: 'linear-gradient(135deg,#ffe4e6,#fecdd3,#fb7185)', emoji: '💋', name: 'Chloe Nakamura', saves: 37 },
+      { gradient: 'linear-gradient(135deg,#ffe4e6,#fecdd3,#fb7185)', emoji: '🔥', name: 'Chloe Nakamura', saves: 37 },
       { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '✨', name: 'Isla Thompson', saves: 52 },
-      { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', name: 'Sofia Brennan', saves: 29 },
+      { gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', name: 'Sofia Brennan', saves: 29 },
     ]},
-    Summer: { desc: 'Sun-kissed looks for the warmer months', posts: [
+    'Summer Denim': { desc: 'Sun-ready denim and shorts from the community', posts: [
       { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', name: 'Priya Nair', saves: 26 },
       { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '🌊', name: 'Nina Reeves', saves: 18 },
       { gradient: 'linear-gradient(135deg,#fef9c3,#fef08a,#facc15)', emoji: '🌻', name: 'Tara Williams', saves: 33 },
@@ -1698,15 +1698,15 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
     ]},
   }
   const posts = [
-    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: `How beautiful is ${BRAND_HANDLE} NEW Pillow talk beauty soulmates palette in the shade — Flawless rosewood 🩷✨`, saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
-    { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'May 2025', time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'Finally tried the Pillow Talk lip kit 💋 The liner and lipstick combo is so gorgeous. Shade: Original.', saves: 18, instagram: { handle: '@sofia.brennan', followers: 22400 }, tiktok: { handle: '@sofiabeauty_', followers: 31600 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '5 challenges in a row' }, { icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }] },
-    { initial: 'M', name: 'Maya Osei', tier: 'Silver', role: null, time: '2h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried layering the Hollywood Flawless Filter over SPF? Wondering if it affects the glow...', saves: 7, instagram: { handle: '@maya.osei', followers: 8900 }, tiktok: { handle: '@mayaosei_', followers: 14500 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
-    { initial: 'P', name: 'Priya Nair', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'June 2025', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the Magic Cream 7-day test and wow — my skin has never looked better. The hydration is genuinely unreal 🧴✨", saves: 31, instagram: { handle: '@priya.nair', followers: 19600 }, tiktok: { handle: '@priyanairbeauty', followers: 44200 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '3 in a row' }] },
-    { initial: 'R', name: 'Rachel Kim', tier: 'Silver', role: null, time: '3h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "Does anyone know if the Airbrush Flawless Foundation works well for oily skin? My T-zone gets really shiny by midday and I'm worried it'll slide off...", saves: 12, instagram: { handle: '@rachelkim.beauty', followers: 6200 }, tiktok: { handle: '@rachelkimbeauty', followers: 9800 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
-    { initial: 'I', name: 'Isla Thompson', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'March 2024', time: '4h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Flawless Filter in shade 4 — my go-to for every shoot this season. That lit-from-within glow is just unmatched 📸', saves: 47, instagram: { handle: '@isla.thompson', followers: 87400 }, tiktok: { handle: '@islathompson', followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#1 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 12 members' }] },
-    { initial: 'A', name: 'Amara Diallo', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'August 2025', time: '5h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "What's the best way to remove the Magic Cream without stripping your skin? I've been using a basic cleanser but I feel like I'm missing something...", saves: 9, instagram: { handle: '@amara.diallo', followers: 11300 }, tiktok: { handle: '@amaradiallo_', followers: 18700 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '4 in a row' }] },
-    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'July 2025', time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Bridal makeup trial done using nothing but American Eagle — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkbeauty', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
-    { initial: 'N', name: 'Nina Reeves', tier: 'Silver', role: null, time: '7h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Is the Pillow Talk Original or Matte Revolution better for fair skin? I keep going back and forth and can\'t decide before I complete the challenge 😅', saves: 5, instagram: { handle: '@nina.reeves', followers: 4400 }, tiktok: { handle: '@ninareevesbeauty', followers: 7100 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
+    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: `The ${BRAND_HANDLE} Crossover Flare Leg Jean is genuinely the best denim I've owned — styled it 3 ways for the challenge and every look landed 🩵👖`, saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
+    { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'May 2025', time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Finally got the Cloud Hoodie and I am obsessed 🤍 The fabric is so soft and the oversized fit is perfect. Already ordered it in two colours.', saves: 18, instagram: { handle: '@sofia.brennan', followers: 22400 }, tiktok: { handle: '@sofiabrennanstyIe', followers: 31600 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '5 challenges in a row' }, { icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }] },
+    { initial: 'M', name: 'Maya Osei', tier: 'Silver', role: null, time: '2h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone sized down in the AirFlex+ jeans? Wondering if they stretch out after a few wears or stay true to size...', saves: 7, instagram: { handle: '@maya.osei', followers: 8900 }, tiktok: { handle: '@mayaosei_', followers: 14500 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
+    { initial: 'P', name: 'Priya Nair', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'June 2025', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the 7-day AirFlex+ wear test and honestly — these are the most comfortable jeans I've ever owned. The stretch is unreal 👖✨", saves: 31, instagram: { handle: '@priya.nair', followers: 19600 }, tiktok: { handle: '@priyanairfashion', followers: 44200 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '3 in a row' }] },
+    { initial: 'R', name: 'Rachel Kim', tier: 'Silver', role: null, time: '3h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "Does anyone know if the Real Me Legging holds up for workouts? Worried about see-through fabric when squatting — worth sizing up?", saves: 12, instagram: { handle: '@rachelkimstyle', followers: 6200 }, tiktok: { handle: '@rachelkimfits', followers: 9800 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
+    { initial: 'I', name: 'Isla Thompson', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'March 2024', time: '4h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'Dream Jean in light wash — my go-to for every shoot this season. The rise and leg opening is just unmatched for styling 📸', saves: 47, instagram: { handle: '@isla.thompson', followers: 87400 }, tiktok: { handle: '@islathompson', followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#1 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 12 members' }] },
+    { initial: 'A', name: 'Amara Diallo', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'August 2025', time: '5h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "What's the best way to wash the Cloud Hoodie without losing the softness? Washing on cold but feel like it's getting a bit rough...", saves: 9, instagram: { handle: '@amara.diallo', followers: 11300 }, tiktok: { handle: '@amaradiallo_', followers: 18700 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '4 in a row' }] },
+    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'July 2025', time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Date night look done ✅ Crossover Flare Jean + going out top from AE and I am OBSESSED. This fit is everything 💫', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkstyle', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
+    { initial: 'N', name: 'Nina Reeves', tier: 'Silver', role: null, time: '7h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Is the AirFlex+ Slim or the Dream Slim better for longer legs? Keep going back and forth and can\'t decide before I complete the challenge 😅', saves: 5, instagram: { handle: '@nina.reeves', followers: 4400 }, tiktok: { handle: '@ninareevestyle', followers: 7100 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
   ]
   return (
     <div ref={tabRef}>
@@ -1734,10 +1734,10 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
       {filter === 'Following' ? (
         <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
-            { initial: 'T', name: 'Tara Williams', tier: 'Platinum', tenure: '2-year advocate', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'This Pillow Talk Blush Balm is everything — the pigment is unreal for an everyday look 🌸', saves: 19 },
-            { initial: 'J', name: 'Jade Parker', tier: 'Gold', tenure: '1-year advocate', time: '34m ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone layered the Hollywood Flawless Filter with the Airbrush Foundation? Wondering which goes on first...', saves: 8 },
-            { initial: 'D', name: 'Daniela Cruz', tier: 'Gold', tenure: '1-year advocate', time: '2h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', body: "Day 3 of the Magic Cream challenge and my skin has never felt this hydrated. Genuinely shocked 🧴✨", saves: 26 },
-            { initial: 'H', name: 'Hannah Scott', tier: 'Silver', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Bridal trial done ✅ Used the full Pillow Talk collection and I am OBSESSED. This is the one 💍', saves: 41 },
+            { initial: 'T', name: 'Tara Williams', tier: 'Platinum', tenure: '2-year advocate', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'These Crossover Flare Leg Jeans are everything — the fit is unreal for an everyday look 🌸', saves: 19 },
+            { initial: 'J', name: 'Jade Parker', tier: 'Gold', tenure: '1-year advocate', time: '34m ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried the Cloud Hoodie in both regular and oversized fit? Wondering which one photographs better for content...', saves: 8 },
+            { initial: 'D', name: 'Daniela Cruz', tier: 'Gold', tenure: '1-year advocate', time: '2h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '✨', body: "Day 3 of the AirFlex+ wear test and these jeans are genuinely the most comfortable denim I've ever worn. Shocked 👖✨", saves: 26 },
+            { initial: 'H', name: 'Hannah Scott', tier: 'Silver', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Graduation outfit done ✅ Wore the full AE look and I am absolutely obsessed. The Crossover Flare was the perfect choice 💫', saves: 41 },
           ].map((post, i) => (
             <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
@@ -1774,7 +1774,7 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
       ) : filter === 'Trending' ? (
         <div style={{ padding: '16px 16px 32px' }}>
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, scrollbarWidth: 'none' }}>
-            {['Bridal', 'Natural Glow', 'Bold & Glam', 'Summer', 'Streaks'].map(t => {
+            {['Date Night', 'Off-Duty Looks', 'Going Out Fits', 'Summer Denim', 'Streaks'].map(t => {
               const on = theme === t
               return (
                 <motion.button key={t} whileTap={{ scale: 0.94 }} onClick={() => setTheme(t)}
@@ -1785,24 +1785,24 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
             })}
           </div>
           <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, marginBottom: 14 }}>{THEME_DATA[theme].desc}</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {THEME_DATA[theme].posts.map((p, j) => (
-              <motion.div key={j} whileTap={{ scale: 0.97 }} style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden', cursor: 'pointer' }}>
-                <div style={{ height: 130, background: p.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 32, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.12))' }}>{p.emoji}</span>
+              <motion.div key={j} whileTap={{ scale: 0.97 }} style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', cursor: 'pointer' }}>
+                <div style={{ aspectRatio: '4/5', background: p.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 46, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))' }}>{p.emoji}</span>
                 </div>
-                <div style={{ padding: '8px 10px 10px' }}>
-                  <p style={{ ...fw(500), fontSize: 12, color: C.text, marginBottom: 4 }}>{p.name}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <div style={{ padding: '10px 12px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <p style={{ ...fw(600), fontSize: 14, color: C.text }}>{p.name}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     {theme === 'Streaks' ? (
                       <>
-                        <Icon name="flame" size={10} color={C.textMuted} />
-                        <span style={{ ...fw(500), fontSize: 11, color: C.textMuted }}>{p.streakDays} days</span>
+                        <Icon name="flame" size={12} color={C.textMuted} />
+                        <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>{p.streakDays} days</span>
                       </>
                     ) : (
                       <>
-                        <Icon name="bookmark" size={10} color={C.textMuted} />
-                        <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{p.saves}</span>
+                        <Icon name="bookmark" size={12} color={C.textMuted} />
+                        <span style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>{p.saves}</span>
                       </>
                     )}
                   </div>
@@ -1965,9 +1965,9 @@ function ContentAnalyserScreen({ onBack }) {
   if (step === 2) {
     const RECS = [
       { icon: 'clock',        category: 'Hook',            title: 'Strengthen your opening',       body: 'Viewers decide within 3 seconds. Start with the product in action or a bold statement — not a wide establishing shot.' },
-      { icon: 'pencilRuler',  category: 'Caption',         title: 'Name the product specifically', body: "Mention the exact product and shade. 'Pillow Talk Blush Balm' performs better than generic descriptions in both search and engagement." },
+      { icon: 'pencilRuler',  category: 'Caption',         title: 'Name the product specifically', body: "Mention the exact product and style. 'Crossover Flare Leg Jean' performs better than generic descriptions in both search and engagement." },
       { icon: 'sliders',      category: 'Lighting',        title: 'Even out your lighting',        body: 'The left side of the frame is slightly dim. Filming near a window or with a ring light will give a more polished finish.' },
-      { icon: 'flag',         category: 'Discoverability', title: 'Add the required hashtags',     body: '#CharlotteTilbury and #MagicBeautyStars are required for challenge submission. Your caption is missing both.' },
+      { icon: 'flag',         category: 'Discoverability', title: 'Add the required hashtags',     body: '#AmericanEagle and #AEStyle are required for challenge submission. Your caption is missing both.' },
     ]
     return (
       <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
@@ -2144,12 +2144,12 @@ function RemixScreen({ onBack }) {
                 <Icon name="person" size={16} color={C.textMuted} />
               </div>
               <div>
-                <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>@beautybyella</p>
+                <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>@stylebyella</p>
                 <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>47.2K views · 3 days ago</p>
               </div>
             </div>
             <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>
-              My everyday American Eagle routine ✨ The Pillow Talk look never gets old. #MagicBeautyStars #CharlotteTilbury
+              My everyday AE outfit ✨ The Crossover Flare never gets old. #AEStyle #AmericanEagle
             </p>
           </div>
 
@@ -2197,9 +2197,9 @@ function RemixScreen({ onBack }) {
         <div>
           <p style={{ ...fw(500), fontSize: 13, color: C.textMuted, margin: '0 0 10px' }}>Or choose from trending posts</p>
           {[
-            { handle: '@beautybyella',   caption: 'My everyday American Eagle routine ✨', views: '47.2K' },
-            { handle: '@glossandglow',   caption: 'Pillow Talk everything — the full collection', views: '31.8K' },
-            { handle: '@makeupwithrose', caption: 'American Eagle morning glow in 5 mins',    views: '28.4K' },
+            { handle: '@stylebyella',    caption: 'My everyday AE outfit ✨', views: '47.2K' },
+            { handle: '@fitswithgrace',  caption: 'AE denim haul — every style ranked', views: '31.8K' },
+            { handle: '@wornbyrose',     caption: 'American Eagle OOTD in 5 mins',    views: '28.4K' },
           ].map((post, i) => (
             <motion.button
               key={i}
@@ -2483,15 +2483,15 @@ function ProgressContent({ mode = 'advocate', onFlywheelOpen }) {
 function ActivityTimeline({ mode = 'advocate' }) {
   const entries = mode === 'loyalty'
     ? [
-        { icon: 'package',     action: 'Purchase recognised',  detail: 'Hollywood Filter 30ml',  pts: '+15 pts',  date: 'Today' },
-        { icon: 'pencilRuler', action: 'Review approved',      detail: 'Hollywood Filter',        pts: '+25 pts',  date: '2 days ago' },
+        { icon: 'package',     action: 'Purchase recognised',  detail: 'Crossover Flare Leg Jean', pts: '+15 pts',  date: 'Today' },
+        { icon: 'pencilRuler', action: 'Review approved',      detail: 'Cloud Hoodie',             pts: '+25 pts',  date: '2 days ago' },
         { icon: 'users',       action: 'Referral confirmed',   detail: 'Sophie made a purchase', pts: '+100 pts', date: 'Jun 10' },
         { icon: 'gift',        action: 'Birthday Bonus',       detail: 'Happy birthday month!',  pts: '+200 pts', date: 'Apr 1' },
       ]
     : [
-        { icon: 'flag',    action: 'Challenge completed',         detail: 'Natural Glow Routine',    pts: '+50 pts',  date: 'Today' },
-        { icon: 'users',   action: 'Referral confirmed',          detail: 'Sophie joined your link', pts: '+100 pts', date: 'Yesterday' },
-        { icon: 'package', action: 'Purchase recognised',         detail: 'Hollywood Filter 30ml',   pts: '+15 pts',  date: '3 days ago' },
+        { icon: 'flag',    action: 'Challenge completed',         detail: 'Crossover Flare: Style It 3 Ways', pts: '+50 pts',  date: 'Today' },
+        { icon: 'users',   action: 'Referral confirmed',          detail: 'Sophie joined your link',         pts: '+100 pts', date: 'Yesterday' },
+        { icon: 'package', action: 'Purchase recognised',         detail: 'AirFlex+ Slim Jean',              pts: '+15 pts',  date: '3 days ago' },
         { icon: 'award',   action: '1-Year Advocacy Anniversary', detail: 'Thank you for a year!',   pts: '+500 pts', date: 'Jun 8' },
         { icon: 'store',   action: 'Storefront sale',             detail: '2 items via your link',   pts: '+22 pts',  date: 'Jun 7' },
       ]
@@ -2540,10 +2540,10 @@ function MilestoneCelebrationOverlay({ name, yearsCount, onClose }) {
 
 function RewardsContent() {
   const products = [
-    { name: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', pts: 120 },
-    { name: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', pts: 120 },
-    { name: 'Hollywood Flawless Filter 30ml', pts: 85 },
-    { name: 'Airbrush Flawless Foundation', pts: 60 },
+    { name: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120 },
+    { name: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120 },
+    { name: 'Cloud Hoodie: Cosy Season Campaign', pts: 85 },
+    { name: 'Real Me Legging: Move With Me', pts: 60 },
   ]
   return (
     <div style={{ padding: '16px 16px 32px' }}>
@@ -3043,24 +3043,24 @@ function getSuggestions(text) {
   const t = text.toLowerCase()
   if (t.match(/coachella|festival|outdoor|stage|concert|music/))
     return [
-      { title: 'Desert-Proof Glam',       desc: `Show us the ${BRAND} look that survives sun, sweat, and the second stage.`, caption: `desert-proof glam 🌵\nthis look survived 12 hours at coachella — the heat, the crowds, the dust, all of it.\n\n🟠 ${BRAND} Pillow Talk Push Up Lashes — didn't smudge once\n🟠 Airbrush Flawless Setting Spray — before AND after` },
-      { title: 'Gates to Headliner',      desc: 'One face. All day. The American Eagle look that goes the distance.',  caption: `from gates to headliner ✨\none ${BRAND} face. all day. no touch-ups. here's my secret lineup:\n\n🟠 Flawless Filter — my second skin\n🟠 Hollywood Contour Wand — never without it` },
-      { title: 'Festival Glow, Your Way', desc: `Your festival, your rules. A ${BRAND}-powered look made for the moment.`,     caption: `festival glow, my way 🎪\nyour rules, your look. here's how I built mine with ${BRAND}:\n\n🟠 Magic Foundation — full coverage, feels like nothing\n🟠 Pillow Talk Blush — the most natural flush` },
-      { title: 'Your Festival Beat',      desc: `Walk us through the ${BRAND} products behind your perfect festival face.`,     caption: `the ${BRAND} products that made my festival look 🎵\nwalk-through incoming. every product, every step.` },
+      { title: 'Festival-Proof Fit',       desc: `Show us the ${BRAND} outfit that survives sun, sweat, and the second stage.`, caption: `festival-proof fit 🌵\nthis look survived 12 hours at coachella — the heat, the crowds, the dust, all of it.\n\n🟠 ${BRAND} AirFlex+ Jeans — didn't crease once\n🟠 AE Vintage Tee — before AND after, still going` },
+      { title: 'Gates to Headliner',      desc: 'One outfit. All day. The AE look that goes the distance.',  caption: `from gates to headliner ✨\none ${BRAND} outfit. all day. no changes. here's my festival formula:\n\n🟠 AirFlex+ Jeans — move all day, look good doing it\n🟠 AE Graphic Tee — the one that goes with everything` },
+      { title: 'Festival Fit, Your Way', desc: `Your festival, your rules. An ${BRAND}-powered look made for the moment.`,     caption: `festival fit, my way 🎪\nyour rules, your look. here's how I built mine with ${BRAND}:\n\n🟠 Crossover Flare Jean — the crowd favourite\n🟠 AE Cropped Hoodie — for when it gets cool` },
+      { title: 'Your Festival Look',      desc: `Walk us through the ${BRAND} pieces behind your perfect festival outfit.`,     caption: `the ${BRAND} pieces that made my festival look 🎵\nwalk-through incoming. every item, every choice.` },
     ]
-  if (t.match(/skin|routine|moistur|serum|glow|complexion|care/))
+  if (t.match(/hoodie|sweater|fleece|top|tee|shirt|layer/))
     return [
-      { title: 'Morning Ritual',    desc: `Share your step-by-step ${BRAND} skincare routine with your community.`,   caption: `my morning routine with ${BRAND} ☀️\nnon-negotiables only. here's what actually makes a difference:\n\n🟠 Charlotte's Magic Cream — 5 mins in, my skin is awake\n🟠 Flawless Filter — the only "makeup" I wear on bare days` },
-      { title: 'Glow From Within',  desc: 'Capture the before-and-after. Show your skin\'s transformation.',    caption: `before → after 🤍\nthis is what consistent ${BRAND} skincare does. no filter, no edits.` },
-      { title: 'Night Mode',        desc: `Your evening wind-down — what ${BRAND} products are non-negotiable?`,      caption: `night mode activated 🌙\nmy wind-down with ${BRAND}. the products I'd keep if I could only keep three.` },
-      { title: 'Skin School',       desc: `Teach your community your skincare secrets, ${BRAND} style.`,               caption: `skin school is in session 📖\nhere's everything I wish I'd known sooner about building a ${BRAND} routine.` },
+      { title: 'Morning OOTD',      desc: `Share your step-by-step ${BRAND} getting-dressed routine with your community.`,   caption: `my morning OOTD with ${BRAND} ☀️\nnon-negotiables only. here's what I always reach for:\n\n🟠 Cloud Hoodie — on before I'm even awake\n🟠 AirFlex+ Jeans — the only bottoms I wear on lazy days` },
+      { title: 'Before & After',    desc: 'Capture the transformation. Show how styling changes the fit.',    caption: `before → after 🤍\nthis is what the right ${BRAND} fit does. no filter, no edits.` },
+      { title: 'Night Mode',        desc: `Your going-out look — what ${BRAND} pieces are non-negotiable?`,      caption: `night mode activated 🌙\nmy going-out formula with ${BRAND}. the pieces I'd keep if I could only keep three.` },
+      { title: 'Style School',      desc: `Teach your community your styling secrets, ${BRAND} style.`,               caption: `style school is in session 📖\nhere's everything I wish I'd known sooner about building an ${BRAND} wardrobe.` },
     ]
   if (t.match(/ootd|outfit|style|fashion|wear|look|fit/))
     return [
-      { title: 'Your Signature Look', desc: `The ${BRAND} makeup that completes your favourite outfit.`,            caption: `my signature look 🖤\nthe outfit chose the makeup. here's how I pulled it together with ${BRAND}.` },
-      { title: 'GRWM: My Way',        desc: `A full get-ready-with-me featuring your go-to ${BRAND} products.`,     caption: `get ready with me ✨\nfull GRWM from bare skin to out-the-door, ${BRAND} only.` },
-      { title: 'Mood Board',          desc: 'Match your makeup to your outfit. Style meets beauty.',           caption: `makeup meets fashion 🎨\nI matched my ${BRAND} look to my outfit and this is what happened.` },
-      { title: 'Day to Night',        desc: `One outfit, two ${BRAND} looks. The daytime and evening transition.`,   caption: `day to night with ${BRAND} 🌅\nsame outfit, completely different energy. here's the transition.` },
+      { title: 'Your Signature Style', desc: `The ${BRAND} pieces that define your personal style.`,               caption: `my signature style 🖤\nthese are the ${BRAND} pieces I reach for on repeat. here's why.` },
+      { title: 'GRWM: My Way',        desc: `A full get-ready-with-me featuring your go-to ${BRAND} pieces.`,      caption: `get ready with me ✨\nfull GRWM from pyjamas to out-the-door, ${BRAND} only.` },
+      { title: 'Mood Board',          desc: 'Build a mood board. Show how you style one piece different ways.',    caption: `one piece, three ways 🎨\nI styled my ${BRAND} fave completely differently each time and this is what happened.` },
+      { title: 'Day to Night',        desc: `One ${BRAND} outfit, styled for day and night.`,                      caption: `day to night with ${BRAND} 🌅\nsame pieces, completely different energy. here's the transition.` },
     ]
   if (t.match(/tutorial|how to|teach|beginner|step|guide|tips/))
     return [
@@ -3069,12 +3069,12 @@ function getSuggestions(text) {
       { title: 'The Magic Trick', desc: `That one ${BRAND} technique that changed everything for you.`,      caption: `one trick. big difference. ✨\nI've been doing this with my ${BRAND} products for 6 months and the results speak.` },
       { title: 'From Scratch',   desc: 'A full face, explained. Walk us through every product.',       caption: 'full face from scratch 🧴\nI\'m explaining every single product and why it earns a place in my routine.' },
     ]
-  if (t.match(/lip|lipstick|tint|balm|nude|red|pout/))
+  if (t.match(/jean|denim|flare|slim|straight|baggy|mom jean/))
     return [
-      { title: 'Pillow Talk, Your Way', desc: `Your favourite ${BRAND} lip look and the story behind it.`,  caption: 'pillow talk, my way 💋\nthis shade does something to me. here\'s the full look and why it\'s stayed in my bag.' },
-      { title: 'Lip Library',           desc: `Swatch, test, review. Your ultimate ${BRAND} lip roundup.`, caption: `my ${BRAND} lip library 💄\nevery shade I've tried, reviewed honestly. your guide to finding yours.` },
-      { title: 'One Lip, All Day',      desc: `Put your ${BRAND} lip to the test — morning to night.`,      caption: `one ${BRAND} lip from 7am to midnight ⏱\nno touch-ups. just results. here's how it held up.` },
-      { title: 'Match My Lip',          desc: `Find the perfect ${BRAND} shade for every mood and occasion.`, caption: `finding your ${BRAND} lip match 🎯\nI tested 6 shades. here's which one belongs on your face.` },
+      { title: 'The Denim Edit',        desc: `Your favourite ${BRAND} jean and the story behind it.`,       caption: `the denim edit 👖\nthis pair does something to me. here\'s the full look and why it\'s stayed in my rotation.` },
+      { title: 'Denim Library',         desc: `Try, compare, review. Your ultimate ${BRAND} denim roundup.`, caption: `my ${BRAND} denim library 👖\nevery style I've tried, reviewed honestly. your guide to finding yours.` },
+      { title: 'One Jean, All Day',     desc: `Put your ${BRAND} denim to the test — morning to night.`,     caption: `one ${BRAND} jean from 7am to midnight ⏱\nno changes. just results. here's how it held up.` },
+      { title: 'Find Your Fit',         desc: `Find the perfect ${BRAND} denim cut for every mood and occasion.`, caption: `finding your ${BRAND} denim match 🎯\nI tried 4 cuts. here's which one belongs in your wardrobe.` },
     ]
   // Default
   return [
@@ -3136,8 +3136,8 @@ function ChallengeCreationScreen({ onBack }) {
   // ── Step 0: Idea input ──
   if (step === 0) {
     const inspirationCards = [
-      { title: 'Desert-Proof Glam',   desc: `Show us the ${BRAND} look that survives sun, sweat, and the second stage.` },
-      { title: 'Morning Ritual',      desc: `Share your step-by-step ${BRAND} skincare routine.` },
+      { title: 'Festival-Proof Fit',   desc: `Show us the ${BRAND} outfit that survives sun, sweat, and the second stage.` },
+      { title: 'Morning OOTD',        desc: `Share your step-by-step ${BRAND} getting-dressed routine.` },
       { title: 'GRWM: My Way',        desc: `A full get-ready-with-me featuring your go-to ${BRAND} products.` },
     ]
     return (
@@ -3226,7 +3226,7 @@ function ChallengeCreationScreen({ onBack }) {
           style={{ width: '100%', height: 72, border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 14px', fontSize: 15, color: C.text, fontFamily: 'inherit', resize: 'none', outline: 'none', lineHeight: '22px', background: C.white, display: 'block', marginBottom: 12 }}
         />
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
-          {['#charlottetilbury', '#beauty', '#skincare'].map(tag => (
+          {['#americaneagle', '#aestyle', '#denimfit'].map(tag => (
             <span key={tag} style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>{tag}</span>
           ))}
         </div>
@@ -3273,7 +3273,7 @@ function ChallengeCreationScreen({ onBack }) {
                     <span style={{ ...fw(600), fontSize: 12, color: C.textBody }}>1</span>
                   </div>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                    <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '20px' }}>Include the required hashtag{'\n'}#CharlotteTilbury #MagicBeautyStars</p>
+                    <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '20px' }}>Include the required hashtag{'\n'}#AmericanEagle #AEStyle</p>
                     <motion.button whileTap={{ scale: 0.95 }} onClick={handleCopy} style={{ flexShrink: 0, height: 32, padding: '0 14px', border: `1px solid ${C.border}`, borderRadius: 8, background: copied ? C.text : C.white, ...fw(600), fontSize: 13, color: copied ? C.white : C.text, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s,color 0.2s' }}>
                       {copied ? 'Copied' : 'Copy'}
                     </motion.button>
@@ -3441,7 +3441,7 @@ function IntroSheet({ onSetProfilePhoto, onPost }) {
         <input
           value={sentence}
           onChange={e => setSentence(e.target.value)}
-          placeholder="the Pillow Talk lipstick..."
+          placeholder="the Crossover Flare Jean..."
           style={{ width: '100%', border: 'none', borderBottom: `1px solid ${C.border}`, padding: '4px 0', fontSize: 14, color: C.text, fontFamily: 'inherit', background: 'transparent', outline: 'none', marginBottom: 8, display: 'block', boxSizing: 'border-box' }}
         />
         <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '22px', margin: 0 }}>
@@ -3812,7 +3812,7 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
       <AnimatePresence>
         {milestoneOpen && (
           <motion.div key="milestone" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }} style={{ position: 'absolute', inset: 0, zIndex: 50 }}>
-            <MilestoneCelebrationOverlay name="Lea" yearsCount={2} onClose={onMilestoneClose} />
+            <MilestoneCelebrationOverlay name="Zara" yearsCount={2} onClose={onMilestoneClose} />
           </motion.div>
         )}
       </AnimatePresence>
