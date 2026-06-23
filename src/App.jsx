@@ -1,9 +1,214 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const BRAND = 'American Eagle'
-const BRAND_HANDLE = '@americaneagle'
-const BRAND_LOGO = '/AE_Logo.svg'
+const BRAND_CONTENT = {
+  // ── Identity ─────────────────────────────────
+  name: 'American Eagle',
+  handle: '@americaneagle',
+  logo: '/AE_Logo.svg',
+
+  // ── Orders (Progress tab) ─────────────────────
+  orders: [
+    { id: 1, name: 'Crossover Flare Leg Jean', ago: '5 days ago', price: '$85', pts: 744, reviewNudge: true },
+    { id: 2, name: 'Cloud Hoodie',             ago: '3 weeks ago', price: '$65', pts: 481, reviewNudge: false },
+    { id: 3, name: 'Real Me Legging',          ago: 'Last month',  price: '$45', pts: 394, reviewNudge: false },
+  ],
+
+  // ── Flywheel ──────────────────────────────────
+  flywheelMoves: [
+    { key: 'purchase',  label: 'Make a purchase',    desc: 'Every order earns points automatically',   icon: 'package',  pts: 15,  cta: 'Shop now',       done: true  },
+    { key: 'refer',     label: 'Refer a friend',     desc: 'Worth ~$50 of spend in points',            icon: 'userPlus', pts: 100, cta: 'Share link',     done: true  },
+    { key: 'review',    label: 'Write a review',     desc: 'Photo & video reviews earn even more',     icon: 'star',     pts: 25,  cta: 'Write review',   done: true  },
+    { key: 'share',     label: 'Share a look',       desc: 'Tag the brand in a post or story',         icon: 'globe',    pts: 50,  cta: 'Create post',    done: false },
+    { key: 'community', label: 'Help the community', desc: 'Answer a question, share a tip',           icon: 'users',    pts: 75,  cta: 'Open community', done: false },
+  ],
+  flywheelBonus: 300,
+
+  // ── Feed: recommended challenges carousel ─────
+  feedChallenges: [
+    { emoji: '👖', gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', title: 'Crossover Flare Leg Jean: Style It 3 Ways', type: 'Photo Post', time: '1h', level: 'Beginner', pts: 120 },
+    { emoji: '🤍', gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', title: 'Cloud Hoodie: Your Go-To Layer Look', type: 'Photo Post', time: '30m', level: 'Beginner', pts: 80 },
+    { emoji: '✨', gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', title: 'AirFlex+ Slim Jean: 7-Day Wear Test', type: 'Video', time: '2h', level: 'Intermediate', pts: 200 },
+  ],
+
+  // ── Feed: community preview posts ─────────────
+  feedPosts: [
+    {
+      body: 'Crossover Flare Leg Jean is everything right now — styled it 3 ways and every single one goes hard 👖✨',
+    },
+    {
+      question: 'Do the AirFlex+ jeans stretch out after a few wears?',
+      body: "Mine fit perfectly on day 1 but feel noticeably looser by day 3. Wondering if I should size down or if it's normal for this fabric?",
+      reply: "Yes, totally normal — the AirFlex fabric relaxes with body heat. Size down and they'll feel perfect after the first wash. Same in the slim fit here.",
+    },
+  ],
+
+  // ── Feed: loyalty mode product grid ───────────
+  loyaltyProducts: [
+    { name: 'Crossover Flare Leg Jean', price: '$85.00', desc: 'Bestseller' },
+    { name: 'Cloud Hoodie',             price: '$65.00', desc: 'New arrival' },
+    { name: 'Real Me Legging',          price: '$45.00', desc: 'Fan favourite' },
+    { name: 'AirFlex+ Slim Jean',       price: '$59.00', desc: 'Top rated' },
+  ],
+
+  // ── Challenge detail (featured challenge) ─────
+  challengeDetail: {
+    title: 'Crossover Flare Leg Jean: Style It 3 Ways',
+    body: 'Show off the Crossover Flare Leg Jean styled three different ways — casual, date night, and elevated basics. Capture the fit and versatility, and share via your affiliate link.',
+    hashtag: '#AmericanEagle #AEStyle',
+    steps: [
+      'Show the Crossover Flare Leg Jean styled 3 different ways in one post or reel',
+      'Highlight the fit, rise, and versatility — casual, date night, and elevated basics',
+      'Share how you sized and why — this is the #1 question your audience will have',
+      'Share your affiliate code and link',
+      'Tag @americaneagle and include #AD #AmericanEagle #AEStyle',
+    ],
+  },
+
+  // ── Challenges tab ────────────────────────────
+  challenges: [
+    { title: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120, type: 'Photo Post', time: '1h',  level: 'Beginner',     emoji: '👖', bg: 'linear-gradient(145deg,#dbe8ff,#6090d0)' },
+    { title: 'Cloud Hoodie: Cosy Season Campaign',        pts: 85,  type: 'Photo Post', time: '45m', level: 'Intermediate',  emoji: '🤍', bg: 'linear-gradient(145deg,#f0e8ff,#b498d8)' },
+    { title: 'AirFlex+ Slim Jean: 7-Day Wear Test',       pts: 200, type: 'Video',      time: '2h',  level: 'Advanced',      emoji: '✨', bg: 'linear-gradient(145deg,#e8f4e8,#90c890)' },
+    { title: 'Real Me Legging: Move With Me',             pts: 60,  type: 'Photo Post', time: '30m', level: 'Beginner',      emoji: '🏃', bg: 'linear-gradient(145deg,#fff4e0,#e8c870)' },
+  ],
+
+  // ── Community: brand spotlight (feed) ─────────
+  brandSpotlight: {
+    initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',
+    gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷',
+    body: 'Styled the Crossover Flare Jean three ways for the challenge — casual, date night, and elevated basics. AE denim does it all 👖✨',
+    saves: 53,
+    brandNote: 'Saved by the American Eagle team',
+  },
+
+  // ── Community: Inspiring tab posts ────────────
+  communityPosts: [
+    { initial: 'L', name: 'Lea Fontaine',   tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024',  time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: "The @americaneagle Crossover Flare Leg Jean is genuinely the best denim I've owned — styled it 3 ways for the challenge and every look landed 🩵👖", saves: 24, instagram: { handle: '@lea.fontaine',     followers: 48200  }, tiktok: { handle: '@leafontaine',         followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator',       sub: '#2 this month'             }, { icon: 'flag',  label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide',   sub: 'Helped 5 members'        }] },
+    { initial: 'S', name: 'Sofia Brennan',  tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'May 2025',    time: '1h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Finally got the Cloud Hoodie and I am obsessed 🤍 The fabric is so soft and the oversized fit is perfect. Already ordered it in two colours.',                              saves: 18, instagram: { handle: '@sofia.brennan',    followers: 22400  }, tiktok: { handle: '@sofiabrennanstyIe',   followers: 31600  }, achievements: [{ icon: 'flag',  label: 'Challenge Streak',   sub: '5 challenges in a row'   }, { icon: 'award', label: 'Rising Star',        sub: 'Top 10 this month'       }] },
+    { initial: 'M', name: 'Maya Osei',      tier: 'Silver',   role: null,    time: '2h ago',            tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: 'Has anyone sized down in the AirFlex+ jeans? Wondering if they stretch out after a few wears or stay true to size...',                                                       saves: 7,  instagram: { handle: '@maya.osei',        followers: 8900   }, tiktok: { handle: '@mayaosei_',           followers: 14500  }, achievements: [{ icon: 'flag',  label: 'First Challenge',    sub: '1 challenge completed'   }] },
+    { initial: 'P', name: 'Priya Nair',     tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'June 2025',   time: '3h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the 7-day AirFlex+ wear test and honestly — these are the most comfortable jeans I've ever owned. The stretch is unreal 👖✨",                                saves: 31, instagram: { handle: '@priya.nair',       followers: 19600  }, tiktok: { handle: '@priyanairfashion',    followers: 44200  }, achievements: [{ icon: 'award', label: 'Rising Star',        sub: 'Top 10 this month'       }, { icon: 'flag',  label: 'Challenge Streak',   sub: '3 in a row'              }] },
+    { initial: 'R', name: 'Rachel Kim',     tier: 'Silver',   role: null,    time: '3h ago',            tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: "Does anyone know if the Real Me Legging holds up for workouts? Worried about see-through fabric when squatting — worth sizing up?",                                          saves: 12, instagram: { handle: '@rachelkimstyle',  followers: 6200   }, tiktok: { handle: '@rachelkimfits',       followers: 9800   }, achievements: [{ icon: 'flag',  label: 'First Challenge',    sub: '1 challenge completed'   }] },
+    { initial: 'I', name: 'Isla Thompson',  tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'March 2024',  time: '4h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'Dream Jean in light wash — my go-to for every shoot this season. The rise and leg opening is just unmatched for styling 📸',                                               saves: 47, instagram: { handle: '@isla.thompson',    followers: 87400  }, tiktok: { handle: '@islathompson',        followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator',       sub: '#1 this month'             }, { icon: 'flag',  label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide',   sub: 'Helped 12 members'       }] },
+    { initial: 'A', name: 'Amara Diallo',   tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'August 2025', time: '5h ago',  tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: "What's the best way to wash the Cloud Hoodie without losing the softness? Washing on cold but feel like it's getting a bit rough...",                                saves: 9,  instagram: { handle: '@amara.diallo',     followers: 11300  }, tiktok: { handle: '@amaradiallo_',        followers: 18700  }, achievements: [{ icon: 'flag',  label: 'Challenge Streak',   sub: '4 in a row'              }] },
+    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'July 2025',   time: '6h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Date night look done ✅ Crossover Flare Jean + going out top from AE and I am OBSESSED. This fit is everything 💫',                                                        saves: 53, instagram: { handle: '@chloe.nakamura',   followers: 34100  }, tiktok: { handle: '@chloenkstyle',        followers: 67800  }, achievements: [{ icon: 'award', label: 'Rising Star',        sub: 'Top 5 this month'        }, { icon: 'flag',  label: 'Challenge Streak',   sub: '6 in a row'              }] },
+    { initial: 'N', name: 'Nina Reeves',    tier: 'Silver',   role: null,    time: '7h ago',            tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: "Is the AirFlex+ Slim or the Dream Slim better for longer legs? Keep going back and forth and can't decide before I complete the challenge 😅",                               saves: 5,  instagram: { handle: '@nina.reeves',      followers: 4400   }, tiktok: { handle: '@ninareevestyle',      followers: 7100   }, achievements: [{ icon: 'flag',  label: 'First Challenge',    sub: '1 challenge completed'   }] },
+  ],
+
+  // ── Community: Following tab posts ────────────
+  followingPosts: [
+    { initial: 'T', name: 'Tara Williams', tier: 'Platinum', tenure: '2-year advocate', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'These Crossover Flare Leg Jeans are everything — the fit is unreal for an everyday look 🌸', saves: 19 },
+    { initial: 'J', name: 'Jade Parker',   tier: 'Gold',     tenure: '1-year advocate', time: '34m ago', tag: { icon: 'help', label: 'Question'  }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried the Cloud Hoodie in both regular and oversized fit? Wondering which one photographs better for content...', saves: 8 },
+    { initial: 'D', name: 'Daniela Cruz',  tier: 'Gold',     tenure: '1-year advocate', time: '2h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '✨', body: "Day 3 of the AirFlex+ wear test and these jeans are genuinely the most comfortable denim I've ever worn. Shocked 👖✨", saves: 26 },
+    { initial: 'H', name: 'Hannah Scott',  tier: 'Silver',   time: '3h ago',             tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Graduation outfit done ✅ Wore the full AE look and I am absolutely obsessed. The Crossover Flare was the perfect choice 💫', saves: 41 },
+  ],
+
+  // ── Community: loyalty mode brand posts ───────
+  loyaltyBrandPosts: [
+    { gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', caption: 'Introducing the new Crossover Flare Leg Jean. The fit that works for everyone.' },
+    { gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', caption: 'Cloud Hoodie: your go-to layer, all season long.' },
+    { gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', caption: "AirFlex+ Denim — the most comfortable jeans we've ever made." },
+    { gradient: 'linear-gradient(145deg,#fff4e0,#fde68a,#f59e0b)', caption: 'The Edit: our most-loved styles of the season, curated for you.' },
+  ],
+
+  // ── Community: trending themes ─────────────────
+  communityThemes: {
+    'Date Night':    { desc: 'Advocate-approved fits for your next evening out', posts: [
+      { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌙', name: 'Sofia Brennan', saves: 34 },
+      { gradient: 'linear-gradient(135deg,#f0e8ff,#e9d5ff,#c4b5fd)', emoji: '✨', name: 'Isla Thompson', saves: 28 },
+      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fdba74)', emoji: '🌟', name: 'Tara Williams', saves: 19 },
+      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '💫', name: 'Lea Fontaine',  saves: 41 },
+    ]},
+    'Off-Duty Looks': { desc: 'Easy, effortless style from the community', posts: [
+      { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', name: 'Priya Nair',   saves: 22 },
+      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#fcd34d)', emoji: '☀️', name: 'Maya Osei',    saves: 17 },
+      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '🍃', name: 'Amara Diallo', saves: 31 },
+      { gradient: 'linear-gradient(135deg,#faeae4,#fdd5c8,#fbb09a)', emoji: '✨', name: 'Rachel Kim',   saves: 14 },
+    ]},
+    'Going Out Fits': { desc: 'Show-stopping looks from our top advocates', posts: [
+      { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', name: 'Lea Fontaine',    saves: 48 },
+      { gradient: 'linear-gradient(135deg,#ffe4e6,#fecdd3,#fb7185)', emoji: '🔥', name: 'Chloe Nakamura', saves: 37 },
+      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '✨', name: 'Isla Thompson',   saves: 52 },
+      { gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', name: 'Sofia Brennan',  saves: 29 },
+    ]},
+    'Summer Denim':   { desc: 'Sun-ready denim and shorts from the community', posts: [
+      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', name: 'Priya Nair',   saves: 26 },
+      { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '🌊', name: 'Nina Reeves',  saves: 18 },
+      { gradient: 'linear-gradient(135deg,#fef9c3,#fef08a,#facc15)', emoji: '🌻', name: 'Tara Williams', saves: 33 },
+      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#4ade80)', emoji: '🍉', name: 'Maya Osei',    saves: 21 },
+    ]},
+    Streaks:          { desc: 'Advocates on an active posting streak right now', posts: [
+      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🔥', name: 'Chloe Nakamura', streakDays: 21 },
+      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '✨', name: 'Isla Thompson',  streakDays: 14 },
+      { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', name: 'Priya Nair',    streakDays: 9  },
+      { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '💫', name: 'Lea Fontaine',  streakDays: 7  },
+    ]},
+  },
+
+  // ── Profile: similar posts ─────────────────────
+  similarPosts: [
+    { gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'My everyday OOTD ft. American Eagle Crossover Flare', saves: 14 },
+    { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Cloud Hoodie 3 ways — casual to elevated',            saves: 9  },
+    { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'AirFlex+ jeans — worth the hype?',                    saves: 21 },
+    { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Full AE denim lineup — every wash reviewed',          saves: 6  },
+    { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: 'Real Me Legging 7-day wear test results',             saves: 33 },
+    { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', body: 'Summer outfit ft. AE Denim Shorts + Graphic Tee',     saves: 18 },
+    { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', body: 'Going out fit using only American Eagle pieces',      saves: 27 },
+    { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '💙', body: 'Day to night: Dream Jean styled 2 ways',              saves: 11 },
+  ],
+
+  // ── Studio: challenge creation suggestions ──────
+  studioSuggestions: {
+    festival: [
+      { title: 'Festival-Proof Fit',    desc: "Show us the American Eagle outfit that survives sun, sweat, and the second stage.", caption: "festival-proof fit 🌵\nthis look survived 12 hours at coachella — the heat, the crowds, the dust, all of it.\n\n🟠 American Eagle AirFlex+ Jeans — didn't crease once\n🟠 AE Vintage Tee — before AND after, still going" },
+      { title: 'Gates to Headliner',    desc: "One outfit. All day. The AE look that goes the distance.",                          caption: "from gates to headliner ✨\none American Eagle outfit. all day. no changes. here's my festival formula:\n\n🟠 AirFlex+ Jeans — move all day, look good doing it\n🟠 AE Graphic Tee — the one that goes with everything" },
+      { title: 'Festival Fit, Your Way',desc: "Your festival, your rules. An American Eagle-powered look made for the moment.",    caption: "festival fit, my way 🎪\nyour rules, your look. here's how I built mine with American Eagle:\n\n🟠 Crossover Flare Jean — the crowd favourite\n🟠 AE Cropped Hoodie — for when it gets cool" },
+      { title: 'Your Festival Look',    desc: "Walk us through the American Eagle pieces behind your perfect festival outfit.",     caption: "the American Eagle pieces that made my festival look 🎵\nwalk-through incoming. every item, every choice." },
+    ],
+    tops: [
+      { title: 'Morning OOTD',   desc: "Share your step-by-step American Eagle getting-dressed routine with your community.",  caption: "my morning OOTD with American Eagle ☀️\nnon-negotiables only. here's what I always reach for:\n\n🟠 Cloud Hoodie — on before I'm even awake\n🟠 AirFlex+ Jeans — the only bottoms I wear on lazy days" },
+      { title: 'Before & After', desc: "Capture the transformation. Show how styling changes the fit.",                        caption: "before → after 🤍\nthis is what the right American Eagle fit does. no filter, no edits." },
+      { title: 'Night Mode',     desc: "Your going-out look — what American Eagle pieces are non-negotiable?",                 caption: "night mode activated 🌙\nmy going-out formula with American Eagle. the pieces I'd keep if I could only keep three." },
+      { title: 'Style School',   desc: "Teach your community your styling secrets, American Eagle style.",                     caption: "style school is in session 📖\nhere's everything I wish I'd known sooner about building an American Eagle wardrobe." },
+    ],
+    outfit: [
+      { title: 'Your Signature Style', desc: "The American Eagle pieces that define your personal style.",                  caption: "my signature style 🖤\nthese are the American Eagle pieces I reach for on repeat. here's why." },
+      { title: 'GRWM: My Way',         desc: "A full get-ready-with-me featuring your go-to American Eagle pieces.",         caption: "get ready with me ✨\nfull GRWM from pyjamas to out-the-door, American Eagle only." },
+      { title: 'Mood Board',           desc: "Build a mood board. Show how you style one piece different ways.",             caption: "one piece, three ways 🎨\nI styled my American Eagle fave completely differently each time and this is what happened." },
+      { title: 'Day to Night',         desc: "One American Eagle outfit, styled for day and night.",                         caption: "day to night with American Eagle 🌅\nsame pieces, completely different energy. here's the transition." },
+    ],
+    tutorial: [
+      { title: 'Beauty 101',      desc: "Break it down for beginners. Your American Eagle tutorial, step by step.",   caption: "American Eagle beauty 101 📚\nstarting from zero? this is everything you need to know. one step at a time." },
+      { title: 'Pro Tips',        desc: "Share the tricks that took your makeup to the next level.",                   caption: "the American Eagle techniques that changed everything for me 💡\nhonest breakdown of what actually works." },
+      { title: 'The Magic Trick', desc: "That one American Eagle technique that changed everything for you.",           caption: "one trick. big difference. ✨\nI've been doing this with my American Eagle products for 6 months and the results speak." },
+      { title: 'From Scratch',    desc: "A full face, explained. Walk us through every product.",                      caption: "full face from scratch 🧴\nI'm explaining every single product and why it earns a place in my routine." },
+    ],
+    denim: [
+      { title: 'The Denim Edit',    desc: "Your favourite American Eagle jean and the story behind it.",            caption: "the denim edit 👖\nthis pair does something to me. here's the full look and why it's stayed in my rotation." },
+      { title: 'Denim Library',     desc: "Try, compare, review. Your ultimate American Eagle denim roundup.",      caption: "my American Eagle denim library 👖\nevery style I've tried, reviewed honestly. your guide to finding yours." },
+      { title: 'One Jean, All Day', desc: "Put your American Eagle denim to the test — morning to night.",          caption: "one American Eagle jean from 7am to midnight ⏱\nno changes. just results. here's how it held up." },
+      { title: 'Find Your Fit',     desc: "Find the perfect American Eagle denim cut for every mood and occasion.", caption: "finding your American Eagle denim match 🎯\nI tried 4 cuts. here's which one belongs in your wardrobe." },
+    ],
+    default: [
+      { title: 'My American Eagle Edit',  desc: "Curate your go-to American Eagle products and show us why they earn a place in your bag.", caption: "my American Eagle edit ✨\nthe products that genuinely changed my routine. no filler, no fluff." },
+      { title: 'First Impressions',        desc: "Review an American Eagle product you've never tried before. Honest, real, yours.",          caption: "first impressions: American Eagle 💬\ni've never used this before. here's my completely honest take." },
+      { title: 'One Product, Many Ways',   desc: "Pick your favourite American Eagle product and show us every way you use it.",               caption: "one American Eagle product. five different ways. 🔄\nversatility test — and the results surprised me." },
+      { title: 'Why I Create',             desc: "The story behind your content. What inspires you to show up and share?",                    caption: "why I create 💛\nthis is the reason I keep showing up. and why American Eagle is always part of the story." },
+    ],
+  },
+}
+
+const BC = BRAND_CONTENT
+
+// Aliases — keep existing usages working without changes
+const BRAND = BC.name
+const BRAND_HANDLE = BC.handle
+const BRAND_LOGO = BC.logo
+const FLYWHEEL_MOVES = BC.flywheelMoves
+const FLYWHEEL_BONUS = BC.flywheelBonus
+const ORDERS = BC.orders
+const BRAND_SPOTLIGHT = BC.brandSpotlight
+const SIMILAR_POSTS_DATA = BC.similarPosts
 
 const C = {
   text: '#101010',
@@ -25,21 +230,6 @@ const BTN = {
   color: C.white,
   fontSize: 15,
 }
-
-const FLYWHEEL_MOVES = [
-  { key: 'purchase',  label: 'Make a purchase',    desc: 'Every order earns points automatically',   icon: 'package',  pts: 15,  cta: 'Shop now',       done: true  },
-  { key: 'refer',     label: 'Refer a friend',     desc: 'Worth ~$50 of spend in points',            icon: 'userPlus', pts: 100, cta: 'Share link',     done: true  },
-  { key: 'review',    label: 'Write a review',     desc: 'Photo & video reviews earn even more',     icon: 'star',     pts: 25,  cta: 'Write review',   done: true  },
-  { key: 'share',     label: 'Share a look',       desc: 'Tag the brand in a post or story',         icon: 'globe',    pts: 50,  cta: 'Create post',    done: false },
-  { key: 'community', label: 'Help the community', desc: 'Answer a question, share a tip',           icon: 'users',    pts: 75,  cta: 'Open community', done: false },
-]
-const FLYWHEEL_BONUS = 300
-
-const ORDERS = [
-  { id: 1, name: 'Crossover Flare Leg Jean', ago: '5 days ago', price: '$85', pts: 744, reviewNudge: true },
-  { id: 2, name: 'Cloud Hoodie',             ago: '3 weeks ago', price: '$65', pts: 481, reviewNudge: false },
-  { id: 3, name: 'Real Me Legging',          ago: 'Last month',  price: '$45', pts: 394, reviewNudge: false },
-]
 
 const fw = (w) => ({ fontWeight: w })
 
@@ -466,12 +656,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
   const [challengeDir, setChallengeDir] = useState(1)
 
   if (mode === 'loyalty') {
-    const loyaltyProducts = [
-      { name: 'Crossover Flare Leg Jean', price: '$85.00', desc: 'Bestseller' },
-      { name: 'Cloud Hoodie', price: '$65.00', desc: 'New arrival' },
-      { name: 'Real Me Legging', price: '$45.00', desc: 'Fan favourite' },
-      { name: 'AirFlex+ Slim Jean', price: '$59.00', desc: 'Top rated' },
-    ]
+    const loyaltyProducts = BC.loyaltyProducts
     return (
       <div>
         <div style={{ position: 'sticky', top: 0, zIndex: 10, borderBottom: `1px solid ${C.borderLight}` }}>
@@ -508,11 +693,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
         <p style={{ ...fw(500), fontSize: 14, color: C.textSecondary, marginBottom: 24 }}>Try a recommended challenge</p>
 
         {(() => {
-          const challenges = [
-            { emoji: '👖', gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', title: 'Crossover Flare Leg Jean: Style It 3 Ways', type: 'Photo Post', time: '1h', level: 'Beginner', pts: 120 },
-            { emoji: '🤍', gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', title: 'Cloud Hoodie: Your Go-To Layer Look', type: 'Photo Post', time: '30m', level: 'Beginner', pts: 80 },
-            { emoji: '✨', gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', title: 'AirFlex+ Slim Jean: 7-Day Wear Test', type: 'Video', time: '2h', level: 'Intermediate', pts: 200 },
-          ]
+          const challenges = BC.feedChallenges
           const c = challenges[challengeIndex]
           const remaining = challenges.length - challengeIndex - 1
           return (
@@ -648,7 +829,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
           <div style={{ height: 200, borderRadius: 10, background: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#b498d8,#9880c0)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
             <span style={{ fontSize: 52, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }}>✨</span>
           </div>
-          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>The <span style={{ ...fw(500), textDecoration: 'underline' }}>{BRAND_HANDLE}</span> Crossover Flare Leg Jean is everything right now — styled it 3 ways and every single one goes hard 👖✨</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>The <span style={{ ...fw(500), textDecoration: 'underline' }}>{BRAND_HANDLE}</span> {BC.feedPosts[0].body}</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>45m ago</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -672,8 +853,8 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
             </div>
             <Pill icon={<Icon name="help" size={10} color={C.textBody} />} bg={C.white}>Question</Pill>
           </div>
-          <p style={{ ...fw(400), fontSize: 17, color: C.text, lineHeight: '24px', marginBottom: 8 }}>Do the AirFlex+ jeans stretch out after a few wears?</p>
-          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 12 }}>Mine fit perfectly on day 1 but feel noticeably looser by day 3. Wondering if I should size down or if it's normal for this fabric?</p>
+          <p style={{ ...fw(400), fontSize: 17, color: C.text, lineHeight: '24px', marginBottom: 8 }}>{BC.feedPosts[1].question}</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 12 }}>{BC.feedPosts[1].body}</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <Avatar initial="C" size={22} />
@@ -706,7 +887,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
                     </div>
                   </div>
                   <div style={{ paddingLeft: 30 }}>
-                    <p style={{ ...fw(400), fontSize: 13, color: 'rgba(66,66,66,0.9)', lineHeight: '19px' }}>Yes, totally normal — the AirFlex fabric relaxes with body heat. Size down and they'll feel perfect after the first wash. Same in the slim fit here.</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: 'rgba(66,66,66,0.9)', lineHeight: '19px' }}>{BC.feedPosts[1].reply}</p>
                   </div>
                 </div>
               </motion.div>
@@ -848,13 +1029,7 @@ function ChallengeDetailScreen({ onBack }) {
   const [copied, setCopied] = useState(false)
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 1500) }
 
-  const steps = [
-    'Show the Crossover Flare Leg Jean styled 3 different ways in one post or reel',
-    'Highlight the fit, rise, and versatility — casual, date night, and elevated basics',
-    'Share how you sized and why — this is the #1 question your audience will have',
-    'Share your affiliate code and link',
-    `Tag ${BRAND_HANDLE} and include #AD #${BRAND.replace(/\s+/g, '')} #AEStyle`,
-  ]
+  const steps = BC.challengeDetail.steps
 
   return (
     <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
@@ -877,7 +1052,7 @@ function ChallengeDetailScreen({ onBack }) {
         {/* Content */}
         <div style={{ padding: '16px 16px 24px' }}>
           <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px', marginBottom: 8 }}>
-            Crossover Flare Leg Jean: Style It 3 Ways
+            {BC.challengeDetail.title}
           </p>
           <div style={{ display: 'flex', gap: 4, marginBottom: 16, flexWrap: 'wrap' }}>
             <Pill icon={<Icon name="package" size={10} color={C.textBody} />}>Photo Post</Pill>
@@ -885,7 +1060,7 @@ function ChallengeDetailScreen({ onBack }) {
             <Pill>Beginner</Pill>
           </div>
           <p style={{ ...fw(400), fontSize: 16, color: C.textBody, lineHeight: '20px', marginBottom: 24 }}>
-            Show off the Crossover Flare Leg Jean styled three different ways — casual, date night, and elevated basics. Capture the fit and versatility, and share via your affiliate link.
+            {BC.challengeDetail.body}
           </p>
 
           <div style={{ background: C.cardBg, borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -928,7 +1103,7 @@ function ChallengeDetailScreen({ onBack }) {
               <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
 
               <p style={{ ...fw(700), fontSize: 20, textAlign: 'center', color: C.text, margin: '0 0 4px' }}>Share Your Challenge</p>
-              <p style={{ ...fw(400), fontSize: 14, textAlign: 'center', color: C.textMuted, margin: '0 0 24px' }}>Crossover Flare Leg Jean: Style It 3 Ways</p>
+              <p style={{ ...fw(400), fontSize: 14, textAlign: 'center', color: C.textMuted, margin: '0 0 24px' }}>{BC.challengeDetail.title}</p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 24 }}>
                 {/* Step 1 */}
@@ -938,7 +1113,7 @@ function ChallengeDetailScreen({ onBack }) {
                   </div>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                     <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '20px' }}>
-                      Include the required hashtag{'\n'}#AmericanEagle #AEStyle
+                      Include the required hashtag{'\n'}{BC.challengeDetail.hashtag}
                     </p>
                     <motion.button whileTap={{ scale: 0.95 }} onClick={handleCopy} style={{ flexShrink: 0, height: 32, padding: '0 14px', border: `1px solid ${C.border}`, borderRadius: 8, background: copied ? C.text : C.white, ...fw(600), fontSize: 13, color: copied ? C.white : C.text, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s,color 0.2s' }}>
                       {copied ? 'Copied' : 'Copy'}
@@ -1065,12 +1240,7 @@ function GroupChallengeDetailScreen({ onBack }) {
 
 function ChallengesTab({ onFilterOpen, onMenuOpen, onWalletOpen, onChallengeOpen, onGroupChallengeOpen, mode = 'advocate' }) {
   const [filter, setFilter] = useState(mode === 'employee' ? 'Group' : 'Explore')
-  const challenges = [
-    { title: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120, type: 'Photo Post', time: '1h', level: 'Beginner', emoji: '👖', bg: 'linear-gradient(145deg,#dbe8ff,#6090d0)' },
-    { title: 'Cloud Hoodie: Cosy Season Campaign', pts: 85, type: 'Photo Post', time: '45m', level: 'Intermediate', emoji: '🤍', bg: 'linear-gradient(145deg,#f0e8ff,#b498d8)' },
-    { title: 'AirFlex+ Slim Jean: 7-Day Wear Test', pts: 200, type: 'Video', time: '2h', level: 'Advanced', emoji: '✨', bg: 'linear-gradient(145deg,#e8f4e8,#90c890)' },
-    { title: 'Real Me Legging: Move With Me', pts: 60, type: 'Photo Post', time: '30m', level: 'Beginner', emoji: '🏃', bg: 'linear-gradient(145deg,#fff4e0,#e8c870)' },
-  ]
+  const challenges = BC.challenges
 
   if (mode === 'loyalty') {
     const earnActivities = [
@@ -1390,17 +1560,6 @@ function AdvocateProfileSheet({ advocate, onClose }) {
   )
 }
 
-const SIMILAR_POSTS_DATA = [
-  { gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: `My everyday OOTD ft. ${BRAND} Crossover Flare`, saves: 14 },
-  { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Cloud Hoodie 3 ways — casual to elevated', saves: 9 },
-  { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'AirFlex+ jeans — worth the hype?', saves: 21 },
-  { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Full AE denim lineup — every wash reviewed', saves: 6 },
-  { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: 'Real Me Legging 7-day wear test results', saves: 33 },
-  { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', body: 'Summer outfit ft. AE Denim Shorts + Graphic Tee', saves: 18 },
-  { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', body: `Going out fit using only ${BRAND} pieces`, saves: 27 },
-  { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '💙', body: 'Day to night: Dream Jean styled 2 ways', saves: 11 },
-]
-
 const SUGGESTED_ADVOCATES = [
   { initial: 'T', name: 'Tara Williams', tier: 'Platinum', similarCount: 412, posts: [
     { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄' },
@@ -1441,14 +1600,6 @@ const RISING_STARS_DATA = [
 const COMMUNITY_HERO = {
   initial: 'L', name: 'Lea Fontaine', tier: 'Platinum',
   reason: 'Answered 5 product questions from newer advocates this week',
-}
-
-const BRAND_SPOTLIGHT = {
-  initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',
-  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷',
-  body: 'Styled the Crossover Flare Jean three ways for the challenge — casual, date night, and elevated basics. AE denim does it all 👖✨',
-  saves: 53,
-  brandNote: 'Saved by the American Eagle team',
 }
 
 function RecognitionSheet({ onClose }) {
@@ -1631,12 +1782,7 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
   const tabRef = useRef(null)
 
   if (mode === 'loyalty') {
-    const brandPosts = [
-      { gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', caption: 'Introducing the new Crossover Flare Leg Jean. The fit that works for everyone.' },
-      { gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', caption: 'Cloud Hoodie: your go-to layer, all season long.' },
-      { gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', caption: 'AirFlex+ Denim — the most comfortable jeans we\'ve ever made.' },
-      { gradient: 'linear-gradient(145deg,#fff4e0,#fde68a,#f59e0b)', caption: 'The Edit: our most-loved styles of the season, curated for you.' },
-    ]
+    const brandPosts = BC.loyaltyBrandPosts
     return (
       <div>
         <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
@@ -1665,49 +1811,8 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
       el = el.parentElement
     }
   }, [filter])
-  const THEME_DATA = {
-    'Date Night': { desc: 'Advocate-approved fits for your next evening out', posts: [
-      { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌙', name: 'Sofia Brennan', saves: 34 },
-      { gradient: 'linear-gradient(135deg,#f0e8ff,#e9d5ff,#c4b5fd)', emoji: '✨', name: 'Isla Thompson', saves: 28 },
-      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fdba74)', emoji: '🌟', name: 'Tara Williams', saves: 19 },
-      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '💫', name: 'Lea Fontaine', saves: 41 },
-    ]},
-    'Off-Duty Looks': { desc: 'Easy, effortless style from the community', posts: [
-      { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌿', name: 'Priya Nair', saves: 22 },
-      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#fcd34d)', emoji: '☀️', name: 'Maya Osei', saves: 17 },
-      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#86efac)', emoji: '🍃', name: 'Amara Diallo', saves: 31 },
-      { gradient: 'linear-gradient(135deg,#faeae4,#fdd5c8,#fbb09a)', emoji: '✨', name: 'Rachel Kim', saves: 14 },
-    ]},
-    'Going Out Fits': { desc: 'Show-stopping looks from our top advocates', posts: [
-      { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', name: 'Lea Fontaine', saves: 48 },
-      { gradient: 'linear-gradient(135deg,#ffe4e6,#fecdd3,#fb7185)', emoji: '🔥', name: 'Chloe Nakamura', saves: 37 },
-      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '✨', name: 'Isla Thompson', saves: 52 },
-      { gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', name: 'Sofia Brennan', saves: 29 },
-    ]},
-    'Summer Denim': { desc: 'Sun-ready denim and shorts from the community', posts: [
-      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', name: 'Priya Nair', saves: 26 },
-      { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '🌊', name: 'Nina Reeves', saves: 18 },
-      { gradient: 'linear-gradient(135deg,#fef9c3,#fef08a,#facc15)', emoji: '🌻', name: 'Tara Williams', saves: 33 },
-      { gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#4ade80)', emoji: '🍉', name: 'Maya Osei', saves: 21 },
-    ]},
-    Streaks: { desc: 'Advocates on an active posting streak right now', posts: [
-      { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🔥', name: 'Chloe Nakamura', streakDays: 21 },
-      { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '✨', name: 'Isla Thompson',  streakDays: 14 },
-      { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', name: 'Priya Nair',     streakDays: 9 },
-      { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '💫', name: 'Lea Fontaine',   streakDays: 7 },
-    ]},
-  }
-  const posts = [
-    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: `The ${BRAND_HANDLE} Crossover Flare Leg Jean is genuinely the best denim I've owned — styled it 3 ways for the challenge and every look landed 🩵👖`, saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
-    { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'May 2025', time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Finally got the Cloud Hoodie and I am obsessed 🤍 The fabric is so soft and the oversized fit is perfect. Already ordered it in two colours.', saves: 18, instagram: { handle: '@sofia.brennan', followers: 22400 }, tiktok: { handle: '@sofiabrennanstyIe', followers: 31600 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '5 challenges in a row' }, { icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }] },
-    { initial: 'M', name: 'Maya Osei', tier: 'Silver', role: null, time: '2h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone sized down in the AirFlex+ jeans? Wondering if they stretch out after a few wears or stay true to size...', saves: 7, instagram: { handle: '@maya.osei', followers: 8900 }, tiktok: { handle: '@mayaosei_', followers: 14500 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
-    { initial: 'P', name: 'Priya Nair', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'June 2025', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the 7-day AirFlex+ wear test and honestly — these are the most comfortable jeans I've ever owned. The stretch is unreal 👖✨", saves: 31, instagram: { handle: '@priya.nair', followers: 19600 }, tiktok: { handle: '@priyanairfashion', followers: 44200 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '3 in a row' }] },
-    { initial: 'R', name: 'Rachel Kim', tier: 'Silver', role: null, time: '3h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "Does anyone know if the Real Me Legging holds up for workouts? Worried about see-through fabric when squatting — worth sizing up?", saves: 12, instagram: { handle: '@rachelkimstyle', followers: 6200 }, tiktok: { handle: '@rachelkimfits', followers: 9800 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
-    { initial: 'I', name: 'Isla Thompson', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'March 2024', time: '4h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'Dream Jean in light wash — my go-to for every shoot this season. The rise and leg opening is just unmatched for styling 📸', saves: 47, instagram: { handle: '@isla.thompson', followers: 87400 }, tiktok: { handle: '@islathompson', followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#1 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 12 members' }] },
-    { initial: 'A', name: 'Amara Diallo', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'August 2025', time: '5h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "What's the best way to wash the Cloud Hoodie without losing the softness? Washing on cold but feel like it's getting a bit rough...", saves: 9, instagram: { handle: '@amara.diallo', followers: 11300 }, tiktok: { handle: '@amaradiallo_', followers: 18700 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '4 in a row' }] },
-    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'July 2025', time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Date night look done ✅ Crossover Flare Jean + going out top from AE and I am OBSESSED. This fit is everything 💫', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkstyle', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
-    { initial: 'N', name: 'Nina Reeves', tier: 'Silver', role: null, time: '7h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Is the AirFlex+ Slim or the Dream Slim better for longer legs? Keep going back and forth and can\'t decide before I complete the challenge 😅', saves: 5, instagram: { handle: '@nina.reeves', followers: 4400 }, tiktok: { handle: '@ninareevestyle', followers: 7100 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
-  ]
+  const THEME_DATA = BC.communityThemes
+  const posts = BC.communityPosts
   return (
     <div ref={tabRef}>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
@@ -1733,12 +1838,7 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
       </div>
       {filter === 'Following' ? (
         <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {[
-            { initial: 'T', name: 'Tara Williams', tier: 'Platinum', tenure: '2-year advocate', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'These Crossover Flare Leg Jeans are everything — the fit is unreal for an everyday look 🌸', saves: 19 },
-            { initial: 'J', name: 'Jade Parker', tier: 'Gold', tenure: '1-year advocate', time: '34m ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried the Cloud Hoodie in both regular and oversized fit? Wondering which one photographs better for content...', saves: 8 },
-            { initial: 'D', name: 'Daniela Cruz', tier: 'Gold', tenure: '1-year advocate', time: '2h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '✨', body: "Day 3 of the AirFlex+ wear test and these jeans are genuinely the most comfortable denim I've ever worn. Shocked 👖✨", saves: 26 },
-            { initial: 'H', name: 'Hannah Scott', tier: 'Silver', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Graduation outfit done ✅ Wore the full AE look and I am absolutely obsessed. The Crossover Flare was the perfect choice 💫', saves: 41 },
-          ].map((post, i) => (
+          {BC.followingPosts.map((post, i) => (
             <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -3041,48 +3141,12 @@ function OnboardingNotificationsScreen({ onNext }) {
 
 function getSuggestions(text) {
   const t = text.toLowerCase()
-  if (t.match(/coachella|festival|outdoor|stage|concert|music/))
-    return [
-      { title: 'Festival-Proof Fit',       desc: `Show us the ${BRAND} outfit that survives sun, sweat, and the second stage.`, caption: `festival-proof fit 🌵\nthis look survived 12 hours at coachella — the heat, the crowds, the dust, all of it.\n\n🟠 ${BRAND} AirFlex+ Jeans — didn't crease once\n🟠 AE Vintage Tee — before AND after, still going` },
-      { title: 'Gates to Headliner',      desc: 'One outfit. All day. The AE look that goes the distance.',  caption: `from gates to headliner ✨\none ${BRAND} outfit. all day. no changes. here's my festival formula:\n\n🟠 AirFlex+ Jeans — move all day, look good doing it\n🟠 AE Graphic Tee — the one that goes with everything` },
-      { title: 'Festival Fit, Your Way', desc: `Your festival, your rules. An ${BRAND}-powered look made for the moment.`,     caption: `festival fit, my way 🎪\nyour rules, your look. here's how I built mine with ${BRAND}:\n\n🟠 Crossover Flare Jean — the crowd favourite\n🟠 AE Cropped Hoodie — for when it gets cool` },
-      { title: 'Your Festival Look',      desc: `Walk us through the ${BRAND} pieces behind your perfect festival outfit.`,     caption: `the ${BRAND} pieces that made my festival look 🎵\nwalk-through incoming. every item, every choice.` },
-    ]
-  if (t.match(/hoodie|sweater|fleece|top|tee|shirt|layer/))
-    return [
-      { title: 'Morning OOTD',      desc: `Share your step-by-step ${BRAND} getting-dressed routine with your community.`,   caption: `my morning OOTD with ${BRAND} ☀️\nnon-negotiables only. here's what I always reach for:\n\n🟠 Cloud Hoodie — on before I'm even awake\n🟠 AirFlex+ Jeans — the only bottoms I wear on lazy days` },
-      { title: 'Before & After',    desc: 'Capture the transformation. Show how styling changes the fit.',    caption: `before → after 🤍\nthis is what the right ${BRAND} fit does. no filter, no edits.` },
-      { title: 'Night Mode',        desc: `Your going-out look — what ${BRAND} pieces are non-negotiable?`,      caption: `night mode activated 🌙\nmy going-out formula with ${BRAND}. the pieces I'd keep if I could only keep three.` },
-      { title: 'Style School',      desc: `Teach your community your styling secrets, ${BRAND} style.`,               caption: `style school is in session 📖\nhere's everything I wish I'd known sooner about building an ${BRAND} wardrobe.` },
-    ]
-  if (t.match(/ootd|outfit|style|fashion|wear|look|fit/))
-    return [
-      { title: 'Your Signature Style', desc: `The ${BRAND} pieces that define your personal style.`,               caption: `my signature style 🖤\nthese are the ${BRAND} pieces I reach for on repeat. here's why.` },
-      { title: 'GRWM: My Way',        desc: `A full get-ready-with-me featuring your go-to ${BRAND} pieces.`,      caption: `get ready with me ✨\nfull GRWM from pyjamas to out-the-door, ${BRAND} only.` },
-      { title: 'Mood Board',          desc: 'Build a mood board. Show how you style one piece different ways.',    caption: `one piece, three ways 🎨\nI styled my ${BRAND} fave completely differently each time and this is what happened.` },
-      { title: 'Day to Night',        desc: `One ${BRAND} outfit, styled for day and night.`,                      caption: `day to night with ${BRAND} 🌅\nsame pieces, completely different energy. here's the transition.` },
-    ]
-  if (t.match(/tutorial|how to|teach|beginner|step|guide|tips/))
-    return [
-      { title: 'Beauty 101',     desc: `Break it down for beginners. Your ${BRAND} tutorial, step by step.`, caption: `${BRAND} beauty 101 📚\nstarting from zero? this is everything you need to know. one step at a time.` },
-      { title: 'Pro Tips',       desc: 'Share the tricks that took your makeup to the next level.',     caption: `the ${BRAND} techniques that changed everything for me 💡\nhonest breakdown of what actually works.` },
-      { title: 'The Magic Trick', desc: `That one ${BRAND} technique that changed everything for you.`,      caption: `one trick. big difference. ✨\nI've been doing this with my ${BRAND} products for 6 months and the results speak.` },
-      { title: 'From Scratch',   desc: 'A full face, explained. Walk us through every product.',       caption: 'full face from scratch 🧴\nI\'m explaining every single product and why it earns a place in my routine.' },
-    ]
-  if (t.match(/jean|denim|flare|slim|straight|baggy|mom jean/))
-    return [
-      { title: 'The Denim Edit',        desc: `Your favourite ${BRAND} jean and the story behind it.`,       caption: `the denim edit 👖\nthis pair does something to me. here\'s the full look and why it\'s stayed in my rotation.` },
-      { title: 'Denim Library',         desc: `Try, compare, review. Your ultimate ${BRAND} denim roundup.`, caption: `my ${BRAND} denim library 👖\nevery style I've tried, reviewed honestly. your guide to finding yours.` },
-      { title: 'One Jean, All Day',     desc: `Put your ${BRAND} denim to the test — morning to night.`,     caption: `one ${BRAND} jean from 7am to midnight ⏱\nno changes. just results. here's how it held up.` },
-      { title: 'Find Your Fit',         desc: `Find the perfect ${BRAND} denim cut for every mood and occasion.`, caption: `finding your ${BRAND} denim match 🎯\nI tried 4 cuts. here's which one belongs in your wardrobe.` },
-    ]
-  // Default
-  return [
-    { title: `My ${BRAND} Edit`,        desc: `Curate your go-to ${BRAND} products and show us why they earn a place in your bag.`, caption: `my ${BRAND} edit ✨\nthe products that genuinely changed my routine. no filler, no fluff.` },
-    { title: 'First Impressions', desc: `Review a ${BRAND} product you've never tried before. Honest, real, yours.`,         caption: `first impressions: ${BRAND} 💬\ni've never used this before. here's my completely honest take.` },
-    { title: 'One Product, Many Ways', desc: `Pick your favourite ${BRAND} product and show us every way you use it.`,        caption: `one ${BRAND} product. five different ways. 🔄\nversatility test — and the results surprised me.` },
-    { title: 'Why I Create',      desc: 'The story behind your content. What inspires you to show up and share?',       caption: 'why I create 💛\nthis is the reason I keep showing up. and why American Eagle is always part of the story.' },
-  ]
+  if (t.match(/coachella|festival|outdoor|stage|concert|music/)) return BC.studioSuggestions.festival
+  if (t.match(/hoodie|sweater|fleece|top|tee|shirt|layer/))       return BC.studioSuggestions.tops
+  if (t.match(/ootd|outfit|style|fashion|wear|look|fit/))         return BC.studioSuggestions.outfit
+  if (t.match(/tutorial|how to|teach|beginner|step|guide|tips/))  return BC.studioSuggestions.tutorial
+  if (t.match(/jean|denim|flare|slim|straight|baggy|mom jean/))   return BC.studioSuggestions.denim
+  return BC.studioSuggestions.default
 }
 
 function ChallengeCreationScreen({ onBack }) {
@@ -3273,7 +3337,7 @@ function ChallengeCreationScreen({ onBack }) {
                     <span style={{ ...fw(600), fontSize: 12, color: C.textBody }}>1</span>
                   </div>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                    <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '20px' }}>Include the required hashtag{'\n'}#AmericanEagle #AEStyle</p>
+                    <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '20px' }}>Include the required hashtag{'\n'}{BC.challengeDetail.hashtag}</p>
                     <motion.button whileTap={{ scale: 0.95 }} onClick={handleCopy} style={{ flexShrink: 0, height: 32, padding: '0 14px', border: `1px solid ${C.border}`, borderRadius: 8, background: copied ? C.text : C.white, ...fw(600), fontSize: 13, color: copied ? C.white : C.text, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s,color 0.2s' }}>
                       {copied ? 'Copied' : 'Copy'}
                     </motion.button>
