@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+const BRAND = 'American Eagle'
+const BRAND_HANDLE = '@americaneagle'
+const BRAND_LOGO = '/AE_Logo.svg'
+
 const C = {
   text: '#101010',
   textBody: '#424242',
@@ -14,7 +18,32 @@ const C = {
   white: '#FFFFFF',
 }
 
+const BTN = {
+  radius: 9999,
+  height: 52,
+  bg: C.text,
+  color: C.white,
+  fontSize: 15,
+}
+
+const FLYWHEEL_MOVES = [
+  { key: 'purchase',  label: 'Make a purchase',    desc: 'Every order earns points automatically',   icon: 'package',  pts: 15,  cta: 'Shop now',       done: true  },
+  { key: 'refer',     label: 'Refer a friend',     desc: 'Worth ~$50 of spend in points',            icon: 'userPlus', pts: 100, cta: 'Share link',     done: true  },
+  { key: 'review',    label: 'Write a review',     desc: 'Photo & video reviews earn even more',     icon: 'star',     pts: 25,  cta: 'Write review',   done: true  },
+  { key: 'share',     label: 'Share a look',       desc: 'Tag the brand in a post or story',         icon: 'globe',    pts: 50,  cta: 'Create post',    done: false },
+  { key: 'community', label: 'Help the community', desc: 'Answer a question, share a tip',           icon: 'users',    pts: 75,  cta: 'Open community', done: false },
+]
+const FLYWHEEL_BONUS = 300
+
+const ORDERS = [
+  { id: 1, name: 'Crossover Flare Leg Jean', ago: '5 days ago', price: '$85', pts: 744, reviewNudge: true },
+  { id: 2, name: 'Cloud Hoodie',             ago: '3 weeks ago', price: '$65', pts: 481, reviewNudge: false },
+  { id: 3, name: 'Real Me Legging',          ago: 'Last month',  price: '$45', pts: 394, reviewNudge: false },
+]
+
 const fw = (w) => ({ fontWeight: w })
+
+const TRANSITION_DIR = 1  // 1 = right-to-left on every screen change; -1 = left-to-right
 
 const slideVariants = {
   enter: (dir) => ({ x: dir > 0 ? '100%' : '-100%' }),
@@ -76,6 +105,9 @@ function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.5 }) {
     tiktok:    <><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" {...s}/></>,
     lock:      <><rect x="3" y="11" width="18" height="11" rx="2" {...s}/><path d="M7 11V7a5 5 0 0 1 10 0v4" {...s}/></>,
     crown:     <><path d="M2 17h20" {...s}/><path d="M4 17L2 6l5.5 4L12 2l4.5 8L22 6l-2 11H4z" {...s}/></>,
+    copy:      <><rect x="9" y="9" width="13" height="13" rx="2" {...s}/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" {...s}/></>,
+    chevronRight: <polyline points="9,18 15,12 9,6" {...s}/>,
+    chevronLeft:  <polyline points="15,18 9,12 15,6" {...s}/>,
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0, display: 'block' }}>
@@ -111,7 +143,7 @@ function PrimaryButton({ children, onClick, disabled = false, dark = false }) {
     <motion.button
       whileTap={disabled ? {} : { scale: 0.97 }}
       onClick={disabled ? undefined : onClick}
-      style={{ width: '100%', height: 48, borderRadius: 12, border: `1px solid ${disabled ? 'rgba(66,66,66,0.1)' : C.text}`, background: disabled ? 'rgba(66,66,66,0.06)' : C.text, color: disabled ? 'rgba(66,66,66,0.3)' : C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: disabled ? 'default' : 'pointer', ...fw(700), fontSize: 14, userSelect: 'none' }}
+      style={{ width: '100%', height: BTN.height, borderRadius: BTN.radius, border: `1px solid ${disabled ? 'rgba(66,66,66,0.1)' : BTN.bg}`, background: disabled ? 'rgba(66,66,66,0.06)' : BTN.bg, color: disabled ? 'rgba(66,66,66,0.3)' : BTN.color, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: disabled ? 'default' : 'pointer', ...fw(700), fontSize: BTN.fontSize, userSelect: 'none' }}
     >
       {children}
     </motion.button>
@@ -132,7 +164,7 @@ function TopNav({ onMenuOpen, onWalletOpen }) {
     <div style={{ height: 63, background: C.white, display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <IconButton icon="menu" size={32} onClick={onMenuOpen} />
-        <span style={{ ...fw(400), fontSize: 14, color: C.textMuted }}>Brand Name 1</span>
+        <span style={{ ...fw(400), fontSize: 14, color: C.textMuted }}>{BRAND}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <motion.button whileTap={{ scale: 0.92 }} onClick={onWalletOpen} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(66,66,66,0.09)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '0 8px', height: 24, cursor: 'pointer' }}>
@@ -182,7 +214,7 @@ function EmailScreen({ onNext }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
           {ssoOptions.map(({ label, icon }) => (
             <motion.button key={label} whileTap={{ scale: 0.97 }} onClick={() => onNext('')}
-              style={{ width: '100%', height: 52, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', ...fw(600), fontSize: 15, color: C.text }}>
+              style={{ width: '100%', height: BTN.height, border: `1px solid ${C.border}`, borderRadius: BTN.radius, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', ...fw(600), fontSize: BTN.fontSize, color: C.text }}>
               {icon}
               {label}
             </motion.button>
@@ -195,7 +227,7 @@ function EmailScreen({ onNext }) {
         </div>
         <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address"
           onKeyDown={e => e.key === 'Enter' && valid && onNext(email)}
-          style={{ width: '100%', height: 52, borderRadius: 12, border: `1px solid ${email ? C.text : C.border}`, padding: '0 16px', ...fw(400), fontSize: 15, color: C.text, background: C.white, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', marginBottom: 12 }} />
+          style={{ width: '100%', height: BTN.height, borderRadius: BTN.radius, border: `1px solid ${email ? C.text : C.border}`, padding: '0 16px', ...fw(400), fontSize: BTN.fontSize, color: C.text, background: C.white, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', marginBottom: 12 }} />
         <PrimaryButton onClick={() => valid && onNext(email)} disabled={!valid}>Continue with email</PrimaryButton>
       </div>
       <SignupFooter />
@@ -235,7 +267,7 @@ function EmailClientScreen({ onNext }) {
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <div style={{ padding: '16px 20px 12px', borderBottom: `1px solid ${C.border}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-            <p style={{ ...fw(700), fontSize: 16, color: C.text, lineHeight: '22px', flex: 1 }}>Your magic link from Charlotte Tilbury × Duel</p>
+            <p style={{ ...fw(700), fontSize: 16, color: C.text, lineHeight: '22px', flex: 1 }}>{`Your magic link from ${BRAND} × Duel`}</p>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
               <Icon name="star" size={20} color={C.textMuted} />
               <span style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 4, padding: '2px 7px', ...fw(500), fontSize: 11, color: C.textMuted }}>Inbox</span>
@@ -269,8 +301,8 @@ function EmailClientScreen({ onNext }) {
           </div>
           <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 24, marginBottom: 20 }}>
             <p style={{ ...fw(700), fontSize: 18, color: C.text, textAlign: 'center', lineHeight: '26px', marginBottom: 8 }}>You're one tap away</p>
-            <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, textAlign: 'center', lineHeight: '20px', marginBottom: 24 }}>Tap the button below to log in to your Charlotte Tilbury advocate account.</p>
-            <motion.button whileTap={{ scale: 0.96 }} onClick={onNext} style={{ width: '100%', height: 48, background: C.text, color: C.white, border: 'none', borderRadius: 12, cursor: 'pointer', ...fw(700), fontSize: 15, marginBottom: 20 }}>Log in to Duel →</motion.button>
+            <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, textAlign: 'center', lineHeight: '20px', marginBottom: 24 }}>{`Tap the button below to log in to your ${BRAND} advocate account.`}</p>
+            <motion.button whileTap={{ scale: 0.96 }} onClick={onNext} style={{ width: '100%', height: BTN.height, background: BTN.bg, color: BTN.color, border: 'none', borderRadius: BTN.radius, cursor: 'pointer', ...fw(700), fontSize: BTN.fontSize, marginBottom: 20 }}>Log in to Duel →</motion.button>
             <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, textAlign: 'center', lineHeight: '18px' }}>This link expires in 30 minutes. If you didn't request this, you can safely ignore this email.</p>
           </div>
           <p style={{ ...fw(400), fontSize: 12, color: C.textPlaceholder, textAlign: 'center' }}>© 2025 Duel · <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>Unsubscribe</span></p>
@@ -298,19 +330,19 @@ function EmailClientScreen({ onNext }) {
 
 const TABS_BY_MODE = {
   advocate: [
-    { id: 'feed',       icon: 'house',       label: 'Home'       },
+    { id: 'feed',       icon: 'house',       label: 'Feed'       },
     { id: 'challenges', icon: 'flag',         label: 'Challenges' },
     { id: 'community',  icon: 'users',        label: 'Community'  },
     { id: 'studio',     icon: 'pencilRuler',  label: 'Studio'     },
     { id: 'progress',   icon: 'chart',        label: 'Progress'   },
   ],
   loyalty: [
-    { id: 'feed',    icon: 'house',    label: 'Home'    },
+    { id: 'feed',    icon: 'house',    label: 'Feed'    },
     { id: 'rewards', icon: 'gift',     label: 'Rewards' },
     { id: 'account', icon: 'person',   label: 'Account' },
   ],
   employee: [
-    { id: 'feed',       icon: 'house',       label: 'Home'       },
+    { id: 'feed',       icon: 'house',       label: 'Feed'       },
     { id: 'challenges', icon: 'flag',         label: 'Challenges' },
     { id: 'community',  icon: 'users',        label: 'Community'  },
     { id: 'studio',     icon: 'pencilRuler',  label: 'Studio'     },
@@ -320,10 +352,118 @@ const TABS_BY_MODE = {
 
 // ── TAB: FEED ─────────────────────────────────────────
 
-function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode = 'advocate' }) {
+function FlywheelGraphic({ size = 88, countLabel }) {
+  const half = size / 2
+  const ro = size * 0.409, ctrlR = ro * 0.52, maskR = size * 0.25
+  const rad = d => d * Math.PI / 180
+  const px = (r, deg) => (half + r * Math.cos(rad(deg - 90))).toFixed(2)
+  const py = (r, deg) => (half + r * Math.sin(rad(deg - 90))).toFixed(2)
+  const bladePath = (base) => {
+    const a1 = base + 8, a2 = base + 65
+    return `M ${half} ${half} Q ${px(ctrlR, base - 22)} ${py(ctrlR, base - 22)} ${px(ro, a1)} ${py(ro, a1)} A ${ro} ${ro} 0 0 1 ${px(ro, a2)} ${py(ro, a2)} Q ${px(ctrlR, base + 82)} ${py(ctrlR, base + 82)} ${half} ${half} Z`
+  }
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {FLYWHEEL_MOVES.map((m, i) => (
+          <path key={m.key} d={bladePath(i * 72)} fill={m.done ? C.text : 'rgba(66,66,66,0.1)'} />
+        ))}
+        <circle cx={half} cy={half} r={maskR} fill={C.white} />
+      </svg>
+      {countLabel && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+          <span style={{ ...fw(700), fontSize: size * 0.2, color: C.text, lineHeight: 1 }}>{countLabel.count}</span>
+          <span style={{ ...fw(400), fontSize: size * 0.115, color: C.textMuted }}>of 5</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+function FlywheelSheet({ onClose }) {
+  const completedCount = FLYWHEEL_MOVES.filter(m => m.done).length
+  const openMoves = FLYWHEEL_MOVES.filter(m => !m.done)
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
+      onClick={onClose}
+      style={{ position: 'absolute', inset: 0, zIndex: 80, background: 'rgba(0,0,0,0.35)' }}>
+      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+        transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+        onClick={e => e.stopPropagation()}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', padding: '20px 16px 40px', maxHeight: '88%', overflowY: 'auto' }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
+        <p style={{ ...fw(500), fontSize: 11, color: C.textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>Monthly flywheel</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+          {FLYWHEEL_MOVES.map((m, i) => {
+            const featured = !m.done && openMoves[0]?.key === m.key
+            const bg = m.done ? C.cardBg : featured ? C.text : C.white
+            const textCol = m.done ? C.textMuted : featured ? C.white : C.text
+            const subCol = m.done ? C.textMuted : featured ? 'rgba(255,255,255,0.6)' : C.textMuted
+            const iconBg = m.done ? 'rgba(66,66,66,0.1)' : featured ? 'rgba(255,255,255,0.12)' : C.cardBg
+            const iconCol = m.done ? C.textMuted : featured ? C.white : C.textBody
+            return (
+              <motion.button key={m.key} whileTap={{ scale: 0.98 }}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '16px 14px', borderRadius: 16, border: m.done ? 'none' : featured ? 'none' : `1px solid ${C.border}`, background: bg, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {m.done
+                    ? <Icon name="check" size={16} color={iconCol} strokeWidth={2.5} />
+                    : <Icon name={m.icon} size={18} color={iconCol} />}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ ...fw(700), fontSize: 15, color: textCol, marginBottom: 2 }}>{m.label}</p>
+                  <p style={{ ...fw(400), fontSize: 12, color: subCol, lineHeight: '16px' }}>{m.desc}</p>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <p style={{ ...fw(700), fontSize: 15, color: m.done ? C.textMuted : featured ? C.white : C.text, marginBottom: 3 }}>+{m.pts} pts</p>
+                  {!m.done && (
+                    <p style={{ ...fw(600), fontSize: 12, color: featured ? 'rgba(255,255,255,0.7)' : C.textMuted }}>{m.cta} ↗</p>
+                  )}
+                </div>
+              </motion.button>
+            )
+          })}
+        </div>
+        <div style={{ padding: '11px 14px', background: C.cardBg, borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {openMoves.length > 0
+            ? <><span style={{ ...fw(400), fontSize: 13, color: C.textBody }}>Complete all 5 for a bonus</span><span style={{ ...fw(700), fontSize: 14, color: C.text }}>+{FLYWHEEL_BONUS} pts</span></>
+            : <><Icon name="check" size={14} color={C.text} strokeWidth={2.5} /><span style={{ ...fw(600), fontSize: 13, color: C.text }}>Loop complete · +{FLYWHEEL_BONUS} pts earned</span></>
+          }
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function FlywheelSection({ onOpen }) {
+  const completedCount = FLYWHEEL_MOVES.filter(m => m.done).length
+  const openMoves = FLYWHEEL_MOVES.filter(m => !m.done)
+  return (
+    <motion.button whileTap={{ scale: 0.98 }} onClick={onOpen}
+      style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 14, padding: 16, background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <p style={{ ...fw(700), fontSize: 15, color: C.text }}>Monthly flywheel</p>
+        <Icon name="chevronRight" size={16} color={C.textMuted} />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+        <FlywheelGraphic size={88} countLabel={{ count: completedCount }} />
+      </div>
+      <div style={{ padding: '10px 14px', background: C.cardBg, borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {openMoves.length > 0
+          ? <><span style={{ ...fw(400), fontSize: 13, color: C.textBody }}>Complete all 5 for a bonus</span><span style={{ ...fw(700), fontSize: 14, color: C.text }}>+{FLYWHEEL_BONUS} pts</span></>
+          : <><Icon name="check" size={14} color={C.text} strokeWidth={2.5} /><span style={{ ...fw(600), fontSize: 13, color: C.text }}>Loop complete · +{FLYWHEEL_BONUS} pts earned</span></>
+        }
+      </div>
+    </motion.button>
+  )
+}
+
+function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFlywheelOpen, mode = 'advocate' }) {
   const [bookmarked, setBookmarked] = useState(false)
   const [threadOpen, setThreadOpen] = useState(false)
   const [hearted, setHearted] = useState(false)
+  const [challengeIndex, setChallengeIndex] = useState(0)
+  const [challengeDir, setChallengeDir] = useState(1)
 
   if (mode === 'loyalty') {
     const loyaltyProducts = [
@@ -364,41 +504,73 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode 
       </div>
 
       <div style={{ padding: '20px 16px 32px' }}>
-        <p style={{ ...fw(400), fontSize: 18, color: C.text, lineHeight: '24px', marginBottom: 4 }}>Hi Zara!</p>
-        <p style={{ ...fw(400), fontSize: 14, color: C.textSecondary, marginBottom: 24 }}>Try a recommended challenge</p>
+        <p style={{ ...fw(700), fontSize: 18, color: C.text, lineHeight: '24px', marginBottom: 4 }}>Hi Zara!</p>
+        <p style={{ ...fw(500), fontSize: 14, color: C.textSecondary, marginBottom: 24 }}>Try a recommended challenge</p>
 
-        <div style={{ position: 'relative', marginBottom: 24, paddingTop: 8 }}>
-          <div style={{ position: 'absolute', top: 0, left: 18, right: 18, height: 'calc(100% - 8px)', background: 'rgba(66,66,66,0.03)', borderRadius: 12, border: `1px solid ${C.border}` }} />
-          <div style={{ position: 'absolute', top: 4, left: 9, right: 9, height: 'calc(100% - 4px)', background: 'rgba(66,66,66,0.05)', borderRadius: 12, border: `1px solid ${C.border}` }} />
-          <motion.div whileTap={{ scale: 0.985 }} style={{ position: 'relative', background: C.white, borderRadius: 12, border: `1px solid ${C.border}`, overflow: 'hidden', cursor: 'pointer' }}>
-            <div style={{ height: 210, background: 'linear-gradient(145deg,#faeae4,#f0c8b8,#e0a090,#c88070)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 38 }}>💄</span>
-              </div>
-              <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(255,255,255,0.92)', borderRadius: 20, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Icon name="starFilled" size={12} color={C.text} />
-                <span style={{ ...fw(700), fontSize: 12, color: C.text }}>120 pts</span>
-              </div>
+        {(() => {
+          const challenges = [
+            { emoji: '💄', gradient: 'linear-gradient(145deg,#faeae4,#f0c8b8,#e0a090,#c88070)', title: 'Pillow Talk Blush Balm Lip Tint: One Swipe Glow', type: 'Product Review', time: '1h', level: 'Beginner', pts: 120 },
+            { emoji: '✨', gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', title: 'Hollywood Flawless Filter: Your Lit-From-Within Look', type: 'Photo Post', time: '30m', level: 'Beginner', pts: 80 },
+            { emoji: '🧴', gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', title: "Charlotte's Magic Cream 7-Day Skin Challenge", type: 'Video', time: '2h', level: 'Intermediate', pts: 200 },
+          ]
+          const c = challenges[challengeIndex]
+          const remaining = challenges.length - challengeIndex - 1
+          return (
+            <div style={{ position: 'relative', marginBottom: 24, paddingTop: 12 }}>
+              {remaining >= 2 && <div style={{ position: 'absolute', top: 0, bottom: 0, left: 18, right: 18, background: C.cardBg, borderRadius: 12, border: `1px solid ${C.border}` }} />}
+              {remaining >= 1 && <div style={{ position: 'absolute', top: 6, bottom: 0, left: 9, right: 9, background: 'rgba(240,240,240,0.9)', borderRadius: 12, border: `1px solid ${C.border}` }} />}
+              <AnimatePresence mode="popLayout" custom={challengeDir}>
+                <motion.div
+                  key={challengeIndex}
+                  custom={challengeDir}
+                  initial={{ opacity: 0, x: challengeDir * 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: challengeDir * -50 }}
+                  transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.18}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -60 && challengeIndex < challenges.length - 1) { setChallengeDir(1); setChallengeIndex(i => i + 1) }
+                    else if (info.offset.x > 60 && challengeIndex > 0) { setChallengeDir(-1); setChallengeIndex(i => i - 1) }
+                  }}
+                  style={{ position: 'relative', zIndex: 1, background: C.white, borderRadius: 12, border: `1px solid ${C.border}`, overflow: 'hidden', cursor: 'grab' }}>
+                  <div style={{ height: 210, background: c.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                    <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 38 }}>{c.emoji}</span>
+                    </div>
+                    <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(255,255,255,0.92)', borderRadius: 20, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Icon name="starFilled" size={12} color={C.text} />
+                      <span style={{ ...fw(700), fontSize: 12, color: C.text }}>{c.pts} pts</span>
+                    </div>
+                    <div style={{ position: 'absolute', bottom: 12, left: 12, display: 'flex', gap: 4 }}>
+                      {challenges.map((_, i) => (
+                        <div key={i} style={{ width: i === challengeIndex ? 16 : 6, height: 6, borderRadius: 3, background: i === challengeIndex ? C.white : 'rgba(255,255,255,0.5)', transition: 'width 0.2s' }} />
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <p style={{ ...fw(700), fontSize: 17, color: C.text, lineHeight: '23px' }}>{c.title}</p>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      <Pill icon={<Icon name="package" size={10} color={C.textBody} />}>{c.type}</Pill>
+                      <Pill icon={<Icon name="clock" size={10} color={C.textBody} />}>{c.time}</Pill>
+                      <Pill>{c.level}</Pill>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Icon name="starFilled" size={14} color={C.text} />
+                        <span style={{ ...fw(500), fontSize: 14, color: C.text }}>{c.pts}</span>
+                      </div>
+                      <motion.button whileTap={{ scale: 0.82 }} onClick={e => { e.stopPropagation(); setHearted(h => !h) }} style={{ width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name={hearted ? 'heartFilled' : 'heart'} size={16} color={hearted ? '#e05555' : C.textBody} />
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
-            <div style={{ padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <p style={{ ...fw(400), fontSize: 17, color: C.text, lineHeight: '23px' }}>Pillow Talk Blush Balm Lip Tint: One Swipe Glow</p>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                <Pill icon={<Icon name="package" size={10} color={C.textBody} />}>Product Review</Pill>
-                <Pill icon={<Icon name="clock" size={10} color={C.textBody} />}>1h</Pill>
-                <Pill>Beginner</Pill>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <Icon name="starFilled" size={14} color={C.text} />
-                  <span style={{ ...fw(500), fontSize: 14, color: C.text }}>120</span>
-                </div>
-                <motion.button whileTap={{ scale: 0.82 }} onClick={() => setHearted(h => !h)} style={{ width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name={hearted ? 'heartFilled' : 'heart'} size={16} color={hearted ? '#e05555' : C.textBody} />
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+          )
+        })()}
 
         <motion.button whileTap={{ scale: 0.97 }} onClick={() => onTabChange('progress')} style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
           <div style={{ width: 52, height: 52, position: 'relative', flexShrink: 0 }}>
@@ -419,7 +591,9 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode 
           </div>
         </motion.button>
 
-        <p style={{ ...fw(400), fontSize: 16, color: C.text, marginBottom: 16 }}>From the community</p>
+        <div style={{ marginBottom: 20 }}><FlywheelSection onOpen={onFlywheelOpen} /></div>
+
+        <p style={{ ...fw(700), fontSize: 16, color: C.text, marginBottom: 16 }}>From the community</p>
 
         {/* User's own post */}
         {userPost && (
@@ -445,7 +619,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode 
               </div>
             )}
             <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>
-              "The first CT product I ever tried was {userPost.sentence} and I've never looked back."
+              "The first {BRAND} product I ever tried was {userPost.sentence} and I've never looked back."
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>just now</span>
@@ -474,7 +648,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode 
           <div style={{ height: 200, borderRadius: 10, background: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#b498d8,#9880c0)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
             <span style={{ fontSize: 52, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }}>✨</span>
           </div>
-          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>How beautiful is <span style={{ ...fw(500), textDecoration: 'underline' }}>@charlottetilbury</span> NEW Pillow talk beauty soulmates palette in the shade- Flawless rosewood 🩷✨</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '20px', marginBottom: 10 }}>How beautiful is <span style={{ ...fw(500), textDecoration: 'underline' }}>{BRAND_HANDLE}</span> NEW Pillow talk beauty soulmates palette in the shade- Flawless rosewood 🩷✨</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>45m ago</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -532,7 +706,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode 
                     </div>
                   </div>
                   <div style={{ paddingLeft: 30 }}>
-                    <p style={{ ...fw(400), fontSize: 13, color: 'rgba(66,66,66,0.9)', lineHeight: '19px' }}>It's the primer — I had the same issue with silicone-based ones. Switch to the Charlotte Tilbury Wonderglow and it stays true all day. Shade 3 here too.</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: 'rgba(66,66,66,0.9)', lineHeight: '19px' }}>It's the primer — I had the same issue with silicone-based ones. Switch to the American Eagle Wonderglow and it stays true all day. Shade 3 here too.</p>
                   </div>
                 </div>
               </motion.div>
@@ -540,7 +714,7 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode 
           </AnimatePresence>
         </div>
 
-        <PrimaryButton onClick={() => {}}>Explore more</PrimaryButton>
+        <PrimaryButton onClick={() => onTabChange('community')}>Explore more</PrimaryButton>
       </div>
     </div>
   )
@@ -657,7 +831,7 @@ function ChallengesFilterPanel({ onClose }) {
         </FilterSection>
 
         <motion.button whileTap={{ scale: 0.97 }} onClick={onClose}
-          style={{ width: '100%', height: 48, background: C.text, color: C.white, border: 'none', borderRadius: 12, cursor: 'pointer', ...fw(700), fontSize: 15, marginTop: 8 }}>
+          style={{ width: '100%', height: BTN.height, background: BTN.bg, color: BTN.color, border: 'none', borderRadius: BTN.radius, cursor: 'pointer', ...fw(700), fontSize: BTN.fontSize, marginTop: 8 }}>
           Apply Filters
         </motion.button>
       </div>
@@ -679,7 +853,7 @@ function ChallengeDetailScreen({ onBack }) {
     'Create content showcasing your shade, highlighting the glow and effortless application',
     'Style it for bridal, romantic, or everyday looks to show its versatility',
     'Share your affiliate code and link',
-    'Tag @CharlotteTilbury and include #AD #CharlotteTilbury #MagicBeautyStars',
+    `Tag ${BRAND_HANDLE} and include #AD #${BRAND.replace(/\s+/g, '')} #MagicBeautyStars`,
   ]
 
   return (
@@ -711,7 +885,7 @@ function ChallengeDetailScreen({ onBack }) {
             <Pill>Beginner</Pill>
           </div>
           <p style={{ ...fw(400), fontSize: 16, color: C.textBody, lineHeight: '20px', marginBottom: 24 }}>
-            Promote Charlotte Tilbury's NEW Pillow Talk Blush Balm Lip Tint — a 3-in-1 lipstick, balm, and tint that creates a customised, blushed-from-within glow. Create scroll-stopping content showcasing your shade and share via your affiliate link.
+            Promote American Eagle's NEW Pillow Talk Blush Balm Lip Tint — a 3-in-1 lipstick, balm, and tint that creates a customised, blushed-from-within glow. Create scroll-stopping content showcasing your shade and share via your affiliate link.
           </p>
 
           <div style={{ background: C.cardBg, borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -879,7 +1053,7 @@ function GroupChallengeDetailScreen({ onBack }) {
         </div>
       </div>
       <div style={{ height: 70, background: C.white, borderTop: `1px solid ${C.borderLight}`, flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
-        <motion.button whileTap={{ scale: 0.97 }} style={{ width: '100%', height: 48, border: 'none', borderRadius: 12, background: C.text, ...fw(700), fontSize: 14, color: C.white, cursor: 'pointer', fontFamily: 'inherit' }}>
+        <motion.button whileTap={{ scale: 0.97 }} style={{ width: '100%', height: BTN.height, border: 'none', borderRadius: BTN.radius, background: BTN.bg, ...fw(700), fontSize: BTN.fontSize, color: BTN.color, cursor: 'pointer', fontFamily: 'inherit' }}>
           Post to this challenge
         </motion.button>
       </div>
@@ -1217,13 +1391,13 @@ function AdvocateProfileSheet({ advocate, onClose }) {
 }
 
 const SIMILAR_POSTS_DATA = [
-  { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'My everyday glow routine featuring CT Pillow Talk', saves: 14 },
+  { gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: `My everyday glow routine featuring ${BRAND} Pillow Talk`, saves: 14 },
   { gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'New Pillow Talk shades ranked by undertone', saves: 9 },
   { gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Filter for a no-makeup makeup look', saves: 21 },
   { gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Full Pillow Talk collection — every product reviewed', saves: 6 },
   { gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Charlotte's Magic Cream 7-day skin transformation", saves: 33 },
   { gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c)', emoji: '🌞', body: 'Summer makeup routine ft. Airbrush Foundation', saves: 18 },
-  { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', body: 'Bold glam look using only CT products', saves: 27 },
+  { gradient: 'linear-gradient(135deg,#ede9fe,#ddd6fe,#a78bfa)', emoji: '💜', body: `Bold glam look using only ${BRAND} products`, saves: 27 },
   { gradient: 'linear-gradient(135deg,#ecfeff,#a5f3fc,#22d3ee)', emoji: '💙', body: 'Dewy skin prep with Hollywood Flawless Filter', saves: 11 },
 ]
 
@@ -1272,9 +1446,9 @@ const COMMUNITY_HERO = {
 const BRAND_SPOTLIGHT = {
   initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',
   gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷',
-  body: 'Bridal makeup trial done using nothing but Charlotte Tilbury — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍',
+  body: 'Bridal makeup trial done using nothing but American Eagle — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍',
   saves: 53,
-  brandNote: 'Saved by the Charlotte Tilbury team',
+  brandNote: 'Saved by the American Eagle team',
 }
 
 function RecognitionSheet({ onClose }) {
@@ -1354,12 +1528,12 @@ function RecognitionSheet({ onClose }) {
           {/* Brand Spotlight */}
           <div style={{ padding: '0 16px', marginBottom: 28 }}>
             <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 2px' }}>Brand Spotlight</p>
-            <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 12px' }}>Picked this week by the Charlotte Tilbury team</p>
+            <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 12px' }}>Picked this week by the American Eagle team</p>
             <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
               <div style={{ aspectRatio: '16/9', background: BRAND_SPOTLIGHT.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                 <span style={{ fontSize: 52, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }}>{BRAND_SPOTLIGHT.emoji}</span>
                 <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 20, padding: '4px 10px' }}>
-                  <span style={{ ...fw(600), fontSize: 11, color: C.white }}>✦ CT Pick</span>
+                  <span style={{ ...fw(600), fontSize: 11, color: C.white }}>✦ {BRAND} Pick</span>
                 </div>
               </div>
               <div style={{ padding: 14 }}>
@@ -1524,14 +1698,14 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
     ]},
   }
   const posts = [
-    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: 'How beautiful is @charlottetilbury NEW Pillow talk beauty soulmates palette in the shade — Flawless rosewood 🩷✨', saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
+    { initial: 'L', name: 'Lea Fontaine', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024', time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '✨', body: `How beautiful is ${BRAND_HANDLE} NEW Pillow talk beauty soulmates palette in the shade — Flawless rosewood 🩷✨`, saves: 24, instagram: { handle: '@lea.fontaine', followers: 48200 }, tiktok: { handle: '@leafontaine', followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#2 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 5 members' }] },
     { initial: 'S', name: 'Sofia Brennan', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'May 2025', time: '1h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#faeae4,#f0c8b8,#c88070)', emoji: '💄', body: 'Finally tried the Pillow Talk lip kit 💋 The liner and lipstick combo is so gorgeous. Shade: Original.', saves: 18, instagram: { handle: '@sofia.brennan', followers: 22400 }, tiktok: { handle: '@sofiabeauty_', followers: 31600 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '5 challenges in a row' }, { icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }] },
     { initial: 'M', name: 'Maya Osei', tier: 'Silver', role: null, time: '2h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried layering the Hollywood Flawless Filter over SPF? Wondering if it affects the glow...', saves: 7, instagram: { handle: '@maya.osei', followers: 8900 }, tiktok: { handle: '@mayaosei_', followers: 14500 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
     { initial: 'P', name: 'Priya Nair', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'June 2025', time: '3h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the Magic Cream 7-day test and wow — my skin has never looked better. The hydration is genuinely unreal 🧴✨", saves: 31, instagram: { handle: '@priya.nair', followers: 19600 }, tiktok: { handle: '@priyanairbeauty', followers: 44200 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 10 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '3 in a row' }] },
     { initial: 'R', name: 'Rachel Kim', tier: 'Silver', role: null, time: '3h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "Does anyone know if the Airbrush Flawless Foundation works well for oily skin? My T-zone gets really shiny by midday and I'm worried it'll slide off...", saves: 12, instagram: { handle: '@rachelkim.beauty', followers: 6200 }, tiktok: { handle: '@rachelkimbeauty', followers: 9800 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
     { initial: 'I', name: 'Isla Thompson', tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'March 2024', time: '4h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fff4e0,#fde68a,#f59e0b)', emoji: '💫', body: 'Hollywood Flawless Filter in shade 4 — my go-to for every shoot this season. That lit-from-within glow is just unmatched 📸', saves: 47, instagram: { handle: '@isla.thompson', followers: 87400 }, tiktok: { handle: '@islathompson', followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator', sub: '#1 this month' }, { icon: 'flag', label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide', sub: 'Helped 12 members' }] },
     { initial: 'A', name: 'Amara Diallo', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'August 2025', time: '5h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: "What's the best way to remove the Magic Cream without stripping your skin? I've been using a basic cleanser but I feel like I'm missing something...", saves: 9, instagram: { handle: '@amara.diallo', followers: 11300 }, tiktok: { handle: '@amaradiallo_', followers: 18700 }, achievements: [{ icon: 'flag', label: 'Challenge Streak', sub: '4 in a row' }] },
-    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'July 2025', time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Bridal makeup trial done using nothing but Charlotte Tilbury — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkbeauty', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
+    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold', role: null, tenure: '1-year advocate', memberSince: 'July 2025', time: '6h ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true, gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Bridal makeup trial done using nothing but American Eagle — the Pillow Talk collection is SO perfect for this. Obsessed with how it turned out 💍', saves: 53, instagram: { handle: '@chloe.nakamura', followers: 34100 }, tiktok: { handle: '@chloenkbeauty', followers: 67800 }, achievements: [{ icon: 'award', label: 'Rising Star', sub: 'Top 5 this month' }, { icon: 'flag', label: 'Challenge Streak', sub: '6 in a row' }] },
     { initial: 'N', name: 'Nina Reeves', tier: 'Silver', role: null, time: '7h ago', tag: { icon: 'help', label: 'Question' }, photo: false, gradient: null, emoji: null, body: 'Is the Pillow Talk Original or Matte Revolution better for fair skin? I keep going back and forth and can\'t decide before I complete the challenge 😅', saves: 5, instagram: { handle: '@nina.reeves', followers: 4400 }, tiktok: { handle: '@ninareevesbeauty', followers: 7100 }, achievements: [{ icon: 'flag', label: 'First Challenge', sub: '1 challenge completed' }] },
   ]
   return (
@@ -1539,17 +1713,17 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: C.white, borderBottom: `1px solid ${C.borderLight}` }}>
         <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
         <div style={{ height: 48, display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
-          <span style={{ ...fw(400), fontSize: 18, color: C.text }}>Community</span>
+          <span style={{ ...fw(700), fontSize: 18, color: C.text }}>Community</span>
           <motion.button whileTap={{ scale: 0.94 }} onClick={onRecognitionOpen} style={{ height: 30, padding: '0 12px', borderRadius: 20, border: `1px solid ${C.border}`, background: 'transparent', ...fw(500), fontSize: 13, color: C.textBody, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
             <Icon name="award" size={13} color={C.textBody} />
             Recognition
           </motion.button>
         </div>
-        <div style={{ padding: '10px 16px 12px', display: 'flex', gap: 8 }}>
+        <div style={{ padding: '10px 16px 12px', display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
           {[{ label: 'Inspiring', icon: 'star' }, { label: 'Trending', icon: 'flame' }, { label: 'New', icon: 'clock' }, { label: 'Following', icon: 'users' }].map(({ label, icon }) => {
             const active = filter === label
             return (
-              <motion.button key={label} whileTap={{ scale: 0.96 }} onClick={() => setFilter(label)} style={{ display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 14px', borderRadius: 100, border: `1px solid ${active ? C.text : C.border}`, background: active ? C.text : 'transparent', cursor: 'pointer', ...fw(500), fontSize: 14, color: active ? C.white : C.textBody, fontFamily: 'inherit' }}>
+              <motion.button key={label} whileTap={{ scale: 0.96 }} onClick={() => setFilter(label)} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 14px', borderRadius: 100, border: `1px solid ${active ? C.text : C.border}`, background: active ? C.text : 'transparent', cursor: 'pointer', ...fw(500), fontSize: 14, color: active ? C.white : C.textBody, fontFamily: 'inherit' }}>
                 <Icon name={icon} size={12} color={active ? C.white : C.textBody} />
                 {label}
               </motion.button>
@@ -1955,7 +2129,7 @@ function RemixScreen({ onBack }) {
       { icon: 'sliders',      title: 'Your setting',        body: "They filmed in a studio — try natural window light or an outdoor setting. A different backdrop makes your version instantly distinct." },
       { icon: 'person',       title: 'Your skin tone',      body: 'Show the same products on your complexion. Shade comparisons are high-value for audiences who struggle to find their match.' },
       { icon: 'arrowRight',   title: 'Before vs after',     body: "Restructure as a transformation reveal instead of a walkthrough. The payoff moment gets significantly more replays." },
-      { icon: 'clock',        title: 'Speed-run version',   body: "Recreate their routine in under 60 seconds. '3-minute Charlotte Tilbury get-ready' outperforms longer tutorials in completion rate." },
+      { icon: 'clock',        title: 'Speed-run version',   body: "Recreate their routine in under 60 seconds. '3-minute American Eagle get-ready' outperforms longer tutorials in completion rate." },
     ]
     return (
       <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
@@ -1975,7 +2149,7 @@ function RemixScreen({ onBack }) {
               </div>
             </div>
             <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>
-              My everyday Charlotte Tilbury routine ✨ The Pillow Talk look never gets old. #MagicBeautyStars #CharlotteTilbury
+              My everyday American Eagle routine ✨ The Pillow Talk look never gets old. #MagicBeautyStars #CharlotteTilbury
             </p>
           </div>
 
@@ -2023,9 +2197,9 @@ function RemixScreen({ onBack }) {
         <div>
           <p style={{ ...fw(500), fontSize: 13, color: C.textMuted, margin: '0 0 10px' }}>Or choose from trending posts</p>
           {[
-            { handle: '@beautybyella',   caption: 'My everyday Charlotte Tilbury routine ✨', views: '47.2K' },
+            { handle: '@beautybyella',   caption: 'My everyday American Eagle routine ✨', views: '47.2K' },
             { handle: '@glossandglow',   caption: 'Pillow Talk everything — the full collection', views: '31.8K' },
-            { handle: '@makeupwithrose', caption: 'Charlotte Tilbury morning glow in 5 mins',    views: '28.4K' },
+            { handle: '@makeupwithrose', caption: 'American Eagle morning glow in 5 mins',    views: '28.4K' },
           ].map((post, i) => (
             <motion.button
               key={i}
@@ -2066,7 +2240,7 @@ function StudioTab({ onMenuOpen, onWalletOpen, onChallengeCreate, onContentAnaly
         <TopNav onMenuOpen={onMenuOpen} onWalletOpen={onWalletOpen} />
       </div>
       <div style={{ padding: '20px 16px 32px' }}>
-        <p style={{ ...fw(400), fontSize: 22, color: C.text, marginBottom: 16 }}>Studio</p>
+        <p style={{ ...fw(700), fontSize: 22, color: C.text, marginBottom: 16 }}>Studio</p>
         <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
           {['New Project', 'My projects'].map(t => (
             <motion.button key={t} whileTap={{ scale: 0.94 }} onClick={() => setTab(t)} style={{ height: 32, padding: '0 16px', borderRadius: 20, border: `1px solid ${tab === t ? C.text : C.border}`, background: tab === t ? C.text : 'transparent', ...fw(tab === t ? 600 : 400), fontSize: 13, color: tab === t ? C.white : C.textBody, cursor: 'pointer' }}>{t}</motion.button>
@@ -2129,9 +2303,44 @@ function StudioTab({ onMenuOpen, onWalletOpen, onChallengeCreate, onContentAnaly
   )
 }
 
+function OrdersSection() {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+        <p style={{ ...fw(600), fontSize: 15, color: C.text }}>Your orders</p>
+        <span style={{ ...fw(400), fontSize: 13, color: C.textMuted, textDecoration: 'underline', cursor: 'pointer' }}>See all</span>
+      </div>
+      <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, marginBottom: 14, lineHeight: '18px' }}>
+        Every order earns points. Tap one to review it and earn even more.
+      </p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {ORDERS.map(order => (
+          <motion.div key={order.id} whileTap={{ scale: 0.98 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: C.cardBg, borderRadius: 12, cursor: 'pointer' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: C.borderLight, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="package" size={16} color={C.textMuted} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ ...fw(500), fontSize: 14, color: C.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{order.name}</p>
+              <p style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>{order.ago} · {order.price}</p>
+              {order.reviewNudge && (
+                <p style={{ ...fw(500), fontSize: 12, color: C.text, marginTop: 4 }}>Write a review to earn more →</p>
+              )}
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <p style={{ ...fw(700), fontSize: 15, color: C.text }}>+{order.pts}</p>
+              <p style={{ ...fw(400), fontSize: 10, color: C.textMuted, letterSpacing: '0.04em', textTransform: 'uppercase' }}>pts earned</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── TAB: PROGRESS + REWARDS ───────────────────────────
 
-function ProgressContent({ mode = 'advocate' }) {
+function ProgressContent({ mode = 'advocate', onFlywheelOpen }) {
   const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
   const streakState = ['none', 'active', 'none', 'today', 'none', 'none', 'none']
   const subBars = mode === 'loyalty'
@@ -2181,10 +2390,10 @@ function ProgressContent({ mode = 'advocate' }) {
   const tierLabel = mode === 'loyalty' ? 'Gold Member' : mode === 'employee' ? 'Champion' : 'Silver Tier'
   const sinceLabel = mode === 'loyalty' ? 'Customer since April 2024' : 'Member since April 2024'
   return (
-    <div style={{ padding: '20px 16px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ padding: '20px 16px 32px', display: 'flex', flexDirection: 'column', gap: 32 }}>
       {/* Points Summary */}
       <div>
-        <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, marginBottom: 10 }}>Points Summary</p>
+        <p style={{ ...fw(700), fontSize: 15, color: C.text, marginBottom: 10 }}>Points Summary</p>
         <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
           <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, textAlign: 'center', marginBottom: 6 }}>
             {sinceLabel}
@@ -2209,14 +2418,14 @@ function ProgressContent({ mode = 'advocate' }) {
             <span style={{ ...fw(700) }}>60 pts</span> to Platinum tier
           </p>
           {/* Sub-bars */}
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
             {subBars.map((bar, i) => (
-              <div key={i} style={{ flex: 1 }}>
-                <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, marginBottom: 5 }}>{bar.label}</p>
-                <div style={{ height: 4, background: C.borderLight, borderRadius: 2, marginBottom: 5 }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, width: 106, flexShrink: 0 }}>{bar.label}</p>
+                <div style={{ flex: 1, height: 4, background: C.borderLight, borderRadius: 2 }}>
                   <div style={{ height: '100%', width: `${bar.pct * 100}%`, background: C.text, borderRadius: 2 }} />
                 </div>
-                <p style={{ ...fw(600), fontSize: 12, color: C.text }}>{bar.pts} pts</p>
+                <p style={{ ...fw(600), fontSize: 12, color: C.text, width: 46, textAlign: 'right', flexShrink: 0 }}>{bar.pts} pts</p>
               </div>
             ))}
           </div>
@@ -2225,7 +2434,7 @@ function ProgressContent({ mode = 'advocate' }) {
 
       {/* Streak */}
       {mode !== 'loyalty' && <div>
-        <p style={{ ...fw(400), fontSize: 15, color: C.text, marginBottom: 12 }}>Streak</p>
+        <p style={{ ...fw(700), fontSize: 15, color: C.text, marginBottom: 12 }}>Streak</p>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           {days.map((day, i) => {
             const s = streakState[i]
@@ -2246,9 +2455,13 @@ function ProgressContent({ mode = 'advocate' }) {
         </div>
       </div>}
 
+      <FlywheelSection onOpen={onFlywheelOpen} />
+
+      <OrdersSection />
+
       {/* Achievements */}
       <div>
-        <p style={{ ...fw(400), fontSize: 15, color: C.text, marginBottom: 12 }}>Your Achievements</p>
+        <p style={{ ...fw(700), fontSize: 15, color: C.text, marginBottom: 12 }}>Your Achievements</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {achievements.map((ach, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px' }}>
@@ -2361,7 +2574,7 @@ function RewardsContent() {
   )
 }
 
-function ProgressTab({ onMenuOpen, onWalletOpen, mode = 'advocate' }) {
+function ProgressTab({ onMenuOpen, onWalletOpen, mode = 'advocate', onFlywheelOpen }) {
   const [subTab, setSubTab] = useState('Progress')
   return (
     <div>
@@ -2375,7 +2588,7 @@ function ProgressTab({ onMenuOpen, onWalletOpen, mode = 'advocate' }) {
       </div>
       <AnimatePresence mode="wait">
         {subTab === 'Progress'
-          ? <motion.div key="progress" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ProgressContent mode={mode} /></motion.div>
+          ? <motion.div key="progress" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ProgressContent mode={mode} onFlywheelOpen={onFlywheelOpen} /></motion.div>
           : subTab === 'Journey'
           ? <motion.div key="journey" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ActivityTimeline mode={mode} /></motion.div>
           : <motion.div key="rewards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><RewardsContent /></motion.div>
@@ -2718,7 +2931,7 @@ function OnboardingTiersScreen({ onNext }) {
 function OnboardingNotificationsScreen({ onNext }) {
   const [showDialog, setShowDialog] = useState(false)
   const benefits = [
-    ['replyIcon',     'Find out when Charlotte Tilbury reshares your content'],
+    ['replyIcon',     'Find out when American Eagle reshares your content'],
     ['messageSquare', 'Hear when your community replies to your posts'],
     ['gift',          'Get notified when you unlock something new.'],
   ]
@@ -2740,15 +2953,15 @@ function OnboardingNotificationsScreen({ onNext }) {
             display: 'flex', gap: 10, alignItems: 'flex-start',
           }}>
             <div style={{ width: 38, height: 38, borderRadius: 9, background: C.text, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ ...fw(700), fontSize: 11, color: C.white, letterSpacing: '-0.3px' }}>CT</span>
+              <span style={{ ...fw(700), fontSize: 11, color: C.white, letterSpacing: '-0.3px' }}>{BRAND}</span>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
-                <span style={{ ...fw(700), fontSize: 12, color: '#111' }}>Charlotte Tilbury</span>
+                <span style={{ ...fw(700), fontSize: 12, color: '#111' }}>American Eagle</span>
                 <span style={{ ...fw(400), fontSize: 11, color: '#888', marginLeft: 6, flexShrink: 0 }}>just now</span>
               </div>
               <p style={{ ...fw(400), fontSize: 13, color: '#333', lineHeight: '17px', margin: 0 }}>
-                Charlotte Tilbury just reshared your post to their story. 🎉
+                American Eagle just reshared your post to their story. 🎉
               </p>
             </div>
           </div>
@@ -2801,10 +3014,10 @@ function OnboardingNotificationsScreen({ onNext }) {
             >
               <div style={{ padding: '20px 16px 16px', textAlign: 'center' }}>
                 <p style={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 17, color: '#000', lineHeight: '22px', margin: '0 0 6px' }}>
-                  "Charlotte Tilbury" Would Like to Send You Notifications
+                  "American Eagle" Would Like to Send You Notifications
                 </p>
                 <p style={{ fontFamily: 'inherit', fontWeight: 400, fontSize: 13, color: '#3c3c43', lineHeight: '18px', margin: 0 }}>
-                  We'll notify you when a challenge drops, Charlotte Tilbury reshares your content, or you unlock something new.
+                  We'll notify you when a challenge drops, American Eagle reshares your content, or you unlock something new.
                 </p>
               </div>
               <div style={{ height: 0.5, background: 'rgba(60,60,67,0.29)' }} />
@@ -2830,45 +3043,45 @@ function getSuggestions(text) {
   const t = text.toLowerCase()
   if (t.match(/coachella|festival|outdoor|stage|concert|music/))
     return [
-      { title: 'Desert-Proof Glam',       desc: 'Show us the CT look that survives sun, sweat, and the second stage.', caption: 'desert-proof glam 🌵\nthis look survived 12 hours at coachella — the heat, the crowds, the dust, all of it.\n\n🟠 CT Pillow Talk Push Up Lashes — didn\'t smudge once\n🟠 Airbrush Flawless Setting Spray — before AND after' },
-      { title: 'Gates to Headliner',      desc: 'One face. All day. The Charlotte Tilbury look that goes the distance.',  caption: 'from gates to headliner ✨\none CT face. all day. no touch-ups. here\'s my secret lineup:\n\n🟠 Flawless Filter — my second skin\n🟠 Hollywood Contour Wand — never without it' },
-      { title: 'Festival Glow, Your Way', desc: 'Your festival, your rules. A CT-powered look made for the moment.',     caption: 'festival glow, my way 🎪\nyour rules, your look. here\'s how I built mine with CT:\n\n🟠 Magic Foundation — full coverage, feels like nothing\n🟠 Pillow Talk Blush — the most natural flush' },
-      { title: 'Your Festival Beat',      desc: 'Walk us through the CT products behind your perfect festival face.',     caption: 'the CT products that made my festival look 🎵\nwalk-through incoming. every product, every step.' },
+      { title: 'Desert-Proof Glam',       desc: `Show us the ${BRAND} look that survives sun, sweat, and the second stage.`, caption: `desert-proof glam 🌵\nthis look survived 12 hours at coachella — the heat, the crowds, the dust, all of it.\n\n🟠 ${BRAND} Pillow Talk Push Up Lashes — didn't smudge once\n🟠 Airbrush Flawless Setting Spray — before AND after` },
+      { title: 'Gates to Headliner',      desc: 'One face. All day. The American Eagle look that goes the distance.',  caption: `from gates to headliner ✨\none ${BRAND} face. all day. no touch-ups. here's my secret lineup:\n\n🟠 Flawless Filter — my second skin\n🟠 Hollywood Contour Wand — never without it` },
+      { title: 'Festival Glow, Your Way', desc: `Your festival, your rules. A ${BRAND}-powered look made for the moment.`,     caption: `festival glow, my way 🎪\nyour rules, your look. here's how I built mine with ${BRAND}:\n\n🟠 Magic Foundation — full coverage, feels like nothing\n🟠 Pillow Talk Blush — the most natural flush` },
+      { title: 'Your Festival Beat',      desc: `Walk us through the ${BRAND} products behind your perfect festival face.`,     caption: `the ${BRAND} products that made my festival look 🎵\nwalk-through incoming. every product, every step.` },
     ]
   if (t.match(/skin|routine|moistur|serum|glow|complexion|care/))
     return [
-      { title: 'Morning Ritual',    desc: 'Share your step-by-step CT skincare routine with your community.',   caption: 'my morning routine with CT ☀️\nnon-negotiables only. here\'s what actually makes a difference:\n\n🟠 Charlotte\'s Magic Cream — 5 mins in, my skin is awake\n🟠 Flawless Filter — the only "makeup" I wear on bare days' },
-      { title: 'Glow From Within',  desc: 'Capture the before-and-after. Show your skin\'s transformation.',    caption: 'before → after 🤍\nthis is what consistent CT skincare does. no filter, no edits.' },
-      { title: 'Night Mode',        desc: 'Your evening wind-down — what CT products are non-negotiable?',      caption: 'night mode activated 🌙\nmy wind-down with CT. the products I\'d keep if I could only keep three.' },
-      { title: 'Skin School',       desc: 'Teach your community your skincare secrets, CT style.',               caption: 'skin school is in session 📖\nhere\'s everything I wish I\'d known sooner about building a CT routine.' },
+      { title: 'Morning Ritual',    desc: `Share your step-by-step ${BRAND} skincare routine with your community.`,   caption: `my morning routine with ${BRAND} ☀️\nnon-negotiables only. here's what actually makes a difference:\n\n🟠 Charlotte's Magic Cream — 5 mins in, my skin is awake\n🟠 Flawless Filter — the only "makeup" I wear on bare days` },
+      { title: 'Glow From Within',  desc: 'Capture the before-and-after. Show your skin\'s transformation.',    caption: `before → after 🤍\nthis is what consistent ${BRAND} skincare does. no filter, no edits.` },
+      { title: 'Night Mode',        desc: `Your evening wind-down — what ${BRAND} products are non-negotiable?`,      caption: `night mode activated 🌙\nmy wind-down with ${BRAND}. the products I'd keep if I could only keep three.` },
+      { title: 'Skin School',       desc: `Teach your community your skincare secrets, ${BRAND} style.`,               caption: `skin school is in session 📖\nhere's everything I wish I'd known sooner about building a ${BRAND} routine.` },
     ]
   if (t.match(/ootd|outfit|style|fashion|wear|look|fit/))
     return [
-      { title: 'Your Signature Look', desc: 'The CT makeup that completes your favourite outfit.',            caption: 'my signature look 🖤\nthe outfit chose the makeup. here\'s how I pulled it together with CT.' },
-      { title: 'GRWM: My Way',        desc: 'A full get-ready-with-me featuring your go-to CT products.',     caption: 'get ready with me ✨\nfull GRWM from bare skin to out-the-door, CT only.' },
-      { title: 'Mood Board',          desc: 'Match your makeup to your outfit. Style meets beauty.',           caption: 'makeup meets fashion 🎨\nI matched my CT look to my outfit and this is what happened.' },
-      { title: 'Day to Night',        desc: 'One outfit, two CT looks. The daytime and evening transition.',   caption: 'day to night with CT 🌅\nsame outfit, completely different energy. here\'s the transition.' },
+      { title: 'Your Signature Look', desc: `The ${BRAND} makeup that completes your favourite outfit.`,            caption: `my signature look 🖤\nthe outfit chose the makeup. here's how I pulled it together with ${BRAND}.` },
+      { title: 'GRWM: My Way',        desc: `A full get-ready-with-me featuring your go-to ${BRAND} products.`,     caption: `get ready with me ✨\nfull GRWM from bare skin to out-the-door, ${BRAND} only.` },
+      { title: 'Mood Board',          desc: 'Match your makeup to your outfit. Style meets beauty.',           caption: `makeup meets fashion 🎨\nI matched my ${BRAND} look to my outfit and this is what happened.` },
+      { title: 'Day to Night',        desc: `One outfit, two ${BRAND} looks. The daytime and evening transition.`,   caption: `day to night with ${BRAND} 🌅\nsame outfit, completely different energy. here's the transition.` },
     ]
   if (t.match(/tutorial|how to|teach|beginner|step|guide|tips/))
     return [
-      { title: 'Beauty 101',     desc: 'Break it down for beginners. Your CT tutorial, step by step.', caption: 'CT beauty 101 📚\nstarting from zero? this is everything you need to know. one step at a time.' },
-      { title: 'Pro Tips',       desc: 'Share the tricks that took your makeup to the next level.',     caption: 'the CT techniques that changed everything for me 💡\nhonest breakdown of what actually works.' },
-      { title: 'The Magic Trick', desc: 'That one CT technique that changed everything for you.',      caption: 'one trick. big difference. ✨\nI\'ve been doing this with my CT products for 6 months and the results speak.' },
+      { title: 'Beauty 101',     desc: `Break it down for beginners. Your ${BRAND} tutorial, step by step.`, caption: `${BRAND} beauty 101 📚\nstarting from zero? this is everything you need to know. one step at a time.` },
+      { title: 'Pro Tips',       desc: 'Share the tricks that took your makeup to the next level.',     caption: `the ${BRAND} techniques that changed everything for me 💡\nhonest breakdown of what actually works.` },
+      { title: 'The Magic Trick', desc: `That one ${BRAND} technique that changed everything for you.`,      caption: `one trick. big difference. ✨\nI've been doing this with my ${BRAND} products for 6 months and the results speak.` },
       { title: 'From Scratch',   desc: 'A full face, explained. Walk us through every product.',       caption: 'full face from scratch 🧴\nI\'m explaining every single product and why it earns a place in my routine.' },
     ]
   if (t.match(/lip|lipstick|tint|balm|nude|red|pout/))
     return [
-      { title: 'Pillow Talk, Your Way', desc: 'Your favourite CT lip look and the story behind it.',  caption: 'pillow talk, my way 💋\nthis shade does something to me. here\'s the full look and why it\'s stayed in my bag.' },
-      { title: 'Lip Library',           desc: 'Swatch, test, review. Your ultimate CT lip roundup.', caption: 'my CT lip library 💄\nevery shade I\'ve tried, reviewed honestly. your guide to finding yours.' },
-      { title: 'One Lip, All Day',      desc: 'Put your CT lip to the test — morning to night.',      caption: 'one CT lip from 7am to midnight ⏱\nno touch-ups. just results. here\'s how it held up.' },
-      { title: 'Match My Lip',          desc: 'Find the perfect CT shade for every mood and occasion.', caption: 'finding your CT lip match 🎯\nI tested 6 shades. here\'s which one belongs on your face.' },
+      { title: 'Pillow Talk, Your Way', desc: `Your favourite ${BRAND} lip look and the story behind it.`,  caption: 'pillow talk, my way 💋\nthis shade does something to me. here\'s the full look and why it\'s stayed in my bag.' },
+      { title: 'Lip Library',           desc: `Swatch, test, review. Your ultimate ${BRAND} lip roundup.`, caption: `my ${BRAND} lip library 💄\nevery shade I've tried, reviewed honestly. your guide to finding yours.` },
+      { title: 'One Lip, All Day',      desc: `Put your ${BRAND} lip to the test — morning to night.`,      caption: `one ${BRAND} lip from 7am to midnight ⏱\nno touch-ups. just results. here's how it held up.` },
+      { title: 'Match My Lip',          desc: `Find the perfect ${BRAND} shade for every mood and occasion.`, caption: `finding your ${BRAND} lip match 🎯\nI tested 6 shades. here's which one belongs on your face.` },
     ]
   // Default
   return [
-    { title: 'My CT Edit',        desc: 'Curate your go-to CT products and show us why they earn a place in your bag.', caption: 'my CT edit ✨\nthe products that genuinely changed my routine. no filler, no fluff.' },
-    { title: 'First Impressions', desc: 'Review a CT product you\'ve never tried before. Honest, real, yours.',         caption: 'first impressions: CT 💬\ni\'ve never used this before. here\'s my completely honest take.' },
-    { title: 'One Product, Many Ways', desc: 'Pick your favourite CT product and show us every way you use it.',        caption: 'one CT product. five different ways. 🔄\nversatility test — and the results surprised me.' },
-    { title: 'Why I Create',      desc: 'The story behind your content. What inspires you to show up and share?',       caption: 'why I create 💛\nthis is the reason I keep showing up. and why Charlotte Tilbury is always part of the story.' },
+    { title: `My ${BRAND} Edit`,        desc: `Curate your go-to ${BRAND} products and show us why they earn a place in your bag.`, caption: `my ${BRAND} edit ✨\nthe products that genuinely changed my routine. no filler, no fluff.` },
+    { title: 'First Impressions', desc: `Review a ${BRAND} product you've never tried before. Honest, real, yours.`,         caption: `first impressions: ${BRAND} 💬\ni've never used this before. here's my completely honest take.` },
+    { title: 'One Product, Many Ways', desc: `Pick your favourite ${BRAND} product and show us every way you use it.`,        caption: `one ${BRAND} product. five different ways. 🔄\nversatility test — and the results surprised me.` },
+    { title: 'Why I Create',      desc: 'The story behind your content. What inspires you to show up and share?',       caption: 'why I create 💛\nthis is the reason I keep showing up. and why American Eagle is always part of the story.' },
   ]
 }
 
@@ -2923,9 +3136,9 @@ function ChallengeCreationScreen({ onBack }) {
   // ── Step 0: Idea input ──
   if (step === 0) {
     const inspirationCards = [
-      { title: 'Desert-Proof Glam',   desc: 'Show us the CT look that survives sun, sweat, and the second stage.' },
-      { title: 'Morning Ritual',      desc: 'Share your step-by-step CT skincare routine.' },
-      { title: 'GRWM: My Way',        desc: 'A full get-ready-with-me featuring your go-to CT products.' },
+      { title: 'Desert-Proof Glam',   desc: `Show us the ${BRAND} look that survives sun, sweat, and the second stage.` },
+      { title: 'Morning Ritual',      desc: `Share your step-by-step ${BRAND} skincare routine.` },
+      { title: 'GRWM: My Way',        desc: `A full get-ready-with-me featuring your go-to ${BRAND} products.` },
     ]
     return (
       <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
@@ -3129,7 +3342,18 @@ function ChallengeCreationScreen({ onBack }) {
 // ── SIDE DRAWER ───────────────────────────────────────
 
 function SideDrawer({ onClose, photo }) {
-  const communities = ['Charlotte Tilbury', 'Huda Beauty', "Paula's Choice"]
+  const [copied, setCopied] = useState(false)
+  const referralCode = 'DEMOA9HINQ'
+  const menuItems = [
+    { icon: 'sliders', label: 'Settings and Privacy' },
+    { icon: 'help',    label: 'Get Help' },
+  ]
+  const handleCopy = (e) => {
+    e.stopPropagation()
+    navigator.clipboard?.writeText(referralCode).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1800)
+  }
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -3141,41 +3365,43 @@ function SideDrawer({ onClose, photo }) {
         initial={{ x: -334 }} animate={{ x: 0 }} exit={{ x: -334 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         onClick={e => e.stopPropagation()}
-        style={{
-          position: 'absolute', left: 0, top: 0, height: '100%', width: 334,
-          background: C.white,
-          borderTopRightRadius: 12, borderBottomRightRadius: 12,
-          border: `1px solid ${C.border}`,
-        }}
+        style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: 334, background: C.white, borderTopRightRadius: 12, borderBottomRightRadius: 12, display: 'flex', flexDirection: 'column' }}
       >
-        <div style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 48 }}>
+        {/* User header */}
+        <div style={{ padding: '48px 20px 24px', borderBottom: `1px solid ${C.borderLight}` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Avatar initial="Z" size={48} photo={photo} />
-            <span style={{ ...fw(400), fontSize: 18, color: C.text }}>Zara Ahmed</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <span style={{ ...fw(400), fontSize: 16, color: C.text }}>Your Communities</span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {communities.map((name, i) => (
-                <motion.button key={i} whileTap={{ scale: 0.97 }} style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: 12, borderRadius: 12,
-                  border: `1px solid ${C.border}`,
-                  background: C.white, cursor: 'pointer', width: '100%',
-                  fontFamily: 'inherit',
-                }}>
-                  <div style={{
-                    width: 44, height: 44, borderRadius: '50%',
-                    background: '#d9d9d9',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <div style={{ width: 18, height: 18, border: '1.5px solid rgba(0,0,0,0.22)', borderRadius: 3 }} />
-                  </div>
-                  <span style={{ ...fw(400), fontSize: 14, color: C.text }}>{name}</span>
-                </motion.button>
-              ))}
+            <div>
+              <p style={{ ...fw(600), fontSize: 16, color: C.text, marginBottom: 2 }}>Zara Ahmed</p>
+              <p style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>Gold member</p>
             </div>
+          </div>
+        </div>
+
+        {/* Menu items */}
+        <div style={{ flex: 1, padding: '8px 0' }}>
+          {menuItems.map(({ icon, label }) => (
+            <motion.button key={label} whileTap={{ scale: 0.98 }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '15px 20px', background: 'none', border: 'none', borderBottom: `1px solid ${C.borderLight}`, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+              <Icon name={icon} size={18} color={C.textBody} />
+              <span style={{ ...fw(400), fontSize: 15, color: C.text }}>{label}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Referral section */}
+        <div style={{ padding: '20px 20px 40px', borderTop: `1px solid ${C.borderLight}` }}>
+          <p style={{ ...fw(700), fontSize: 14, color: C.text, marginBottom: 4 }}>Invite Advocates and Earn 50 Credits</p>
+          <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, lineHeight: '18px', marginBottom: 14 }}>You'll earn 50 credits for every advocate that joins with your code and gets approved.</p>
+          <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden' }}>
+            <div style={{ flex: 1, padding: '10px 14px' }}>
+              <p style={{ ...fw(400), fontSize: 11, color: C.textMuted, marginBottom: 2, letterSpacing: '0.02em' }}>Referral Code</p>
+              <p style={{ ...fw(700), fontSize: 15, color: C.text, letterSpacing: '0.04em' }}>{referralCode}</p>
+            </div>
+            <motion.button whileTap={{ scale: 0.92 }} onClick={handleCopy}
+              style={{ width: 52, alignSelf: 'stretch', background: copied ? C.text : C.cardBg, border: 'none', borderLeft: `1px solid ${C.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
+              <Icon name={copied ? 'check' : 'copy'} size={16} color={copied ? C.white : C.textBody} strokeWidth={copied ? 2.5 : 1.8} />
+            </motion.button>
           </div>
         </div>
       </motion.div>
@@ -3210,7 +3436,7 @@ function IntroSheet({ onSetProfilePhoto, onPost }) {
       <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 8px' }}>Finish this:</p>
       <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 14, marginBottom: 16 }}>
         <p style={{ ...fw(400), fontSize: 14, color: C.textBody, lineHeight: '22px', margin: '0 0 8px' }}>
-          The first CT product I ever tried was
+          The first {BRAND} product I ever tried was
         </p>
         <input
           value={sentence}
@@ -3230,7 +3456,7 @@ function IntroSheet({ onSetProfilePhoto, onPost }) {
       >
         {localPhoto
           ? <img src={localPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span style={{ ...fw(400), fontSize: 13, color: C.textMuted, textAlign: 'center', padding: '0 24px', lineHeight: '20px' }}>Add a photo with your favourite CT product — or just a selfie</span>
+          : <span style={{ ...fw(400), fontSize: 13, color: C.textMuted, textAlign: 'center', padding: '0 24px', lineHeight: '20px' }}>Add a photo with your favourite {BRAND} product — or just a selfie</span>
         }
       </motion.button>
       <PrimaryButton onClick={() => onPost(sentence)}>Post now</PrimaryButton>
@@ -3516,15 +3742,16 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
   const [openCommunityRemix, setOpenCommunityRemix] = useState(null)
   const [recognitionOpen, setRecognitionOpen] = useState(false)
   const [savedRemixes, setSavedRemixes] = useState([])
+  const [flywheelOpen, setFlywheelOpen] = useState(false)
   const openMenu = () => setMenuOpen(true)
   const openWallet = () => setWalletOpen(true)
   const renderTab = () => {
     switch (activeTab) {
-      case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} mode={mode} />
+      case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} onFlywheelOpen={() => setFlywheelOpen(true)} mode={mode} />
       case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeOpen={onChallengeOpen} onGroupChallengeOpen={onGroupChallengeOpen} mode={mode} />
       case 'community':   return <CommunityTab onMenuOpen={openMenu} onWalletOpen={openWallet} onAdvocateOpen={setOpenAdvocate} onReplyOpen={setOpenReply} onRemixOpen={setOpenCommunityRemix} onRecognitionOpen={() => setRecognitionOpen(true)} mode={mode} />
       case 'studio':      return <StudioTab onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeCreate={onChallengeCreate} onContentAnalyse={onContentAnalyse} onRemix={onRemix} savedRemixes={savedRemixes} />
-      case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} mode={mode} />
+      case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} mode={mode} onFlywheelOpen={() => setFlywheelOpen(true)} />
       case 'rewards':     return <RewardsTab mode={mode} onMenuOpen={openMenu} onWalletOpen={openWallet} />
       case 'account':     return <AccountTab mode={mode} />
       default:            return null
@@ -3566,6 +3793,9 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
       </AnimatePresence>
       <AnimatePresence>
         {openCommunityRemix && <CommunityRemixSheet post={openCommunityRemix} onClose={() => setOpenCommunityRemix(null)} savedRemixes={savedRemixes} onSave={r => setSavedRemixes(prev => [...prev, r])} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {flywheelOpen && <FlywheelSheet onClose={() => setFlywheelOpen(false)} />}
       </AnimatePresence>
       <AnimatePresence>
         {menuOpen && <SideDrawer onClose={() => setMenuOpen(false)} photo={profilePhoto} />}
@@ -3741,8 +3971,8 @@ function SignupFooter() {
 
 function SignupLogoArea({ top = 85 }) {
   return (
-    <div style={{ position: 'absolute', top, left: '50%', transform: 'translateX(-50%)', width: 120, height: 60, background: 'rgba(66,66,66,0.07)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-      <span style={{ ...fw(600), fontSize: 10, color: 'rgba(66,66,66,0.3)', letterSpacing: 2 }}>LOGO AREA</span>
+    <div style={{ position: 'absolute', top, left: '50%', transform: 'translateX(-50%)', width: 160, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <img src={BRAND_LOGO} alt={BRAND} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
     </div>
   )
 }
@@ -3750,7 +3980,7 @@ function SignupLogoArea({ top = 85 }) {
 function SignupMotivationScreen({ onNext }) {
   const [selected, setSelected] = useState(null)
   const options = [
-    'I genuinely love [brand]',
+    '{`I genuinely love ${BRAND}`}',
     'I want to grow my content',
     'I want to be part of something bigger',
     'A friend told me about this',
@@ -3787,16 +4017,19 @@ function SignupMotivationScreen({ onNext }) {
 
 function SignupBenefitsScreen({ onNext }) {
   const benefits = [
-    { title: 'Exclusive product access', sub: 'First to know. First to try. Before it hits the shelves.' },
-    { title: 'Events & experiences', sub: "The moments fans talk about for years — you'll be in the room." },
-    { title: "Moments that money can't buy", sub: 'Recognition from a brand that actually sees you.' },
+    { title: 'Be seen, not just followed', sub: 'Complete challenges and create content that reaches American Eagle, not just your feed.' },
+    { title: 'Unlock earning as you grow', sub: 'The American Eagle team reviews your content — and can reshare, reward, or reach out.' },
+    { title: 'Points, commissions, and gift cards.', sub: 'Rewards that grow the more you share.' },
   ]
   return (
     <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
       <SignupLogoArea />
       <div style={{ position: 'absolute', top: 192, left: 16, right: 16 }}>
-        <p style={{ ...fw(700), fontSize: 24, color: C.text, marginBottom: 28, lineHeight: '32px' }}>
-          We thought so. Here's what loving [Brand] can become
+        <p style={{ ...fw(700), fontSize: 24, color: C.text, marginBottom: 6, lineHeight: '32px', textAlign: 'center' }}>
+          Share what you love. Get rewarded.
+        </p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 28, textAlign: 'center' }}>
+          Create content that counts
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
           {benefits.map((b, i) => (
@@ -3809,7 +4042,7 @@ function SignupBenefitsScreen({ onNext }) {
             </div>
           ))}
         </div>
-        <PrimaryButton onClick={onNext}>Continue</PrimaryButton>
+        <PrimaryButton onClick={onNext}>Apply now</PrimaryButton>
       </div>
       <SignupFooter />
     </div>
@@ -3818,7 +4051,7 @@ function SignupBenefitsScreen({ onNext }) {
 
 function SignupBenefitsGrowthScreen({ onNext, onBack }) {
   const benefits = [
-    { title: 'Real social proof',        sub: '[Brand] reshares the content you\'re already making.' },
+    { title: 'Real social proof',        sub: `${BRAND} reshares the content you're already making.` },
     { title: 'Watch your reach grow',    sub: 'Every post, tracked. Every result, yours to keep.' },
     { title: 'An audience that trusts you', sub: 'Because you\'re recommending something you actually love.' },
   ]
@@ -3830,7 +4063,7 @@ function SignupBenefitsGrowthScreen({ onNext, onBack }) {
       </motion.button>
       <div style={{ position: 'absolute', top: 192, left: 16, right: 16 }}>
         <p style={{ ...fw(700), fontSize: 24, color: C.text, marginBottom: 28, lineHeight: '32px' }}>
-          Here's how [Brand] helps you grow.
+          Here's how {BRAND} helps you grow.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
           {benefits.map((b, i) => (
@@ -3852,9 +4085,9 @@ function SignupBenefitsGrowthScreen({ onNext, onBack }) {
 
 function SignupBenefitsCommunityScreen({ onNext, onBack }) {
   const benefits = [
-    { title: 'A community that gets it',       sub: 'Meet advocates who love [brand] as much as you do — and show up for each other.' },
+    { title: 'A community that gets it',       sub: `Meet advocates who love ${BRAND} as much as you do — and show up for each other.` },
     { title: 'Moments worth being part of',    sub: 'Events, launches, and experiences built for the people who care most.' },
-    { title: 'Your voice, amplified',          sub: 'When you speak, [brand] listens — and so does everyone else in here.' },
+    { title: 'Your voice, amplified',          sub: `When you speak, ${BRAND} listens — and so does everyone else in here.` },
   ]
   return (
     <div style={{ width: 390, height: 844, background: C.white, position: 'relative' }}>
@@ -3971,7 +4204,7 @@ function SignupSSOScreen({ onNext, onBack }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
           {ssoOptions.map(({ label, icon }) => (
             <motion.button key={label} whileTap={{ scale: 0.97 }} onClick={() => onNext('')}
-              style={{ width: '100%', height: 52, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', ...fw(600), fontSize: 15, color: C.text }}>
+              style={{ width: '100%', height: BTN.height, border: `1px solid ${C.border}`, borderRadius: BTN.radius, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', ...fw(600), fontSize: BTN.fontSize, color: C.text }}>
               {icon}
               {label}
             </motion.button>
@@ -3983,7 +4216,7 @@ function SignupSSOScreen({ onNext, onBack }) {
           <div style={{ flex: 1, height: 1, background: C.border }} />
         </div>
         <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address"
-          style={{ width: '100%', height: 52, borderRadius: 12, border: `1px solid ${email ? C.text : C.border}`, padding: '0 16px', ...fw(400), fontSize: 15, color: C.text, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', marginBottom: 12 }} />
+          style={{ width: '100%', height: BTN.height, borderRadius: BTN.radius, border: `1px solid ${email ? C.text : C.border}`, padding: '0 16px', ...fw(400), fontSize: 15, color: C.text, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', marginBottom: 12 }} />
         <PrimaryButton onClick={() => valid && onNext(email)} disabled={!valid}>Continue with email</PrimaryButton>
       </div>
       <TermsFooter />
@@ -4185,10 +4418,17 @@ function SignupQueueScreen() {
 
 const NAV_SECTIONS = [
   {
-    label: 'Journeys',
+    label: 'Loyalty',
     items: [
-      { key: 'signup',     label: 'Sign up',    toScreen: 4,  tab: null   },
-      { key: 'onboarding', label: 'Onboarding', toScreen: 12, tab: null   },
+      { key: 'loyalty-invite', label: 'Loyalty invite', toScreen: 29, tab: null },
+      { key: 'journey-c',      label: 'Add loyalty',    toScreen: 34, tab: null },
+    ],
+  },
+  {
+    label: 'Advocacy',
+    items: [
+      { key: 'signup',     label: 'Sign up',    toScreen: 5,  tab: null },
+      { key: 'onboarding', label: 'Onboarding', toScreen: 12, tab: null },
       { key: 'login',      label: 'Log in',     toScreen: 3,  tab: 'feed', triggerMilestone: true },
     ],
   },
@@ -4228,22 +4468,10 @@ function ModeTabs({ mode, onChange }) {
   )
 }
 
-function SideNav({ activeKey, onNavigate, onLoginNav, mode = 'advocate' }) {
-  const appItems = mode === 'loyalty'
-    ? [
-        { key: 'dashboard', label: 'Home',    toScreen: 3, tab: 'feed'    },
-        { key: 'rewards',   label: 'Rewards', toScreen: 3, tab: 'rewards' },
-        { key: 'account',   label: 'Account', toScreen: 3, tab: 'account' },
-      ]
-    : mode === 'employee'
-    ? [
-        ...NAV_SECTIONS[1].items,
-        { key: 'managerview', label: 'Manager View', toScreen: 29, tab: null },
-      ]
-    : NAV_SECTIONS[1].items
-  const sections = [NAV_SECTIONS[0], { label: 'App', items: appItems }]
+function SideNav({ activeKey, onNavigate, onLoginNav }) {
+  const sections = NAV_SECTIONS
   return (
-    <div style={{ width: 160, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ width: 160, display: 'flex', flexDirection: 'column', gap: 24 }}>
       {sections.map(section => (
         <div key={section.label}>
           <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(0,0,0,0.28)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4, paddingLeft: 10 }}>
@@ -4281,10 +4509,323 @@ function SideNav({ activeKey, onNavigate, onLoginNav, mode = 'advocate' }) {
   )
 }
 
+// ── JOURNEY B: ONBOARDING LOYALTY DETECTION ───────────
+
+function OnboardingLoyaltyDetectedScreen({ onLink, onSkip }) {
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <SignupLogoArea top={64} />
+      <div style={{ position: 'absolute', top: 168, left: 24, right: 24 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(66,66,66,0.06)', borderRadius: 20, padding: '5px 12px', marginBottom: 20 }}>
+          <Icon name="check" size={12} color={C.textMuted} strokeWidth={2.5} />
+          <span style={{ ...fw(500), fontSize: 12, color: C.textMuted, letterSpacing: '0.02em' }}>Loyalty account found</span>
+        </div>
+        <p style={{ ...fw(700), fontSize: 28, color: C.text, lineHeight: '36px', marginBottom: 12, letterSpacing: '-0.5px' }}>
+          We found your {BRAND} account.
+        </p>
+        <p style={{ ...fw(400), fontSize: 16, color: C.textMuted, lineHeight: '24px', marginBottom: 24 }}>
+          Your points and Gold status carry through to your advocacy rewards — nothing to fill in.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', background: C.cardBg, borderRadius: 10, marginBottom: 36 }}>
+          <Icon name="mail" size={16} color={C.textMuted} />
+          <span style={{ ...fw(400), fontSize: 14, color: C.textBody }}>zara@example.com</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }} />
+            <span style={{ ...fw(600), fontSize: 12, color: '#166534' }}>Gold member</span>
+          </div>
+        </div>
+        <PrimaryButton onClick={onLink}>Link my loyalty account →</PrimaryButton>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={onSkip}
+          style={{ width: '100%', marginTop: 16, background: 'none', border: 'none', cursor: 'pointer', ...fw(400), fontSize: 14, color: C.textMuted, fontFamily: 'inherit', padding: '4px 0', textDecoration: 'underline' }}>
+          Skip for now
+        </motion.button>
+      </div>
+    </div>
+  )
+}
+
+// ── JOURNEY A: LOYALTY INVITE ─────────────────────────
+
+function LoyaltyInviteScreen({ onNext }) {
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <SignupLogoArea top={52} />
+      <div style={{ position: 'absolute', top: 156, left: 24, right: 24 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(180,237,62,0.15)', border: '1px solid rgba(180,237,62,0.4)', borderRadius: 20, padding: '4px 10px', marginBottom: 20 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.lime }} />
+          <span style={{ ...fw(600), fontSize: 11, color: '#4a6b0a', letterSpacing: '0.04em' }}>Gold member · American Eagle</span>
+        </div>
+        <p style={{ ...fw(700), fontSize: 28, color: C.text, lineHeight: '36px', marginBottom: 14, letterSpacing: '-0.5px' }}>
+          Your loyalty programme just got an upgrade.
+        </p>
+        <p style={{ ...fw(400), fontSize: 16, color: C.textMuted, lineHeight: '24px', marginBottom: 32 }}>
+          American Eagle members are now invited to the advocate programme — new ways to earn, exclusive challenges, and a community of people who love the brand as much as you do.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+          {[
+            { icon: 'wallet', label: 'Your points and tier come with you' },
+            { icon: 'users',  label: 'Access to the advocate community' },
+            { icon: 'award',  label: 'Earn faster with new challenges' },
+          ].map(({ icon, label }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name={icon} size={16} color={C.textBody} />
+              </div>
+              <span style={{ ...fw(400), fontSize: 15, color: C.textBody }}>{label}</span>
+            </div>
+          ))}
+        </div>
+        <PrimaryButton onClick={onNext}>Accept your invitation →</PrimaryButton>
+      </div>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+        <span style={{ ...fw(400), fontSize: 10, color: C.textMuted }}>Powered by</span>
+        <span style={{ ...fw(900), fontSize: 18, color: C.text, letterSpacing: '-0.02em', lineHeight: 1 }}>duel.</span>
+      </div>
+    </div>
+  )
+}
+
+function LoyaltyConnectScreen({ onNext, onBack }) {
+  const [connecting, setConnecting] = useState(false)
+  const handleConnect = () => {
+    setConnecting(true)
+    setTimeout(onNext, 1200)
+  }
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div style={{ height: 56, display: 'flex', alignItems: 'center', padding: '0 8px', flexShrink: 0 }}>
+        <IconButton icon="arrowLeft" size={36} onClick={onBack} color={C.textBody} />
+      </div>
+      <div style={{ padding: '8px 24px 0' }}>
+        <p style={{ ...fw(700), fontSize: 24, color: C.text, lineHeight: '32px', marginBottom: 8, letterSpacing: '-0.3px' }}>
+          Connect your American Eagle account
+        </p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 32 }}>
+          We'll bring in your points balance, tier status, and purchase history. Nothing changes on the American Eagle side.
+        </p>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={handleConnect}
+          style={{ width: '100%', height: BTN.height, border: `1px solid ${C.border}`, borderRadius: BTN.radius, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', ...fw(600), fontSize: BTN.fontSize, color: C.text, marginBottom: 16 }}>
+          <div style={{ width: 24, height: 24, borderRadius: 4, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ ...fw(900), fontSize: 12, color: C.text }}>A</span>
+          </div>
+          Continue with American Eagle
+        </motion.button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+          <span style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>or</span>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+        </div>
+        <input
+          type="email"
+          defaultValue="sarah@example.com"
+          placeholder="American Eagle email address"
+          style={{ width: '100%', height: BTN.height, borderRadius: BTN.radius, border: `1px solid ${C.border}`, padding: '0 16px', ...fw(400), fontSize: BTN.fontSize, color: C.text, background: C.white, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', marginBottom: 12 }}
+        />
+        <PrimaryButton onClick={handleConnect} disabled={connecting}>
+          {connecting ? 'Connecting…' : 'Connect with email'}
+        </PrimaryButton>
+        <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, textAlign: 'center', marginTop: 16, lineHeight: '18px' }}>
+          We only read your loyalty data. We'll never post or make purchases on your behalf.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function LoyaltyRecognitionScreen({ onNext }) {
+  const stats = [
+    { value: 'Gold',   label: 'Member tier' },
+    { value: '2,340',  label: 'Points balance' },
+    { value: '3 yrs',  label: 'Member tenure' },
+    { value: '47',     label: 'Purchases' },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: '#0C0C0E', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 28px', position: 'relative' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 20, padding: '4px 10px', marginBottom: 28, alignSelf: 'flex-start' }}>
+          <Icon name="check" size={11} color={C.white} strokeWidth={2.5} />
+          <span style={{ ...fw(600), fontSize: 11, color: C.white, letterSpacing: '0.04em' }}>American Eagle connected</span>
+        </div>
+        <p style={{ ...fw(700), fontSize: 32, color: C.white, lineHeight: '40px', marginBottom: 10, letterSpacing: '-0.5px' }}>
+          Welcome back, Zara.
+        </p>
+        <p style={{ ...fw(400), fontSize: 17, color: 'rgba(255,255,255,0.5)', lineHeight: '25px', marginBottom: 36 }}>
+          Your history with American Eagle is here. Every purchase, every point — recognised.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 40 }}>
+          {stats.map(({ value, label }) => (
+            <div key={label} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '18px 16px' }}>
+              <p style={{ ...fw(700), fontSize: 22, color: C.white, marginBottom: 4, letterSpacing: '-0.3px' }}>{value}</p>
+              <p style={{ ...fw(400), fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{label}</p>
+            </div>
+          ))}
+        </div>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={onNext}
+          style={{ width: '100%', height: BTN.height, borderRadius: BTN.radius, background: C.white, border: 'none', color: C.text, ...fw(700), fontSize: BTN.fontSize, cursor: 'pointer', fontFamily: 'inherit' }}>
+          See what's unlocked for you →
+        </motion.button>
+      </div>
+    </div>
+  )
+}
+
+function LoyaltyUnlockScreen({ onNext }) {
+  const unlocks = [
+    { icon: 'flag',    title: 'Challenges',          desc: 'Earn points through content, referrals, and events.' },
+    { icon: 'users',   title: 'Advocate community',  desc: 'Connect with others who share your love for the brand.' },
+    { icon: 'scissors', title: 'Content studio',     desc: 'Create, remix, and submit brand content from one place.' },
+    { icon: 'chart',   title: 'Accelerated earning', desc: 'Gold members earn 1.5× points on every advocacy action.' },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '48px 24px 24px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(180,237,62,0.15)', border: '1px solid rgba(180,237,62,0.4)', borderRadius: 20, padding: '4px 10px', marginBottom: 20 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.lime }} />
+          <span style={{ ...fw(600), fontSize: 11, color: '#4a6b0a', letterSpacing: '0.04em' }}>Gold member · American Eagle</span>
+        </div>
+        <p style={{ ...fw(700), fontSize: 26, color: C.text, lineHeight: '34px', marginBottom: 8, letterSpacing: '-0.3px' }}>
+          Here's what's new for you.
+        </p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 32 }}>
+          Your American Eagle membership unlocks all of this from day one.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {unlocks.map(({ icon, title, desc }, i) => (
+            <motion.div
+              key={title}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.35, ease: 'easeOut' }}
+              style={{ display: 'flex', gap: 16, padding: '18px 16px', border: `1px solid ${C.border}`, borderRadius: 14, alignItems: 'flex-start' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name={icon} size={18} color={C.textBody} />
+              </div>
+              <div>
+                <p style={{ ...fw(600), fontSize: 15, color: C.text, marginBottom: 3 }}>{title}</p>
+                <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, lineHeight: '19px' }}>{desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+      <div style={{ padding: '12px 24px 40px', flexShrink: 0, borderTop: `1px solid ${C.borderLight}` }}>
+        <PrimaryButton onClick={onNext}>Start exploring →</PrimaryButton>
+      </div>
+    </div>
+  )
+}
+
+function LoyaltyNudgeSheetScreen({ onConnect, onDismiss }) {
+  return (
+    <div style={{ width: 390, height: 844, position: 'relative', overflow: 'hidden' }}>
+      {/* Live feed in the background, non-interactive */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <FeedTab onMenuOpen={() => {}} onWalletOpen={() => {}} photo={null} userPost={null} onTabChange={() => {}} mode="advocate" />
+      </div>
+      {/* Dimming overlay — tap to dismiss; z-index above sticky TopNav (10) */}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 20 }} onClick={onDismiss} />
+      {/* Sheet — above overlay */}
+      <motion.div
+        initial={{ y: 60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 28 }}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', padding: '28px 24px 44px', zIndex: 30 }}>
+        {/* Handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 24px' }} />
+        {/* Badge */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(66,66,66,0.06)', borderRadius: 20, padding: '5px 12px', marginBottom: 16 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }} />
+          <span style={{ ...fw(500), fontSize: 12, color: C.textMuted, letterSpacing: '0.02em' }}>Loyalty account found</span>
+        </div>
+        <p style={{ ...fw(700), fontSize: 24, color: C.text, lineHeight: '32px', marginBottom: 10, letterSpacing: '-0.4px' }}>
+          Your {BRAND} account is ready to connect.
+        </p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 20 }}>
+          Connect it to carry over your Gold status and points — nothing to fill in.
+        </p>
+        {/* Account preview */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 16px', background: C.cardBg, borderRadius: 10, marginBottom: 24 }}>
+          <Icon name="mail" size={15} color={C.textMuted} />
+          <span style={{ ...fw(400), fontSize: 14, color: C.textBody, flex: 1 }}>zara@example.com</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }} />
+            <span style={{ ...fw(600), fontSize: 12, color: '#166534' }}>Gold · 2,340 pts</span>
+          </div>
+        </div>
+        <PrimaryButton onClick={onConnect}>Connect my account →</PrimaryButton>
+        <motion.button whileTap={{ scale: 0.96 }} onClick={onDismiss}
+          style={{ width: '100%', marginTop: 14, background: 'none', border: 'none', cursor: 'pointer', ...fw(400), fontSize: 14, color: C.textMuted, fontFamily: 'inherit', padding: '4px 0' }}>
+          Not now
+        </motion.button>
+      </motion.div>
+    </div>
+  )
+}
+
+function LoyaltyConnectConfirmScreen({ onConfirm, onBack }) {
+  const benefits = [
+    { icon: 'award',   title: '2,340 points carried over',          desc: 'Your existing balance arrives in full.' },
+    { icon: 'star',    title: 'Gold status, from day one',           desc: 'Earn 1.5× points on every advocacy action.' },
+    { icon: 'package', title: 'Purchase history recognised',         desc: 'Past orders count toward your advocacy flywheel.' },
+  ]
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '56px 20px 0' }}>
+        <motion.button whileTap={{ scale: 0.88 }} onClick={onBack}
+          style={{ width: 36, height: 36, border: `1px solid ${C.border}`, borderRadius: 10, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <Icon name="chevronLeft" size={16} color={C.text} />
+        </motion.button>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 24px 0' }}>
+        <p style={{ ...fw(700), fontSize: 26, color: C.text, lineHeight: '34px', marginBottom: 8, letterSpacing: '-0.3px' }}>Link your loyalty account</p>
+        <p style={{ ...fw(400), fontSize: 15, color: C.textMuted, lineHeight: '22px', marginBottom: 24 }}>Everything carries over automatically — no forms to fill in.</p>
+        {/* Account card */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', border: `1px solid ${C.border}`, borderRadius: 12, marginBottom: 28 }}>
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icon name="mail" size={16} color={C.textMuted} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ ...fw(500), fontSize: 14, color: C.text, marginBottom: 2 }}>zara@example.com</p>
+            <p style={{ ...fw(400), fontSize: 12, color: C.textMuted }}>American Eagle Outfitters</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, background: 'rgba(34,197,94,0.1)' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }} />
+            <span style={{ ...fw(600), fontSize: 12, color: '#166534' }}>Gold member</span>
+          </div>
+        </div>
+        {/* Benefits */}
+        <p style={{ ...fw(500), fontSize: 13, color: C.textMuted, marginBottom: 12, letterSpacing: '0.02em' }}>What you'll get</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 32 }}>
+          {benefits.map(({ icon, title, desc }) => (
+            <div key={title} style={{ display: 'flex', gap: 14, padding: '14px 16px', background: C.cardBg, borderRadius: 12, alignItems: 'flex-start' }}>
+              <div style={{ width: 34, height: 34, borderRadius: 9, background: C.white, border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name={icon} size={15} color={C.textBody} />
+              </div>
+              <div>
+                <p style={{ ...fw(600), fontSize: 14, color: C.text, marginBottom: 2 }}>{title}</p>
+                <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, lineHeight: '17px' }}>{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ padding: '12px 24px 40px', borderTop: `1px solid ${C.borderLight}`, flexShrink: 0 }}>
+        <PrimaryButton onClick={onConfirm}>Confirm and link →</PrimaryButton>
+      </div>
+    </div>
+  )
+}
+
 // ── APP ROOT ──────────────────────────────────────────
 
 export default function App() {
-  const [screen, setScreen] = useState(0)
+  const [screen, setScreen] = useState(() => { const s = new URLSearchParams(window.location.search).get('s'); return s !== null ? parseInt(s, 10) : 0; })
   const [dir, setDir] = useState(1)
   const [slowTransition, setSlowTransition] = useState(false)
   const [email, setEmail] = useState('')
@@ -4296,10 +4837,11 @@ export default function App() {
   const [showMarkScreen, setShowMarkScreen] = useState(false)
   const [milestoneOpen, setMilestoneOpen] = useState(false)
   const [mode, setMode] = useState('advocate')
+  const [loyaltyViaOnboarding, setLoyaltyViaOnboarding] = useState(false)
 
   const go = (toScreen, tab = null, forceDir = null, slow = false) => {
     if (toScreen !== screen) {
-      setDir(forceDir !== null ? forceDir : (toScreen > screen ? 1 : -1))
+      setDir(TRANSITION_DIR)
       setScreen(toScreen)
       setSlowTransition(slow)
     }
@@ -4309,8 +4851,10 @@ export default function App() {
   const loginNav = () => { go(3, 'feed'); setMilestoneOpen(true) }
 
   const getActiveNavKey = () => {
+    if (screen >= 29 && screen <= 32) return 'loyalty-invite'
+    if (screen === 34 || screen === 35) return 'journey-c'
     if (screen >= 4 && screen <= 11) return 'signup'
-    if (screen === 12 || screen === 13 || screen === 14 || screen === 16 || screen === 17 || screen === 19) return 'onboarding'
+    if (screen === 12 || screen === 13 || screen === 14 || screen === 16 || screen === 17 || screen === 19 || screen === 33) return 'onboarding'
     if (screen <= 2) return 'login'
     if (screen === 15 || screen === 27) return 'challenges'
     if (screen === 18 || screen === 25 || screen === 26) return 'studio'
@@ -4335,7 +4879,7 @@ export default function App() {
     <SignupInboxScreen key="su-inbox" email={signupInfo.email} onOpenEmail={() => go(11)} />,
     <SignupQueueScreen key="su-queue" />,
     <EmailClientScreen key="su-email-client" onNext={() => go(10, null, 1)} />,
-    <OnboardingLandingScreen key="ob-landing" onNext={() => go(19)} />,
+    <OnboardingLandingScreen key="ob-landing" onNext={() => go(33)} />,
     <OnboardingTiersScreen key="ob-tiers" onNext={() => go(17)} />,
     <OnboardingFrequencyScreen key="ob-frequency" onNext={() => go(13, null, 1)} />,
     <ChallengeDetailScreen key="challenge-detail" onBack={() => go(3, 'challenges')} />,
@@ -4352,6 +4896,13 @@ export default function App() {
     <RemixScreen key="remix" onBack={() => go(3, 'studio')} />,
     <GroupChallengeDetailScreen key="group-challenge-detail" onBack={() => go(3, 'challenges')} />,
     <ManagerViewScreen key="manager-view" onBack={() => go(3, 'progress')} />,
+    <LoyaltyInviteScreen key="loyalty-invite" onNext={() => go(30)} />,
+    <LoyaltyConnectScreen key="loyalty-connect" onNext={() => go(31)} onBack={() => go(29, null, -1)} />,
+    <LoyaltyRecognitionScreen key="loyalty-recognition" onNext={() => go(32)} />,
+    <LoyaltyUnlockScreen key="loyalty-unlock" onNext={() => loyaltyViaOnboarding ? go(19) : go(3, 'feed')} />,
+    <OnboardingLoyaltyDetectedScreen key="ob-loyalty-detected" onLink={() => { setLoyaltyViaOnboarding(true); go(31) }} onSkip={() => go(19)} />,
+    <LoyaltyNudgeSheetScreen key="loyalty-nudge-sheet" onConnect={() => go(35)} onDismiss={() => go(3, 'feed', -1)} />,
+    <LoyaltyConnectConfirmScreen key="loyalty-connect-confirm" onConfirm={() => go(31)} onBack={() => go(34, null, -1)} />,
   ]
 
   const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 500
@@ -4368,13 +4919,11 @@ export default function App() {
       padding: isMobileViewport ? 0 : 32,
     }}>
       {!isMobileViewport && (
-        <SideNav activeKey={getActiveNavKey()} onNavigate={go} onLoginNav={loginNav} mode={mode} />
+        <SideNav activeKey={getActiveNavKey()} onNavigate={go} onLoginNav={loginNav} />
       )}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-        {!isMobileViewport && (
-          <ModeTabs mode={mode} onChange={setMode} />
-        )}
-        <div style={{
+
+        <div id="m4-device" style={{
           width: 390, height: 844,
           borderRadius: isMobileViewport ? 0 : 44,
           overflow: 'hidden', position: 'relative',
