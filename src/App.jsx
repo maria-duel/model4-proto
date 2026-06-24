@@ -26,15 +26,15 @@ const BRAND_CONTENT = {
 
   // ── Feed: recommended challenges carousel ─────
   feedChallenges: [
-    { emoji: '👖', gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', title: 'Crossover Flare Leg Jean: Style It 3 Ways', type: 'Photo Post', time: '1h', level: 'Beginner', pts: 120 },
-    { emoji: '🤍', gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', title: 'Cloud Hoodie: Your Go-To Layer Look', type: 'Photo Post', time: '30m', level: 'Beginner', pts: 80 },
-    { emoji: '✨', gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', title: 'AirFlex+ Slim Jean: 7-Day Wear Test', type: 'Video', time: '2h', level: 'Intermediate', pts: 200 },
+    { emoji: '🛍️', gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', title: 'Summer Edit Drop: Shop 2 New Arrivals', type: 'Purchase', time: '7d', level: 'Beginner', pts: 150 },
+    { emoji: '🎁', gradient: 'linear-gradient(145deg,#f0e8ff,#d4b8f0,#9880c0)', title: 'Refer a Friend, Earn Together', type: 'Referral', time: '30d', level: 'Beginner', pts: 300 },
+    { emoji: '👖', gradient: 'linear-gradient(145deg,#e8f4e8,#a8d8a8,#78b878)', title: 'Denim Devotee: 3 AE Denim Pieces', type: 'Purchase', time: '30d', level: 'Intermediate', pts: 250 },
   ],
 
   // ── Feed: community preview posts ─────────────
   feedPosts: [
     {
-      body: 'Crossover Flare Leg Jean is everything right now — styled it 3 ways and every single one goes hard 👖✨',
+      body: 'Just unlocked the Summer Edit Drop challenge — grabbed 2 new arrivals and the bonus points landed instantly 🛍️✨',
     },
     {
       question: 'Do the AirFlex+ jeans stretch out after a few wears?',
@@ -53,54 +53,54 @@ const BRAND_CONTENT = {
 
   // ── Challenge detail (featured challenge) ─────
   challengeDetail: {
-    title: 'Crossover Flare Leg Jean: Style It 3 Ways',
-    body: 'Show off the Crossover Flare Leg Jean styled three different ways — casual, date night, and elevated basics. Capture the fit and versatility, and share via your affiliate link.',
-    hashtag: '#AmericanEagle #AEStyle',
+    title: 'Summer Edit Drop: Shop 2 New Arrivals',
+    body: 'Pick any 2 pieces from the Summer Edit and earn 150 bonus points on top of your regular purchase points. New arrivals drop every Thursday — be the first to earn.',
+    hashtag: '@americaneagle #AELoyalty',
     steps: [
-      'Show the Crossover Flare Leg Jean styled 3 different ways in one post or reel',
-      'Highlight the fit, rise, and versatility — casual, date night, and elevated basics',
-      'Share how you sized and why — this is the #1 question your audience will have',
-      'Share your affiliate code and link',
-      'Tag @americaneagle and include #AD #AmericanEagle #AEStyle',
+      'Browse the Summer Edit at ae.com/new-arrivals',
+      'Add any 2 new arrival pieces to your cart',
+      'Complete your purchase — bonus points apply automatically',
+      'Check your loyalty dashboard to see your 150 bonus points land',
+      'Share your new finds in the AE community to inspire other members',
     ],
   },
 
   // ── Challenges tab ────────────────────────────
   challenges: [
-    { title: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120, type: 'Photo Post', time: '1h',  level: 'Beginner',     emoji: '👖', bg: 'linear-gradient(145deg,#dbe8ff,#6090d0)' },
-    { title: 'Cloud Hoodie: Cosy Season Campaign',        pts: 85,  type: 'Photo Post', time: '45m', level: 'Intermediate',  emoji: '🤍', bg: 'linear-gradient(145deg,#f0e8ff,#b498d8)' },
-    { title: 'AirFlex+ Slim Jean: 7-Day Wear Test',       pts: 200, type: 'Video',      time: '2h',  level: 'Advanced',      emoji: '✨', bg: 'linear-gradient(145deg,#e8f4e8,#90c890)' },
-    { title: 'Real Me Legging: Move With Me',             pts: 60,  type: 'Photo Post', time: '30m', level: 'Beginner',      emoji: '🏃', bg: 'linear-gradient(145deg,#fff4e0,#e8c870)' },
+    { title: 'Summer Edit Drop: Shop 2 New Arrivals',  pts: 150, type: 'Purchase',  time: '7d',  level: 'Beginner',      emoji: '🛍️', bg: 'linear-gradient(145deg,#dbe8ff,#6090d0)' },
+    { title: 'Refer a Friend, Earn Together',          pts: 300, type: 'Referral',  time: '30d', level: 'Beginner',      emoji: '🎁',  bg: 'linear-gradient(145deg,#f0e8ff,#b498d8)' },
+    { title: 'Denim Devotee: 3 AE Denim Pieces',       pts: 250, type: 'Purchase',  time: '30d', level: 'Intermediate',  emoji: '👖', bg: 'linear-gradient(145deg,#e8f4e8,#90c890)' },
+    { title: 'Double Points Weekend: Spend $75+',      pts: 200, type: 'Purchase',  time: '2d',  level: 'Advanced',      emoji: '⚡', bg: 'linear-gradient(145deg,#fff4e0,#e8c870)' },
   ],
 
   // ── Community: brand spotlight (feed) ─────────
   brandSpotlight: {
     initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',
     gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷',
-    body: 'Styled the Crossover Flare Jean three ways for the challenge — casual, date night, and elevated basics. AE denim does it all 👖✨',
+    body: 'Just hit Gold tier after unlocking the Denim Devotee challenge 🎉 Three AE denim pieces in and I am obsessed with every single one 👖✨',
     saves: 53,
     brandNote: 'Saved by the American Eagle team',
   },
 
   // ── Community: Inspiring tab posts ────────────
   communityPosts: [
-    { initial: 'L', name: 'Lea Fontaine',   tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024',  time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: "The @americaneagle Crossover Flare Leg Jean is genuinely the best denim I've owned — styled it 3 ways for the challenge and every look landed 🩵👖", saves: 24, instagram: { handle: '@lea.fontaine',     followers: 48200  }, tiktok: { handle: '@leafontaine',         followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator',       sub: '#2 this month'             }, { icon: 'flag',  label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide',   sub: 'Helped 5 members'        }] },
-    { initial: 'S', name: 'Sofia Brennan',  tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'May 2025',    time: '1h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Finally got the Cloud Hoodie and I am obsessed 🤍 The fabric is so soft and the oversized fit is perfect. Already ordered it in two colours.',                              saves: 18, instagram: { handle: '@sofia.brennan',    followers: 22400  }, tiktok: { handle: '@sofiabrennanstyIe',   followers: 31600  }, achievements: [{ icon: 'flag',  label: 'Challenge Streak',   sub: '5 challenges in a row'   }, { icon: 'award', label: 'Rising Star',        sub: 'Top 10 this month'       }] },
+    { initial: 'L', name: 'Lea Fontaine',   tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'April 2024',  time: '45m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: "Just unlocked the Summer Edit Drop challenge — grabbed the Crossover Flare and Cloud Hoodie and both are already in constant rotation 🛍️🩵", saves: 24, instagram: { handle: '@lea.fontaine',     followers: 48200  }, tiktok: { handle: '@leafontaine',         followers: 102000 }, achievements: [{ icon: 'award', label: 'Top Creator',       sub: '#2 this month'             }, { icon: 'flag',  label: 'Challenge Champion', sub: '12 challenges completed' }, { icon: 'users', label: 'Community Guide',   sub: 'Helped 5 members'        }] },
+    { initial: 'S', name: 'Sofia Brennan',  tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'May 2025',    time: '1h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#f0e8ff,#d4b8f0,#9880c0)', emoji: '🤍', body: 'Referred three friends this month for the loyalty challenge and already earned 900 bonus points 🎁 Genuinely the easiest challenge — everyone I know wanted the code 🤍',                              saves: 18, instagram: { handle: '@sofia.brennan',    followers: 22400  }, tiktok: { handle: '@sofiabrennanstyIe',   followers: 31600  }, achievements: [{ icon: 'flag',  label: 'Challenge Streak',   sub: '5 challenges in a row'   }, { icon: 'award', label: 'Rising Star',        sub: 'Top 10 this month'       }] },
     { initial: 'M', name: 'Maya Osei',      tier: 'Silver',   role: null,    time: '2h ago',            tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: 'Has anyone sized down in the AirFlex+ jeans? Wondering if they stretch out after a few wears or stay true to size...',                                                       saves: 7,  instagram: { handle: '@maya.osei',        followers: 8900   }, tiktok: { handle: '@mayaosei_',           followers: 14500  }, achievements: [{ icon: 'flag',  label: 'First Challenge',    sub: '1 challenge completed'   }] },
-    { initial: 'P', name: 'Priya Nair',     tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'June 2025',   time: '3h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just finished the 7-day AirFlex+ wear test and honestly — these are the most comfortable jeans I've ever owned. The stretch is unreal 👖✨",                                saves: 31, instagram: { handle: '@priya.nair',       followers: 19600  }, tiktok: { handle: '@priyanairfashion',    followers: 44200  }, achievements: [{ icon: 'award', label: 'Rising Star',        sub: 'Top 10 this month'       }, { icon: 'flag',  label: 'Challenge Streak',   sub: '3 in a row'              }] },
+    { initial: 'P', name: 'Priya Nair',     tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'June 2025',   time: '3h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '🌟', body: "Just hit the Denim Devotee milestone — 3 AE denim pieces purchased and the 250 bonus points landed instantly 👖✨ My loyalty dashboard has never looked so good",                                saves: 31, instagram: { handle: '@priya.nair',       followers: 19600  }, tiktok: { handle: '@priyanairfashion',    followers: 44200  }, achievements: [{ icon: 'award', label: 'Rising Star',        sub: 'Top 10 this month'       }, { icon: 'flag',  label: 'Challenge Streak',   sub: '3 in a row'              }] },
     { initial: 'R', name: 'Rachel Kim',     tier: 'Silver',   role: null,    time: '3h ago',            tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: "Does anyone know if the Real Me Legging holds up for workouts? Worried about see-through fabric when squatting — worth sizing up?",                                          saves: 12, instagram: { handle: '@rachelkimstyle',  followers: 6200   }, tiktok: { handle: '@rachelkimfits',       followers: 9800   }, achievements: [{ icon: 'flag',  label: 'First Challenge',    sub: '1 challenge completed'   }] },
     { initial: 'I', name: 'Isla Thompson',  tier: 'Platinum', role: 'Guide', tenure: '2-year advocate', memberSince: 'March 2024',  time: '4h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'Dream Jean in light wash — my go-to for every shoot this season. The rise and leg opening is just unmatched for styling 📸',                                               saves: 47, instagram: { handle: '@isla.thompson',    followers: 87400  }, tiktok: { handle: '@islathompson',        followers: 213000 }, achievements: [{ icon: 'award', label: 'Top Creator',       sub: '#1 this month'             }, { icon: 'flag',  label: 'Challenge Champion', sub: '18 challenges completed' }, { icon: 'users', label: 'Community Guide',   sub: 'Helped 12 members'       }] },
     { initial: 'A', name: 'Amara Diallo',   tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'August 2025', time: '5h ago',  tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: "What's the best way to wash the Cloud Hoodie without losing the softness? Washing on cold but feel like it's getting a bit rough...",                                saves: 9,  instagram: { handle: '@amara.diallo',     followers: 11300  }, tiktok: { handle: '@amaradiallo_',        followers: 18700  }, achievements: [{ icon: 'flag',  label: 'Challenge Streak',   sub: '4 in a row'              }] },
-    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'July 2025',   time: '6h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Date night look done ✅ Crossover Flare Jean + going out top from AE and I am OBSESSED. This fit is everything 💫',                                                        saves: 53, instagram: { handle: '@chloe.nakamura',   followers: 34100  }, tiktok: { handle: '@chloenkstyle',        followers: 67800  }, achievements: [{ icon: 'award', label: 'Rising Star',        sub: 'Top 5 this month'        }, { icon: 'flag',  label: 'Challenge Streak',   sub: '6 in a row'              }] },
-    { initial: 'N', name: 'Nina Reeves',    tier: 'Silver',   role: null,    time: '7h ago',            tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: "Is the AirFlex+ Slim or the Dream Slim better for longer legs? Keep going back and forth and can't decide before I complete the challenge 😅",                               saves: 5,  instagram: { handle: '@nina.reeves',      followers: 4400   }, tiktok: { handle: '@ninareevestyle',      followers: 7100   }, achievements: [{ icon: 'flag',  label: 'First Challenge',    sub: '1 challenge completed'   }] },
+    { initial: 'C', name: 'Chloe Nakamura', tier: 'Gold',     role: null,    tenure: '1-year advocate', memberSince: 'July 2025',   time: '6h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899)', emoji: '🩷', body: 'Gold tier unlocked ✅ Hit my quarterly spend goal and 300 bonus points just dropped into my account. This loyalty programme is everything 💫',                                                        saves: 53, instagram: { handle: '@chloe.nakamura',   followers: 34100  }, tiktok: { handle: '@chloenkstyle',        followers: 67800  }, achievements: [{ icon: 'award', label: 'Rising Star',        sub: 'Top 5 this month'        }, { icon: 'flag',  label: 'Challenge Streak',   sub: '6 in a row'              }] },
+    { initial: 'N', name: 'Nina Reeves',    tier: 'Silver',   role: null,    time: '7h ago',            tag: { icon: 'help', label: 'Question' },  photo: false, gradient: null, emoji: null, body: "Is the AirFlex+ Slim or the Dream Slim better for longer legs? Keep going back and forth and can't decide which one to buy first to kick off my Denim Devotee challenge 😅",                               saves: 5,  instagram: { handle: '@nina.reeves',      followers: 4400   }, tiktok: { handle: '@ninareevestyle',      followers: 7100   }, achievements: [{ icon: 'flag',  label: 'First Challenge',    sub: '1 challenge completed'   }] },
   ],
 
   // ── Community: Following tab posts ────────────
   followingPosts: [
-    { initial: 'T', name: 'Tara Williams', tier: 'Platinum', tenure: '2-year advocate', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'These Crossover Flare Leg Jeans are everything — the fit is unreal for an everyday look 🌸', saves: 19 },
-    { initial: 'J', name: 'Jade Parker',   tier: 'Gold',     tenure: '1-year advocate', time: '34m ago', tag: { icon: 'help', label: 'Question'  }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried the Cloud Hoodie in both regular and oversized fit? Wondering which one photographs better for content...', saves: 8 },
-    { initial: 'D', name: 'Daniela Cruz',  tier: 'Gold',     tenure: '1-year advocate', time: '2h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '✨', body: "Day 3 of the AirFlex+ wear test and these jeans are genuinely the most comfortable denim I've ever worn. Shocked 👖✨", saves: 26 },
-    { initial: 'H', name: 'Hannah Scott',  tier: 'Silver',   time: '3h ago',             tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Graduation outfit done ✅ Wore the full AE look and I am absolutely obsessed. The Crossover Flare was the perfect choice 💫', saves: 41 },
+    { initial: 'T', name: 'Tara Williams', tier: 'Platinum', tenure: '2-year advocate', time: '12m ago', tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#dbe8ff,#a8c4f0,#6090d0)', emoji: '👖', body: 'Just completed the Summer Edit Drop challenge and the 150 bonus points landed instantly — so easy 🛍️🌸', saves: 19 },
+    { initial: 'J', name: 'Jade Parker',   tier: 'Gold',     tenure: '1-year advocate', time: '34m ago', tag: { icon: 'help', label: 'Question'  }, photo: false, gradient: null, emoji: null, body: 'Has anyone tried both the regular and oversized Cloud Hoodie? Wondering which one is more worth the loyalty points...', saves: 8 },
+    { initial: 'D', name: 'Daniela Cruz',  tier: 'Gold',     tenure: '1-year advocate', time: '2h ago',  tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#e8f4e8,#a8d8a8,#78b878)', emoji: '✨', body: "Day 3 with my Denim Devotee haul and honestly — 3 AE denim pieces in and I am completely converted. The loyalty points were just a bonus 👖✨", saves: 26 },
+    { initial: 'H', name: 'Hannah Scott',  tier: 'Silver',   time: '3h ago',             tag: { icon: 'flag', label: 'Challenge' }, photo: true,  gradient: 'linear-gradient(135deg,#fce7f3,#f9a8d4,#fbcfe8)', emoji: '🌸', body: 'Graduation gift to myself ✅ Redeemed my loyalty reward on a full AE look and I am absolutely obsessed. Best decision I ever made 💫', saves: 41 },
   ],
 
   // ── Community: loyalty mode brand posts ───────
