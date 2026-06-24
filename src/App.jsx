@@ -2639,37 +2639,228 @@ function MilestoneCelebrationOverlay({ name, yearsCount, onClose }) {
 }
 
 function RewardsContent() {
-  const products = [
-    { name: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120 },
-    { name: 'Crossover Flare Leg Jean: Style It 3 Ways', pts: 120 },
-    { name: 'Cloud Hoodie: Cosy Season Campaign', pts: 85 },
-    { name: 'Real Me Legging: Move With Me', pts: 60 },
+  const [catalogTab, setCatalogTab] = useState('All')
+
+  const benefits = [
+    { icon: 'package',  title: 'Free express shipping',     desc: 'All year, every order' },
+    { icon: 'clock',    title: 'Early access to drops',      desc: '24h → 48h as you climb' },
+    { icon: 'star',     title: '1.75× Loyalty points',       desc: 'Up to 2× at Icon' },
+    { icon: 'gift',     title: 'Free deluxe sample',         desc: 'With every order' },
+    { icon: 'award',    title: 'Birthday treat',              desc: 'A bigger gift each tier' },
+    { icon: 'scissors', title: `1:1 ${BRAND} stylist`,        desc: 'Unlocked by advocacy' },
   ]
+
+  const advocacyUnlocked = [
+    { emoji: '🎀', title: 'Gift a friend Insider status',              desc: 'Skip them to the front — they start as an Insider, you earn +150 Loyalty points' },
+    { emoji: '🔒', title: `Early access to the ${BRAND} Swim drop`,   desc: 'Shop 48h before anyone else' },
+    { emoji: '⚡',  title: 'Boosted referral payout',                   desc: 'Earn +50% Loyalty points on every referral' },
+  ]
+
+  const catalogItems = [
+    { emoji: '🎨', title: `Live styling session with a ${BRAND} stylist`, desc: 'Live, 20 seats, Q&A included',      badge: 'Points OR advocacy', redeemCost: 2500, earnLabel: '10 converted referrals', progress: 80 },
+    { emoji: '💎', title: `1:1 with a ${BRAND} stylist`,                   desc: 'A personal 30-min styling session',  badge: 'Stretch goal',       earnLabel: 'Reach Icon',             progress: 78 },
+    { emoji: '🥂', title: `Seat at the ${BRAND} launch event`,            desc: 'Front row, the night before launch',  badge: 'Points OR advocacy', redeemCost: 4000, earnLabel: 'Reach Icon', progress: 78 },
+  ]
+
+  const pointsItems = [
+    { emoji: '📦', category: 'Discount', title: '£10 off your next order',  desc: 'Stacks with any active offer',     cost: 1000 },
+    { emoji: '🚚', category: 'Perk',     title: 'Free express shipping',     desc: 'Next-day, on your next order',    cost: 500  },
+    { emoji: '🩲', category: 'Freebie',  title: 'Free undie (any style)',    desc: 'Add one to your next order',      cost: 800  },
+    { emoji: '🧘', category: 'Product',  title: 'OFFLINE Real Me Legging',   desc: 'The everyday legging, your size', cost: 3500 },
+  ]
+
+  const progressBar = (pct) => (
+    <div style={{ height: 4, borderRadius: 4, background: C.borderLight, overflow: 'hidden' }}>
+      <div style={{ height: '100%', width: `${pct}%`, background: C.text, borderRadius: 4 }} />
+    </div>
+  )
+
+  const SectionDot = () => (
+    <div style={{ width: 8, height: 8, borderRadius: '50%', background: C.text, flexShrink: 0 }} />
+  )
+
+  const UnlockedBadge = () => (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 20, background: C.cardBg, border: `1px solid ${C.borderLight}`, ...fw(500), fontSize: 11, color: C.textBody, whiteSpace: 'nowrap', flexShrink: 0 }}>
+      <Icon name="check" size={10} color={C.textBody} /> Unlocked
+    </span>
+  )
+
   return (
-    <div style={{ padding: '16px 16px 32px' }}>
-      {/* Gift cards banner */}
-      <motion.button whileTap={{ scale: 0.98 }} style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 10, padding: '14px 16px', background: C.white, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <span style={{ ...fw(400), fontSize: 15, color: C.text }}>See your Gift Cards & Discounts</span>
-        <Icon name="arrowRight" size={18} color={C.textMuted} />
-      </motion.button>
+    <div style={{ padding: '20px 16px 48px', display: 'flex', flexDirection: 'column', gap: 32 }}>
 
-      <p style={{ ...fw(400), fontSize: 15, color: C.text, marginBottom: 14 }}>Products</p>
+      {/* ── Ambassador benefits ── */}
+      <section>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+          <SectionDot />
+          <p style={{ ...fw(700), fontSize: 17, color: C.text, margin: 0 }}>Your Ambassador benefits</p>
+        </div>
+        <p style={{ ...fw(400), fontSize: 14, color: C.textBody, margin: '0 0 16px', lineHeight: '20px' }}>
+          Standing perks, just for being a member — advocacy makes each one bigger and faster.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {benefits.map((b, i) => (
+            <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px 14px 12px', background: C.white }}>
+              <div style={{ marginBottom: 10 }}>
+                <Icon name={b.icon} size={22} color={C.textBody} />
+              </div>
+              <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: '0 0 4px', lineHeight: '18px' }}>{b.title}</p>
+              <p style={{ ...fw(400), fontSize: 12, color: C.textBody, margin: 0, lineHeight: '16px' }}>→ {b.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* 2-col grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        {products.map((p, i) => (
-          <motion.div key={i} whileTap={{ scale: 0.97 }} style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', background: C.white }}>
-            <div style={{ height: 160, background: C.cardBg }} />
-            <div style={{ padding: '10px 10px 12px' }}>
-              <p style={{ ...fw(400), fontSize: 13, color: C.text, lineHeight: '18px', marginBottom: 6 }}>{p.name}</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                <Icon name="star" size={12} color={C.textBody} />
-                <span style={{ ...fw(400), fontSize: 12, color: C.textBody }}>{p.pts}</span>
+      {/* ── The catalog ── */}
+      <section>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <SectionDot />
+          <p style={{ ...fw(700), fontSize: 17, color: C.text, margin: 0 }}>The catalog</p>
+        </div>
+
+        {/* Segmented tabs */}
+        <div style={{ display: 'inline-flex', gap: 4, padding: 3, background: C.cardBg, borderRadius: 10, marginBottom: 20 }}>
+          {['All', 'Loyalty points', 'Advocacy'].map(t => (
+            <button key={t} onClick={() => setCatalogTab(t)} style={{ border: 'none', cursor: 'pointer', padding: '6px 14px', borderRadius: 8, ...fw(catalogTab === t ? 600 : 400), fontSize: 13, background: catalogTab === t ? C.white : 'transparent', color: catalogTab === t ? C.text : C.textMuted, boxShadow: catalogTab === t ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', fontFamily: 'inherit' }}>
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {/* All tab */}
+        {catalogTab === 'All' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* Advocacy banner */}
+            <div style={{ borderRadius: 14, background: '#141414', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name="heart" size={18} color={C.white} />
+              </div>
+              <div>
+                <p style={{ ...fw(700), fontSize: 15, color: C.white, margin: '0 0 4px' }}>Earned through advocacy</p>
+                <p style={{ ...fw(400), fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: '17px' }}>Can't be bought — earned through advocacy alone.</p>
               </div>
             </div>
-          </motion.div>
-        ))}
-      </div>
+            <p style={{ ...fw(400), fontSize: 13, color: C.textBody, margin: 0, lineHeight: '18px' }}>
+              Some unlocks are <span style={{ ...fw(600) }}>passes</span> — earn them through advocacy, or redeem one now with Loyalty points.
+            </p>
+            {/* Unlocked advocacy items */}
+            {advocacyUnlocked.map((item, i) => (
+              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px', background: C.white }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 10, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                    {item.emoji}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                      <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '18px' }}>{item.title}</p>
+                      <UnlockedBadge />
+                    </div>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, margin: '0 0 8px', lineHeight: '17px' }}>{item.desc}</p>
+                    <p style={{ ...fw(500), fontSize: 12, color: C.textBody, margin: 0 }}>Earned via Ambassador status</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {/* Mixed catalog items */}
+            {catalogItems.map((item, i) => (
+              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px', background: C.white }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 10, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                    {item.emoji}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                      <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '18px' }}>{item.title}</p>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 20, background: item.badge === 'Points OR advocacy' ? C.text : C.cardBg, border: `1px solid ${item.badge === 'Points OR advocacy' ? C.text : C.borderLight}`, ...fw(500), fontSize: 11, color: item.badge === 'Points OR advocacy' ? C.white : C.textMuted, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        {item.badge === 'Stretch goal' && <Icon name="lock" size={10} color={C.textMuted} />}{item.badge === 'Stretch goal' ? ' ' : ''}{item.badge}
+                      </span>
+                    </div>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, margin: 0, lineHeight: '17px' }}>{item.desc}</p>
+                  </div>
+                </div>
+                {item.badge === 'Stretch goal' ? (
+                  <div style={{ paddingTop: 10, borderTop: `1px solid ${C.borderLight}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <p style={{ ...fw(600), fontSize: 13, color: C.textBody, margin: 0 }}>{item.earnLabel}</p>
+                      <span style={{ ...fw(600), fontSize: 13, color: C.textBody }}>{item.progress}%</span>
+                    </div>
+                    {progressBar(item.progress)}
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, paddingTop: 10, borderTop: `1px solid ${C.borderLight}` }}>
+                    <div>
+                      <p style={{ ...fw(700), fontSize: 9, color: C.textMuted, letterSpacing: '0.07em', textTransform: 'uppercase', margin: '0 0 6px' }}>Redeem now</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                        <span style={{ fontSize: 15, lineHeight: 1 }}>✦</span>
+                        <span style={{ ...fw(700), fontSize: 20, color: C.text }}>{item.redeemCost.toLocaleString()}</span>
+                      </div>
+                      <motion.button whileTap={{ scale: 0.97 }} style={{ width: '100%', background: C.text, color: C.white, border: 'none', cursor: 'pointer', borderRadius: BTN.radius, height: 38, ...fw(600), fontSize: 14, fontFamily: 'inherit' }}>Redeem</motion.button>
+                    </div>
+                    <div style={{ borderLeft: `1px solid ${C.borderLight}`, paddingLeft: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                        <p style={{ ...fw(700), fontSize: 9, color: C.textMuted, letterSpacing: '0.07em', textTransform: 'uppercase', margin: 0 }}>Or earn it</p>
+                        <span style={{ ...fw(600), fontSize: 13, color: C.textBody }}>{item.progress}%</span>
+                      </div>
+                      <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: '0 0 10px', lineHeight: '16px' }}>{item.earnLabel}</p>
+                      {progressBar(item.progress)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Loyalty points tab */}
+        {catalogTab === 'Loyalty points' && (
+          <div>
+            <p style={{ ...fw(400), fontSize: 14, color: C.textBody, margin: '0 0 16px', lineHeight: '20px' }}>
+              Spend your Loyalty points — earned from buying and advocating.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {pointsItems.map((item, i) => (
+                <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px', background: C.white, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
+                      {item.emoji}
+                    </div>
+                    <span style={{ ...fw(500), fontSize: 11, color: C.textMuted, padding: '3px 8px', borderRadius: 20, background: C.cardBg, border: `1px solid ${C.borderLight}` }}>{item.category}</span>
+                  </div>
+                  <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: '0 0 4px', lineHeight: '18px' }}>{item.title}</p>
+                  <p style={{ ...fw(400), fontSize: 12, color: C.textBody, margin: '0 0 12px', lineHeight: '16px', flex: 1 }}>{item.desc}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+                    <span style={{ fontSize: 15, lineHeight: 1 }}>✦</span>
+                    <span style={{ ...fw(700), fontSize: 20, color: C.text }}>{item.cost.toLocaleString()}</span>
+                  </div>
+                  <motion.button whileTap={{ scale: 0.97 }} style={{ width: '100%', background: C.text, color: C.white, border: 'none', cursor: 'pointer', borderRadius: BTN.radius, height: 40, ...fw(600), fontSize: 14, fontFamily: 'inherit' }}>Redeem</motion.button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Advocacy tab */}
+        {catalogTab === 'Advocacy' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {advocacyUnlocked.map((item, i) => (
+              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px', background: C.white }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 10, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                    {item.emoji}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                      <p style={{ ...fw(700), fontSize: 14, color: C.text, margin: 0, lineHeight: '18px' }}>{item.title}</p>
+                      <UnlockedBadge />
+                    </div>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, margin: '0 0 8px', lineHeight: '17px' }}>{item.desc}</p>
+                    <p style={{ ...fw(500), fontSize: 12, color: C.textBody, margin: 0 }}>Earned via Ambassador status</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   )
 }
