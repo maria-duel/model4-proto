@@ -902,7 +902,7 @@ function ChallengesFilterPanel({ onClose }) {
 
 // ── CHALLENGE DETAIL SCREEN ───────────────────────────
 
-function ChallengeDetailScreen({ onBack }) {
+function ChallengeDetailScreen({ onBack, onCreate }) {
   const [checked, setChecked] = useState([false, false, false, false, false])
   const toggle = i => setChecked(prev => prev.map((v, idx) => idx === i ? !v : v))
   const [showSubmit, setShowSubmit] = useState(false)
@@ -959,8 +959,11 @@ function ChallengeDetailScreen({ onBack }) {
       </div>
 
       {/* Bottom bar */}
-      <div style={{ height: 70, background: C.white, borderTop: `1px solid ${C.borderLight}`, flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
-        <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmit(true)} style={{ width: '100%', height: 48, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, ...fw(700), fontSize: 14, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>
+      <div style={{ height: 70, background: C.white, borderTop: `1px solid ${C.borderLight}`, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, padding: '0 16px' }}>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={onCreate} style={{ flex: 1, height: 48, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, ...fw(700), fontSize: 14, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>
+          Create in Studio
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmit(true)} style={{ flex: 1, height: 48, border: `1px solid ${C.text}`, borderRadius: 12, background: C.text, ...fw(700), fontSize: 14, color: C.white, cursor: 'pointer', fontFamily: 'inherit' }}>
           Submit
         </motion.button>
       </div>
@@ -2226,18 +2229,31 @@ function CreateScreen({ draft, onSaveProject, onExit }) {
   const [done, setDone] = useState(false)
   const [pid] = useState(() => draft?.id || 'p' + Date.now())
   const fileRef = useRef(null)
+  const brief = draft?.brief || null
 
-  const suggested = getSuggestions(overlayText || caption || 'default')[0]?.caption || ''
+  const suggested = getSuggestions(overlayText || caption || brief?.title || 'default')[0]?.caption || ''
 
   const buildProject = (status) => ({
     id: pid,
     kind: status === 'In review' ? 'submitted' : 'draft',
     status,
     title: (caption || overlayText).trim().split('\n')[0].slice(0, 42)
+      || brief?.title
       || (mediaType === 'video' ? 'Untitled video' : mediaType === 'image' ? 'Untitled photo' : 'Untitled post'),
-    caption, media, mediaType, overlayText, track,
+    caption, media, mediaType, overlayText, track, brief,
     savedAt: 'Just now',
   })
+
+  const briefBanner = brief ? (
+    <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+        <Icon name="flag" size={13} color={C.textBody} />
+        <span style={{ ...fw(600), fontSize: 12, color: C.textMuted, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Creating for</span>
+      </div>
+      <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 2px' }}>{brief.title}</p>
+      {brief.hashtag && <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: 0 }}>Include {brief.hashtag}</p>}
+    </div>
+  ) : null
   const saveDraft = () => { if (media || caption) onSaveProject(buildProject('Draft')) }
 
   const handleFile = (e) => {
@@ -2290,6 +2306,7 @@ function CreateScreen({ draft, onSaveProject, onExit }) {
     <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
       <Header title="Create a post" />
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {briefBanner}
         <div>
           <p style={{ ...fw(400), fontSize: 22, color: C.text, lineHeight: '30px', margin: '0 0 6px' }}>Add your content</p>
           <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, lineHeight: '20px', margin: 0 }}>Upload a photo or video to get started. You can edit and add a caption next.</p>
@@ -2393,6 +2410,7 @@ function CreateScreen({ draft, onSaveProject, onExit }) {
     <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       <Header title="Caption & details" />
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 16px 24px' }}>
+        {briefBanner}
         <div style={{ display: 'flex', gap: 12, marginBottom: 20, alignItems: 'center' }}>
           <div style={{ width: 56, height: 56, borderRadius: 10, background: C.cardBg, border: `1px solid ${C.border}`, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {media && mediaType === 'image' && <img src={media} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
@@ -4640,7 +4658,7 @@ const NAV_SECTIONS = [
     items: [
       { key: 'signup',     label: 'Sign up',    toScreen: 5,  tab: null },
       { key: 'onboarding', label: 'Onboarding', toScreen: 12, tab: null },
-      { key: 'login',      label: 'Log in',     toScreen: 3,  tab: 'feed', triggerMilestone: true },
+      { key: 'login',      label: 'Log in',     toScreen: 0,  tab: null },
     ],
   },
   {
@@ -5087,7 +5105,7 @@ export default function App() {
   }
 
   const screens = [
-    <EmailScreen key="email" onNext={(e) => { setEmail(e); go(1) }} />,
+    <EmailScreen key="email" onNext={(e) => { setEmail(e); loginNav() }} />,
     <InboxScreen key="inbox" email={email} onNext={() => go(2)} />,
     <EmailClientScreen key="email-client" onNext={() => go(12)} />,
     <HomeScreen key="home" activeTab={activeTab} onTabChange={setActiveTab} onChallengeOpen={() => go(15)} onGroupChallengeOpen={() => go(27)} onChallengeCreate={() => go(18)} onContentAnalyse={() => go(25)} onRemix={() => go(26)} onCreatePost={openCreate} projects={projects} onSaveProject={saveProject} profilePhoto={profilePhoto} onSetProfilePhoto={setProfilePhoto} showIntroSheet={showIntroSheet} onIntroPost={(s) => { setPostSentence(s); setShowIntroSheet(false); setShowMarkScreen(true) }} userPost={postSentence ? { sentence: postSentence, photo: profilePhoto } : null} milestoneOpen={milestoneOpen} onMilestoneClose={() => setMilestoneOpen(false)} mode={mode} />,
@@ -5102,7 +5120,7 @@ export default function App() {
     <OnboardingLandingScreen key="ob-landing" onNext={() => go(33)} />,
     <OnboardingTiersScreen key="ob-tiers" onNext={() => go(17)} />,
     <OnboardingFrequencyScreen key="ob-frequency" onNext={() => go(13, null, 1)} />,
-    <ChallengeDetailScreen key="challenge-detail" onBack={() => go(3, 'challenges')} />,
+    <ChallengeDetailScreen key="challenge-detail" onBack={() => go(3, 'challenges')} onCreate={() => openCreate({ brief: { title: BC.challengeDetail.title, hashtag: BC.challengeDetail.hashtag } })} />,
     <OnboardingCommunityScreen key="ob-community" onNext={() => go(14, null, 1)} />,
     <OnboardingNotificationsScreen key="ob-notifications" onNext={() => { setShowIntroSheet(true); go(3, 'feed', 1, true) }} />,
     <ChallengeCreationScreen key="challenge-create" onBack={() => go(3, 'studio')} />,
