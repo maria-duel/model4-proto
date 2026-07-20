@@ -1896,11 +1896,13 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
 
 // ── CONTENT ANALYSER SCREEN ───────────────────────────
 
-function ContentAnalyserScreen({ onBack }) {
+function ContentAnalyserScreen({ onBack, onCreate }) {
   const [step, setStep] = useState(0) // 0: input, 1: loading, 2: results
   const [media, setMedia] = useState(null)
   const [mediaType, setMediaType] = useState(null)
   const [caption, setCaption] = useState('')
+  const [music, setMusic] = useState(null)
+  const [musicOpen, setMusicOpen] = useState(false)
   const fileRef = useRef(null)
 
   const handleFileChange = (e) => {
@@ -1953,7 +1955,7 @@ function ContentAnalyserScreen({ onBack }) {
       { icon: 'flag',         category: 'Discoverability', title: 'Add the required hashtags',     body: '#AmericanEagle and #AEStyle are required for challenge submission. Your caption is missing both.' },
     ]
     return (
-      <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
         <Header />
         <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '20px 16px 40px' }}>
 
@@ -1992,22 +1994,46 @@ function ContentAnalyserScreen({ onBack }) {
 
           {/* Music check */}
           <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>Music check</p>
-          <div style={{ border: '1px solid rgba(249,115,22,0.3)', borderRadius: 12, padding: 14, background: 'rgba(249,115,22,0.04)' }}>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                <Icon name="music" size={14} color="#f97316" />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-                  <span style={{ ...fw(600), fontSize: 14, color: C.text }}>Flowers — Miley Cyrus</span>
-                  <span style={{ ...fw(600), fontSize: 11, color: '#f97316', background: 'rgba(249,115,22,0.1)', padding: '2px 8px', borderRadius: 20, flexShrink: 0 }}>Copyrighted</span>
+          {music ? (
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, background: C.white }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                  <Icon name="check" size={14} color={C.text} strokeWidth={2.5} />
                 </div>
-                <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>Not cleared for commercial use. Switch to a royalty-free track to avoid your content being muted or removed.</p>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                    <span style={{ ...fw(600), fontSize: 14, color: C.text }}>{music.name}</span>
+                    <span style={{ ...fw(600), fontSize: 11, color: C.textBody, background: C.cardBg, border: `1px solid ${C.border}`, padding: '2px 8px', borderRadius: 20, flexShrink: 0 }}>Cleared</span>
+                  </div>
+                  <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>Licensed for commercial use — you're good to post.</p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div style={{ border: '1px solid rgba(249,115,22,0.3)', borderRadius: 12, padding: 14, background: 'rgba(249,115,22,0.04)' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                  <Icon name="music" size={14} color="#f97316" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                    <span style={{ ...fw(600), fontSize: 14, color: C.text }}>Flowers — Miley Cyrus</span>
+                    <span style={{ ...fw(600), fontSize: 11, color: '#f97316', background: 'rgba(249,115,22,0.1)', padding: '2px 8px', borderRadius: 20, flexShrink: 0 }}>Copyrighted</span>
+                  </div>
+                  <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 12px' }}>Not cleared for commercial use. Switch to a royalty-free track to avoid your content being muted or removed.</p>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => setMusicOpen(true)} style={{ height: 34, padding: '0 14px', border: `1px solid ${C.text}`, borderRadius: 8, background: C.white, ...fw(600), fontSize: 13, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>Swap to a licensed track</motion.button>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
+        <div style={{ flexShrink: 0, borderTop: `1px solid ${C.borderLight}`, padding: '12px 16px', background: C.white }}>
+          <PrimaryButton onClick={() => onCreate({ media, mediaType, caption, track: music })}>Apply &amp; create in Studio</PrimaryButton>
+        </div>
+        <AnimatePresence>
+          {musicOpen && <MusicPickerSheet track={music} onPick={tr => { setMusic(tr); setMusicOpen(false) }} onClose={() => setMusicOpen(false)} />}
+        </AnimatePresence>
       </div>
     )
   }
@@ -2070,9 +2096,15 @@ function ContentAnalyserScreen({ onBack }) {
 
 // ── REMIX SCREEN ──────────────────────────────────────
 
-function RemixScreen({ onBack }) {
+function RemixScreen({ onBack, onCreate, onSaveProject }) {
   const [step, setStep] = useState(0) // 0: input, 1: loading, 2: results
   const [url, setUrl] = useState('')
+  const [saved, setSaved] = useState(false)
+
+  const savePost = () => {
+    onSaveProject({ id: 'remix-' + (url || 'stylebyella'), kind: 'idea', authorName: '@stylebyella', authorInitial: 'S', authorTier: 'Creator', body: 'My everyday AE outfit ✨ The Crossover Flare never gets old. #AEStyle #AmericanEagle', savedAt: 'Today' })
+    setSaved(true); setTimeout(() => setSaved(false), 1500)
+  }
 
   const handleFind = () => {
     setStep(1)
@@ -2126,10 +2158,11 @@ function RemixScreen({ onBack }) {
               <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.cardBg, border: `1px solid ${C.border}`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon name="person" size={16} color={C.textMuted} />
               </div>
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>@stylebyella</p>
                 <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>47.2K views · 3 days ago</p>
               </div>
+              <motion.button whileTap={{ scale: 0.95 }} onClick={savePost} style={{ flexShrink: 0, height: 32, padding: '0 12px', border: `1px solid ${saved ? C.text : C.border}`, borderRadius: 8, background: saved ? C.text : C.white, ...fw(600), fontSize: 13, color: saved ? C.white : C.text, cursor: 'pointer', fontFamily: 'inherit' }}>{saved ? 'Saved' : 'Save'}</motion.button>
             </div>
             <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>
               My everyday AE outfit ✨ The Crossover Flare never gets old. #AEStyle #AmericanEagle
@@ -2140,17 +2173,19 @@ function RemixScreen({ onBack }) {
           <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>4 ways to remix this</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {IDEAS.map((idea, i) => (
-              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+              <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => onCreate({ brief: { title: idea.title } })}
+                style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                     <Icon name={idea.icon} size={14} color={C.textBody} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 4px' }}>{idea.title}</p>
-                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{idea.body}</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 10px' }}>{idea.body}</p>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, ...fw(600), fontSize: 13, color: C.text }}>Start from this <Icon name="arrowRight" size={13} color={C.text} /></span>
                   </div>
                 </div>
-              </div>
+              </motion.button>
             ))}
           </div>
 
@@ -2216,6 +2251,38 @@ const LICENSED_TRACKS = [
   { name: 'Soft Focus',      artist: 'AE Sound Library' },
   { name: 'Weekend Mode',    artist: 'AE Sound Library' },
 ]
+
+// Shared music picker sheet — used by the editor and the content analyser's copyright fix
+function MusicPickerSheet({ track, onPick, onClose }) {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 10 }} />
+      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={spring} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 11, padding: '16px 16px 32px' }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 16px' }} />
+        <p style={{ ...fw(700), fontSize: 17, color: C.text, margin: '0 0 4px' }}>Add music</p>
+        <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 16px' }}>Licensed tracks — cleared for commercial use.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {LICENSED_TRACKS.map((tr, i) => {
+            const sel = track?.name === tr.name
+            return (
+              <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => onPick(tr)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${sel ? C.text : C.border}`, borderRadius: 10, padding: '12px 14px', background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="music" size={16} color={C.textMuted} /></div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ ...fw(500), fontSize: 14, color: C.text, margin: 0 }}>{tr.name}</p>
+                  <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{tr.artist}</p>
+                </div>
+                {sel && <Icon name="check" size={16} color={C.text} strokeWidth={2.5} />}
+              </motion.button>
+            )
+          })}
+          {track && (
+            <motion.button whileTap={{ scale: 0.98 }} onClick={() => onPick(null)} style={{ width: '100%', height: 40, border: 'none', background: 'none', ...fw(500), fontSize: 13, color: C.textMuted, cursor: 'pointer', fontFamily: 'inherit' }}>Remove music</motion.button>
+          )}
+        </div>
+      </motion.div>
+    </>
+  )
+}
 
 function CreateScreen({ draft, onSaveProject, onExit }) {
   const [step, setStep] = useState(draft?.media ? 1 : 0) // 0 import · 1 edit · 2 caption
@@ -2372,34 +2439,7 @@ function CreateScreen({ draft, onSaveProject, onExit }) {
         </div>
 
         <AnimatePresence>
-          {musicOpen && (
-            <>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMusicOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 10 }} />
-              <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={spring} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 11, padding: '16px 16px 32px' }}>
-                <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 16px' }} />
-                <p style={{ ...fw(700), fontSize: 17, color: C.text, margin: '0 0 4px' }}>Add music</p>
-                <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 16px' }}>Licensed tracks — cleared for commercial use.</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {LICENSED_TRACKS.map((tr, i) => {
-                    const sel = track?.name === tr.name
-                    return (
-                      <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => { setTrack(tr); setMusicOpen(false) }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${sel ? C.text : C.border}`, borderRadius: 10, padding: '12px 14px', background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-                        <div style={{ width: 36, height: 36, borderRadius: 8, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="music" size={16} color={C.textMuted} /></div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ ...fw(500), fontSize: 14, color: C.text, margin: 0 }}>{tr.name}</p>
-                          <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{tr.artist}</p>
-                        </div>
-                        {sel && <Icon name="check" size={16} color={C.text} strokeWidth={2.5} />}
-                      </motion.button>
-                    )
-                  })}
-                  {track && (
-                    <motion.button whileTap={{ scale: 0.98 }} onClick={() => { setTrack(null); setMusicOpen(false) }} style={{ width: '100%', height: 40, border: 'none', background: 'none', ...fw(500), fontSize: 13, color: C.textMuted, cursor: 'pointer', fontFamily: 'inherit' }}>Remove music</motion.button>
-                  )}
-                </div>
-              </motion.div>
-            </>
-          )}
+          {musicOpen && <MusicPickerSheet track={track} onPick={tr => { setTrack(tr); setMusicOpen(false) }} onClose={() => setMusicOpen(false)} />}
         </AnimatePresence>
       </div>
     )
@@ -5130,8 +5170,8 @@ export default function App() {
     <SignupBenefitsGrowthScreen key="su-benefits-growth" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
     <SignupBenefitsCommunityScreen key="su-benefits-community" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
     <SignupBenefitsFriendScreen key="su-benefits-friend" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
-    <ContentAnalyserScreen key="content-analyser" onBack={() => go(3, 'studio')} />,
-    <RemixScreen key="remix" onBack={() => go(3, 'studio')} />,
+    <ContentAnalyserScreen key="content-analyser" onBack={() => go(3, 'studio')} onCreate={(seed) => openCreate(seed)} />,
+    <RemixScreen key="remix" onBack={() => go(3, 'studio')} onCreate={(seed) => openCreate(seed)} onSaveProject={saveProject} />,
     <GroupChallengeDetailScreen key="group-challenge-detail" onBack={() => go(3, 'challenges')} />,
     <ManagerViewScreen key="manager-view" onBack={() => go(3, 'progress')} />,
     <LoyaltyInviteScreen key="loyalty-invite" onNext={() => go(30)} />,
