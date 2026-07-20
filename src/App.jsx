@@ -902,7 +902,7 @@ function ChallengesFilterPanel({ onClose }) {
 
 // ── CHALLENGE DETAIL SCREEN ───────────────────────────
 
-function ChallengeDetailScreen({ onBack }) {
+function ChallengeDetailScreen({ onBack, onCreate }) {
   const [checked, setChecked] = useState([false, false, false, false, false])
   const toggle = i => setChecked(prev => prev.map((v, idx) => idx === i ? !v : v))
   const [showSubmit, setShowSubmit] = useState(false)
@@ -959,8 +959,11 @@ function ChallengeDetailScreen({ onBack }) {
       </div>
 
       {/* Bottom bar */}
-      <div style={{ height: 70, background: C.white, borderTop: `1px solid ${C.borderLight}`, flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
-        <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmit(true)} style={{ width: '100%', height: 48, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, ...fw(700), fontSize: 14, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>
+      <div style={{ height: 70, background: C.white, borderTop: `1px solid ${C.borderLight}`, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, padding: '0 16px' }}>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={onCreate} style={{ flex: 1, height: 48, border: `1px solid ${C.border}`, borderRadius: 12, background: C.white, ...fw(700), fontSize: 14, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>
+          Create in Studio
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmit(true)} style={{ flex: 1, height: 48, border: `1px solid ${C.text}`, borderRadius: 12, background: C.text, ...fw(700), fontSize: 14, color: C.white, cursor: 'pointer', fontFamily: 'inherit' }}>
           Submit
         </motion.button>
       </div>
@@ -1893,11 +1896,13 @@ function CommunityTab({ onMenuOpen, onWalletOpen, onAdvocateOpen, onReplyOpen, o
 
 // ── CONTENT ANALYSER SCREEN ───────────────────────────
 
-function ContentAnalyserScreen({ onBack }) {
+function ContentAnalyserScreen({ onBack, onCreate }) {
   const [step, setStep] = useState(0) // 0: input, 1: loading, 2: results
   const [media, setMedia] = useState(null)
   const [mediaType, setMediaType] = useState(null)
   const [caption, setCaption] = useState('')
+  const [music, setMusic] = useState(null)
+  const [musicOpen, setMusicOpen] = useState(false)
   const fileRef = useRef(null)
 
   const handleFileChange = (e) => {
@@ -1950,7 +1955,7 @@ function ContentAnalyserScreen({ onBack }) {
       { icon: 'flag',         category: 'Discoverability', title: 'Add the required hashtags',     body: '#AmericanEagle and #AEStyle are required for challenge submission. Your caption is missing both.' },
     ]
     return (
-      <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
         <Header />
         <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '20px 16px 40px' }}>
 
@@ -1989,22 +1994,46 @@ function ContentAnalyserScreen({ onBack }) {
 
           {/* Music check */}
           <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>Music check</p>
-          <div style={{ border: '1px solid rgba(249,115,22,0.3)', borderRadius: 12, padding: 14, background: 'rgba(249,115,22,0.04)' }}>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                <Icon name="music" size={14} color="#f97316" />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-                  <span style={{ ...fw(600), fontSize: 14, color: C.text }}>Flowers — Miley Cyrus</span>
-                  <span style={{ ...fw(600), fontSize: 11, color: '#f97316', background: 'rgba(249,115,22,0.1)', padding: '2px 8px', borderRadius: 20, flexShrink: 0 }}>Copyrighted</span>
+          {music ? (
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, background: C.white }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                  <Icon name="check" size={14} color={C.text} strokeWidth={2.5} />
                 </div>
-                <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>Not cleared for commercial use. Switch to a royalty-free track to avoid your content being muted or removed.</p>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                    <span style={{ ...fw(600), fontSize: 14, color: C.text }}>{music.name}</span>
+                    <span style={{ ...fw(600), fontSize: 11, color: C.textBody, background: C.cardBg, border: `1px solid ${C.border}`, padding: '2px 8px', borderRadius: 20, flexShrink: 0 }}>Cleared</span>
+                  </div>
+                  <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>Licensed for commercial use — you're good to post.</p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div style={{ border: '1px solid rgba(249,115,22,0.3)', borderRadius: 12, padding: 14, background: 'rgba(249,115,22,0.04)' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                  <Icon name="music" size={14} color="#f97316" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                    <span style={{ ...fw(600), fontSize: 14, color: C.text }}>Flowers — Miley Cyrus</span>
+                    <span style={{ ...fw(600), fontSize: 11, color: '#f97316', background: 'rgba(249,115,22,0.1)', padding: '2px 8px', borderRadius: 20, flexShrink: 0 }}>Copyrighted</span>
+                  </div>
+                  <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 12px' }}>Not cleared for commercial use. Switch to a royalty-free track to avoid your content being muted or removed.</p>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => setMusicOpen(true)} style={{ height: 34, padding: '0 14px', border: `1px solid ${C.text}`, borderRadius: 8, background: C.white, ...fw(600), fontSize: 13, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>Swap to a licensed track</motion.button>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
+        <div style={{ flexShrink: 0, borderTop: `1px solid ${C.borderLight}`, padding: '12px 16px', background: C.white }}>
+          <PrimaryButton onClick={() => onCreate({ media, mediaType, caption, track: music })}>Apply &amp; create in Studio</PrimaryButton>
+        </div>
+        <AnimatePresence>
+          {musicOpen && <MusicPickerSheet track={music} onPick={tr => { setMusic(tr); setMusicOpen(false) }} onClose={() => setMusicOpen(false)} />}
+        </AnimatePresence>
       </div>
     )
   }
@@ -2067,9 +2096,15 @@ function ContentAnalyserScreen({ onBack }) {
 
 // ── REMIX SCREEN ──────────────────────────────────────
 
-function RemixScreen({ onBack }) {
+function RemixScreen({ onBack, onCreate, onSaveProject }) {
   const [step, setStep] = useState(0) // 0: input, 1: loading, 2: results
   const [url, setUrl] = useState('')
+  const [saved, setSaved] = useState(false)
+
+  const savePost = () => {
+    onSaveProject({ id: 'remix-' + (url || 'stylebyella'), kind: 'idea', authorName: '@stylebyella', authorInitial: 'S', authorTier: 'Creator', body: 'My everyday AE outfit ✨ The Crossover Flare never gets old. #AEStyle #AmericanEagle', savedAt: 'Today' })
+    setSaved(true); setTimeout(() => setSaved(false), 1500)
+  }
 
   const handleFind = () => {
     setStep(1)
@@ -2123,10 +2158,11 @@ function RemixScreen({ onBack }) {
               <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.cardBg, border: `1px solid ${C.border}`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon name="person" size={16} color={C.textMuted} />
               </div>
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: 0 }}>@stylebyella</p>
                 <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>47.2K views · 3 days ago</p>
               </div>
+              <motion.button whileTap={{ scale: 0.95 }} onClick={savePost} style={{ flexShrink: 0, height: 32, padding: '0 12px', border: `1px solid ${saved ? C.text : C.border}`, borderRadius: 8, background: saved ? C.text : C.white, ...fw(600), fontSize: 13, color: saved ? C.white : C.text, cursor: 'pointer', fontFamily: 'inherit' }}>{saved ? 'Saved' : 'Save'}</motion.button>
             </div>
             <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>
               My everyday AE outfit ✨ The Crossover Flare never gets old. #AEStyle #AmericanEagle
@@ -2137,17 +2173,19 @@ function RemixScreen({ onBack }) {
           <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: '0 0 12px' }}>4 ways to remix this</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {IDEAS.map((idea, i) => (
-              <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+              <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => onCreate({ brief: { title: idea.title } })}
+                style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                     <Icon name={idea.icon} size={14} color={C.textBody} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 4px' }}>{idea.title}</p>
-                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: 0 }}>{idea.body}</p>
+                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 10px' }}>{idea.body}</p>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, ...fw(600), fontSize: 13, color: C.text }}>Start from this <Icon name="arrowRight" size={13} color={C.text} /></span>
                   </div>
                 </div>
-              </div>
+              </motion.button>
             ))}
           </div>
 
@@ -2205,14 +2243,290 @@ function RemixScreen({ onBack }) {
   )
 }
 
+// ── CREATE SCREEN ─────────────────────────────────────
+
+const LICENSED_TRACKS = [
+  { name: 'Golden Hour',     artist: 'AE Sound Library' },
+  { name: 'City Pop Dreams', artist: 'AE Sound Library' },
+  { name: 'Soft Focus',      artist: 'AE Sound Library' },
+  { name: 'Weekend Mode',    artist: 'AE Sound Library' },
+]
+
+// Shared music picker sheet — used by the editor and the content analyser's copyright fix
+function MusicPickerSheet({ track, onPick, onClose }) {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 10 }} />
+      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={spring} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 11, padding: '16px 16px 32px' }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 16px' }} />
+        <p style={{ ...fw(700), fontSize: 17, color: C.text, margin: '0 0 4px' }}>Add music</p>
+        <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: '0 0 16px' }}>Licensed tracks — cleared for commercial use.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {LICENSED_TRACKS.map((tr, i) => {
+            const sel = track?.name === tr.name
+            return (
+              <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => onPick(tr)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${sel ? C.text : C.border}`, borderRadius: 10, padding: '12px 14px', background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="music" size={16} color={C.textMuted} /></div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ ...fw(500), fontSize: 14, color: C.text, margin: 0 }}>{tr.name}</p>
+                  <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{tr.artist}</p>
+                </div>
+                {sel && <Icon name="check" size={16} color={C.text} strokeWidth={2.5} />}
+              </motion.button>
+            )
+          })}
+          {track && (
+            <motion.button whileTap={{ scale: 0.98 }} onClick={() => onPick(null)} style={{ width: '100%', height: 40, border: 'none', background: 'none', ...fw(500), fontSize: 13, color: C.textMuted, cursor: 'pointer', fontFamily: 'inherit' }}>Remove music</motion.button>
+          )}
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
+function CreateScreen({ draft, onSaveProject, onExit }) {
+  const [step, setStep] = useState(draft?.media ? 1 : 0) // 0 import · 1 edit · 2 caption
+  const [media, setMedia] = useState(draft?.media || null)
+  const [mediaType, setMediaType] = useState(draft?.mediaType || null)
+  const [overlayText, setOverlayText] = useState(draft?.overlayText || '')
+  const [track, setTrack] = useState(draft?.track || null)
+  const [caption, setCaption] = useState(draft?.caption || '')
+  const [musicOpen, setMusicOpen] = useState(false)
+  const [showSubmit, setShowSubmit] = useState(false)
+  const [done, setDone] = useState(false)
+  const [pid] = useState(() => draft?.id || 'p' + Date.now())
+  const fileRef = useRef(null)
+  const brief = draft?.brief || null
+
+  const suggested = getSuggestions(overlayText || caption || brief?.title || 'default')[0]?.caption || ''
+
+  const buildProject = (status) => ({
+    id: pid,
+    kind: status === 'In review' ? 'submitted' : 'draft',
+    status,
+    title: (caption || overlayText).trim().split('\n')[0].slice(0, 42)
+      || brief?.title
+      || (mediaType === 'video' ? 'Untitled video' : mediaType === 'image' ? 'Untitled photo' : 'Untitled post'),
+    caption, media, mediaType, overlayText, track, brief,
+    savedAt: 'Just now',
+  })
+
+  const briefBanner = brief ? (
+    <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+        <Icon name="flag" size={13} color={C.textBody} />
+        <span style={{ ...fw(600), fontSize: 12, color: C.textMuted, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Creating for</span>
+      </div>
+      <p style={{ ...fw(600), fontSize: 14, color: C.text, margin: '0 0 2px' }}>{brief.title}</p>
+      {brief.hashtag && <p style={{ ...fw(400), fontSize: 13, color: C.textMuted, margin: 0 }}>Include {brief.hashtag}</p>}
+    </div>
+  ) : null
+  const saveDraft = () => { if (media || caption) onSaveProject(buildProject('Draft')) }
+
+  const handleFile = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setMediaType(file.type.startsWith('video') ? 'video' : 'image')
+    const reader = new FileReader()
+    reader.onload = ev => { setMedia(ev.target.result); setStep(1) }
+    reader.readAsDataURL(file)
+  }
+
+  const goBack = () => {
+    if (step > 0) { setStep(s => s - 1); return }
+    saveDraft(); onExit()
+  }
+
+  const Header = ({ title }) => (
+    <div style={{ height: 52, borderBottom: `1px solid ${C.borderLight}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0, background: C.white }}>
+      <motion.button whileTap={{ scale: 0.88 }} onClick={goBack} style={{ position: 'absolute', left: 12, width: 32, height: 32, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="arrowLeft" size={18} color={C.textBody} />
+      </motion.button>
+      <span style={{ ...fw(500), fontSize: 15, color: C.text }}>{title}</span>
+      {step > 0 && !done && (
+        <motion.button whileTap={{ scale: 0.94 }} onClick={() => { saveDraft(); onExit() }} style={{ position: 'absolute', right: 12, height: 32, padding: '0 10px', background: 'none', border: 'none', cursor: 'pointer', ...fw(500), fontSize: 13, color: C.textMuted, fontFamily: 'inherit' }}>
+          Save draft
+        </motion.button>
+      )}
+    </div>
+  )
+
+  // ── Success ──
+  if (done) return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '0 40px', textAlign: 'center' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="check" size={28} color={C.text} strokeWidth={2.5} />
+        </div>
+        <p style={{ ...fw(700), fontSize: 20, color: C.text, margin: 0 }}>Submitted for review</p>
+        <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, lineHeight: '20px', margin: 0 }}>We'll let you know once it's approved — you'll earn points when it goes live. Find it under My projects.</p>
+      </div>
+      <div style={{ flexShrink: 0, padding: '12px 16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <PrimaryButton onClick={onExit}>Back to Studio</PrimaryButton>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={() => { setMedia(null); setMediaType(null); setOverlayText(''); setTrack(null); setCaption(''); setDone(false); setStep(0) }} style={{ width: '100%', height: 44, border: `1px solid ${C.border}`, borderRadius: 10, background: C.white, ...fw(500), fontSize: 14, color: C.textBody, cursor: 'pointer', fontFamily: 'inherit' }}>Create another</motion.button>
+      </div>
+    </div>
+  )
+
+  // ── Step 0: Import ──
+  if (step === 0) return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+      <Header title="Create a post" />
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {briefBanner}
+        <div>
+          <p style={{ ...fw(400), fontSize: 22, color: C.text, lineHeight: '30px', margin: '0 0 6px' }}>Add your content</p>
+          <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, lineHeight: '20px', margin: 0 }}>Upload a photo or video to get started. You can edit and add a caption next.</p>
+        </div>
+        <input type="file" accept="image/*,video/*" ref={fileRef} style={{ display: 'none' }} onChange={handleFile} />
+        <motion.button whileTap={{ scale: 0.98 }} onClick={() => fileRef.current?.click()} style={{ width: '100%', height: 200, border: `1px dashed ${C.border}`, borderRadius: 14, background: C.cardBg, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, fontFamily: 'inherit' }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, border: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+              <line x1="12" y1="19" x2="12" y2="5" stroke={C.textMuted} strokeWidth={1.5} strokeLinecap="round" />
+              <polyline points="5,12 12,5 19,12" stroke={C.textMuted} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <span style={{ ...fw(400), fontSize: 14, color: C.textMuted }}>Upload photo or video</span>
+          <span style={{ ...fw(400), fontSize: 12, color: C.textPlaceholder }}>MP4, MOV, JPG, PNG</span>
+        </motion.button>
+      </div>
+    </div>
+  )
+
+  // ── Step 1: Edit ──
+  if (step === 1) {
+    const tools = [
+      { icon: 'pencilRuler',   title: 'Text overlay', value: overlayText ? 'Added' : null },
+      { icon: 'music',         title: 'Music',        value: track ? track.name : null, action: 'music' },
+      { icon: 'scissors',      title: 'Trim',         soon: true },
+      { icon: 'messageSquare', title: 'Subtitles',    soon: true },
+    ]
+    return (
+      <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
+        <Header title="Edit" />
+        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 16px 24px' }}>
+          <div style={{ width: '100%', height: 260, borderRadius: 14, background: C.cardBg, border: `1px solid ${C.border}`, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            {media && mediaType === 'image' && <img src={media} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+            {media && mediaType === 'video' && <Icon name="video" size={32} color={C.textMuted} />}
+            {overlayText && <span style={{ position: 'absolute', bottom: 14, left: 14, right: 14, ...fw(700), fontSize: 16, color: C.white, textShadow: '0 1px 4px rgba(0,0,0,0.5)', lineHeight: '22px' }}>{overlayText}</span>}
+            {track && <span style={{ position: 'absolute', top: 12, left: 12, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.55)', borderRadius: 20, padding: '4px 10px' }}><Icon name="music" size={12} color={C.white} /><span style={{ ...fw(500), fontSize: 12, color: C.white }}>{track.name}</span></span>}
+          </div>
+
+          <textarea value={overlayText} onChange={e => setOverlayText(e.target.value)} placeholder="Add text on your content (optional)" style={{ width: '100%', height: 56, border: `1px solid ${overlayText ? C.text : C.border}`, borderRadius: 10, padding: '10px 14px', fontSize: 15, color: C.text, fontFamily: 'inherit', resize: 'none', outline: 'none', lineHeight: '22px', background: C.white, display: 'block', boxSizing: 'border-box', marginBottom: 16 }} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {tools.map((t, i) => (
+              <motion.button key={i} whileTap={t.soon ? {} : { scale: 0.98 }} onClick={t.soon ? undefined : () => { if (t.action === 'music') setMusicOpen(true) }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', background: C.white, cursor: t.soon ? 'default' : 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name={t.icon} size={16} color={C.textMuted} />
+                </div>
+                <span style={{ flex: 1, ...fw(500), fontSize: 14, color: t.soon ? C.textMuted : C.text }}>{t.title}</span>
+                {t.soon ? <Pill bg={C.cardBg}>Soon</Pill> : t.value ? <span style={{ ...fw(500), fontSize: 13, color: C.textMuted }}>{t.value}</span> : <Icon name="chevronRight" size={16} color={C.textMuted} />}
+              </motion.button>
+            ))}
+          </div>
+
+          {track && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+              <Icon name="check" size={14} color={C.textBody} strokeWidth={2.5} />
+              <span style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>{track.name} — cleared for commercial use</span>
+            </div>
+          )}
+        </div>
+
+        <div style={{ flexShrink: 0, borderTop: `1px solid ${C.borderLight}`, padding: '12px 16px', background: C.white }}>
+          <PrimaryButton onClick={() => { saveDraft(); setStep(2) }}>Next</PrimaryButton>
+        </div>
+
+        <AnimatePresence>
+          {musicOpen && <MusicPickerSheet track={track} onPick={tr => { setTrack(tr); setMusicOpen(false) }} onClose={() => setMusicOpen(false)} />}
+        </AnimatePresence>
+      </div>
+    )
+  }
+
+  // ── Step 2: Caption & details ──
+  return (
+    <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+      <Header title="Caption & details" />
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 16px 24px' }}>
+        {briefBanner}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 20, alignItems: 'center' }}>
+          <div style={{ width: 56, height: 56, borderRadius: 10, background: C.cardBg, border: `1px solid ${C.border}`, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {media && mediaType === 'image' && <img src={media} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+            {media && mediaType === 'video' && <Icon name="video" size={20} color={C.textMuted} />}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ ...fw(500), fontSize: 13, color: C.text, margin: '0 0 2px' }}>{mediaType === 'video' ? 'Video' : 'Photo'} ready</p>
+            <p style={{ ...fw(400), fontSize: 12, color: C.textMuted, margin: 0 }}>{track ? `Music: ${track.name}` : 'No music added'}</p>
+          </div>
+        </div>
+
+        <textarea value={caption} onChange={e => setCaption(e.target.value)} placeholder="Write a caption…" style={{ width: '100%', height: 96, border: `1px solid ${caption ? C.text : C.border}`, borderRadius: 10, padding: '12px 14px', fontSize: 15, color: C.text, fontFamily: 'inherit', resize: 'none', outline: 'none', lineHeight: '22px', background: C.white, display: 'block', boxSizing: 'border-box', marginBottom: 12 }} />
+
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+          {['#americaneagle', '#aestyle', '#denimfit'].map(tag => (
+            <span key={tag} style={{ ...fw(400), fontSize: 13, color: C.textMuted }}>{tag}</span>
+          ))}
+        </div>
+
+        {suggested && (
+          <div style={{ borderTop: `1px solid ${C.borderLight}`, paddingTop: 16 }}>
+            <p style={{ ...fw(600), fontSize: 12, color: C.textMuted, letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 10px' }}>Suggested caption</p>
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 14px 12px', background: C.cardBg }}>
+              <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '20px', margin: '0 0 12px', whiteSpace: 'pre-line', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{suggested}</p>
+              <motion.button whileTap={{ scale: 0.96 }} onClick={() => setCaption(suggested)} style={{ height: 30, padding: '0 14px', border: `1px solid ${caption === suggested ? C.text : C.border}`, borderRadius: 20, background: caption === suggested ? C.text : C.white, ...fw(600), fontSize: 12, color: caption === suggested ? C.white : C.textBody, cursor: 'pointer', fontFamily: 'inherit' }}>{caption === suggested ? 'Applied ✓' : 'Use this'}</motion.button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ flexShrink: 0, borderTop: `1px solid ${C.borderLight}`, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'center', background: C.white }}>
+        <motion.button whileTap={{ scale: 0.96 }} onClick={() => { saveDraft(); onExit() }} style={{ flex: 1, height: 44, border: `1px solid ${C.border}`, borderRadius: 10, background: C.white, ...fw(500), fontSize: 14, color: C.textBody, cursor: 'pointer', fontFamily: 'inherit' }}>Save as draft</motion.button>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmit(true)} style={{ flex: 1, height: 44, border: `1px solid ${C.text}`, borderRadius: 10, background: C.text, ...fw(700), fontSize: 14, color: C.white, cursor: 'pointer', fontFamily: 'inherit' }}>Submit</motion.button>
+      </div>
+
+      <AnimatePresence>
+        {showSubmit && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSubmit(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 10 }} />
+            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={spring} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', zIndex: 11, padding: '24px 16px 32px' }}>
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
+              <p style={{ ...fw(700), fontSize: 20, textAlign: 'center', color: C.text, margin: '0 0 4px' }}>Submit for review?</p>
+              <p style={{ ...fw(400), fontSize: 14, textAlign: 'center', color: C.textMuted, margin: '0 0 20px', lineHeight: '20px' }}>Your post goes to the brand for approval. You'll earn points once it's approved.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { ok: !!media, label: 'Photo or video added' },
+                  { ok: !!caption.trim(), label: 'Caption written' },
+                  { ok: true, label: 'Required hashtags included' },
+                ].map((c, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: c.ok ? C.text : C.cardBg, border: c.ok ? 'none' : `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {c.ok && <Icon name="check" size={12} color={C.white} strokeWidth={2.5} />}
+                    </div>
+                    <span style={{ ...fw(400), fontSize: 14, color: c.ok ? C.text : C.textMuted }}>{c.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 24 }}>
+                <PrimaryButton onClick={() => { onSaveProject(buildProject('In review')); setShowSubmit(false); setDone(true) }}>Submit for review</PrimaryButton>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 // ── TAB: STUDIO ───────────────────────────────────────
 
-function StudioTab({ onMenuOpen, onWalletOpen, onChallengeCreate, onContentAnalyse, onRemix, savedRemixes }) {
+function StudioTab({ onMenuOpen, onWalletOpen, onCreatePost, onContentAnalyse, onRemix, projects }) {
   const [tab, setTab] = useState('New Project')
   const cards = [
-    { label: 'Analyse my content for a challenge',    action: onContentAnalyse },
-    { label: 'I have an idea for a new challenge/content', action: onChallengeCreate },
-    { label: "Remix someone else's content",          action: onRemix },
+    { label: 'Create a post',                    action: () => onCreatePost() },
+    { label: 'Get content ideas',                action: onRemix },
+    { label: 'Check my content before I post',   action: onContentAnalyse },
   ]
   return (
     <div>
@@ -2241,38 +2555,56 @@ function StudioTab({ onMenuOpen, onWalletOpen, onChallengeCreate, onContentAnaly
         ) : (
           <>
             <p style={{ ...fw(400), fontSize: 20, color: C.text, lineHeight: '28px', marginBottom: 6 }}>My projects</p>
-            {savedRemixes.length === 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', gap: 10 }}>
+            {projects.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px 8px', gap: 10 }}>
                 <div style={{ width: 48, height: 48, borderRadius: '50%', background: C.cardBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
-                  <Icon name="scissors" size={20} color={C.textMuted} />
+                  <Icon name="pencilRuler" size={20} color={C.textMuted} />
                 </div>
                 <p style={{ ...fw(600), fontSize: 15, color: C.text, margin: 0 }}>No projects yet</p>
-                <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, textAlign: 'center', margin: 0, lineHeight: '20px' }}>Save a remix idea from the community to find it here.</p>
+                <p style={{ ...fw(400), fontSize: 14, color: C.textMuted, textAlign: 'center', margin: '0 0 16px', lineHeight: '20px' }}>Your drafts and submitted posts will show up here.</p>
+                <PrimaryButton onClick={() => onCreatePost()}>Create your first post</PrimaryButton>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
-                {savedRemixes.map((r, i) => (
-                  <motion.button key={i} whileTap={{ scale: 0.98 }}
-                    style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 14, padding: 14, background: C.white, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
-                      <Avatar initial={r.authorInitial} size={32} />
+                {projects.map((r, i) => (
+                  r.kind === 'idea' ? (
+                    <motion.button key={r.id || i} whileTap={{ scale: 0.98 }}
+                      style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 14, padding: 14, background: C.white, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+                        <Avatar initial={r.authorInitial} size={32} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: '0 0 3px' }}>{r.authorName}</p>
+                          <Pill bg={C.cardBg}>{r.authorTier}</Pill>
+                        </div>
+                        <span style={{ ...fw(400), fontSize: 11, color: C.textMuted, flexShrink: 0 }}>{r.savedAt}</span>
+                      </div>
+                      {r.photo && (
+                        <div style={{ height: 80, borderRadius: 8, background: r.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                          <span style={{ fontSize: 28 }}>{r.emoji}</span>
+                        </div>
+                      )}
+                      <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{r.body}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Icon name="scissors" size={12} color={C.textMuted} />
+                        <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>4 remix ideas</span>
+                      </div>
+                    </motion.button>
+                  ) : (
+                    <motion.button key={r.id || i} whileTap={{ scale: 0.98 }} onClick={() => onCreatePost(r)}
+                      style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 14, padding: 14, background: C.white, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', display: 'flex', gap: 12, alignItems: 'center' }}>
+                      <div style={{ width: 52, height: 52, borderRadius: 8, background: C.cardBg, border: `1px solid ${C.border}`, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {r.media && r.mediaType === 'image' ? <img src={r.media} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Icon name="video" size={20} color={C.textMuted} />}
+                      </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ ...fw(600), fontSize: 13, color: C.text, margin: '0 0 3px' }}>{r.authorName}</p>
-                        <Pill bg={C.cardBg}>{r.authorTier}</Pill>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                          <Pill bg={C.cardBg}>{r.status}</Pill>
+                          <span style={{ ...fw(400), fontSize: 11, color: C.textMuted }}>{r.savedAt}</span>
+                        </div>
+                        <p style={{ ...fw(500), fontSize: 14, color: C.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.title}</p>
                       </div>
-                      <span style={{ ...fw(400), fontSize: 11, color: C.textMuted, flexShrink: 0 }}>{r.savedAt}</span>
-                    </div>
-                    {r.photo && (
-                      <div style={{ height: 80, borderRadius: 8, background: r.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                        <span style={{ fontSize: 28 }}>{r.emoji}</span>
-                      </div>
-                    )}
-                    <p style={{ ...fw(400), fontSize: 13, color: C.textBody, lineHeight: '19px', margin: '0 0 10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{r.body}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Icon name="scissors" size={12} color={C.textMuted} />
-                      <span style={{ ...fw(500), fontSize: 12, color: C.textMuted }}>4 remix ideas</span>
-                    </div>
-                  </motion.button>
+                      <Icon name="chevronRight" size={16} color={C.textMuted} />
+                    </motion.button>
+                  )
                 ))}
               </div>
             )}
@@ -3674,7 +4006,7 @@ function WalletBottomSheet({ onClose, onSeeAllEarnings, mode = 'advocate' }) {
 
 // ── HOME SCREEN ───────────────────────────────────────
 
-function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeOpen, onChallengeCreate, onContentAnalyse, onRemix, profilePhoto, onSetProfilePhoto, showIntroSheet, onIntroPost, userPost, milestoneOpen, onMilestoneClose, mode = 'advocate' }) {
+function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeOpen, onChallengeCreate, onContentAnalyse, onRemix, onCreatePost, projects, onSaveProject, profilePhoto, onSetProfilePhoto, showIntroSheet, onIntroPost, userPost, milestoneOpen, onMilestoneClose, mode = 'advocate' }) {
   const [filterOpen, setFilterOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [walletOpen, setWalletOpen] = useState(false)
@@ -3683,7 +4015,6 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
   const [openReply, setOpenReply] = useState(null)
   const [openCommunityRemix, setOpenCommunityRemix] = useState(null)
   const [recognitionOpen, setRecognitionOpen] = useState(false)
-  const [savedRemixes, setSavedRemixes] = useState([])
   const openMenu = () => setMenuOpen(true)
   const openWallet = () => setWalletOpen(true)
   const renderTab = () => {
@@ -3691,7 +4022,7 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
       case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} mode={mode} />
       case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeOpen={onChallengeOpen} onGroupChallengeOpen={onGroupChallengeOpen} mode={mode} />
       case 'community':   return <CommunityTab onMenuOpen={openMenu} onWalletOpen={openWallet} onAdvocateOpen={setOpenAdvocate} onReplyOpen={setOpenReply} onRemixOpen={setOpenCommunityRemix} onRecognitionOpen={() => setRecognitionOpen(true)} mode={mode} />
-      case 'studio':      return <StudioTab onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeCreate={onChallengeCreate} onContentAnalyse={onContentAnalyse} onRemix={onRemix} savedRemixes={savedRemixes} />
+      case 'studio':      return <StudioTab onMenuOpen={openMenu} onWalletOpen={openWallet} onCreatePost={onCreatePost} onContentAnalyse={onContentAnalyse} onRemix={onRemix} projects={projects} />
       case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} mode={mode} />
       case 'rewards':     return <RewardsTab mode={mode} onMenuOpen={openMenu} onWalletOpen={openWallet} />
       case 'account':     return <AccountTab mode={mode} />
@@ -3733,7 +4064,7 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
         {openReply && <ReplySheet post={openReply} onClose={() => setOpenReply(null)} />}
       </AnimatePresence>
       <AnimatePresence>
-        {openCommunityRemix && <CommunityRemixSheet post={openCommunityRemix} onClose={() => setOpenCommunityRemix(null)} savedRemixes={savedRemixes} onSave={r => setSavedRemixes(prev => [...prev, r])} />}
+        {openCommunityRemix && <CommunityRemixSheet post={openCommunityRemix} onClose={() => setOpenCommunityRemix(null)} savedRemixes={projects} onSave={r => onSaveProject({ ...r, kind: 'idea' })} />}
       </AnimatePresence>
       <AnimatePresence>
         {menuOpen && <SideDrawer onClose={() => setMenuOpen(false)} photo={profilePhoto} />}
@@ -4367,7 +4698,7 @@ const NAV_SECTIONS = [
     items: [
       { key: 'signup',     label: 'Sign up',    toScreen: 5,  tab: null },
       { key: 'onboarding', label: 'Onboarding', toScreen: 12, tab: null },
-      { key: 'login',      label: 'Log in',     toScreen: 3,  tab: 'feed', triggerMilestone: true },
+      { key: 'login',      label: 'Log in',     toScreen: 0,  tab: null },
     ],
   },
   {
@@ -4776,6 +5107,8 @@ export default function App() {
   const [milestoneOpen, setMilestoneOpen] = useState(false)
   const [mode, setMode] = useState('advocate')
   const [loyaltyViaOnboarding, setLoyaltyViaOnboarding] = useState(false)
+  const [projects, setProjects] = useState([])
+  const [studioDraft, setStudioDraft] = useState(null)
 
   const go = (toScreen, tab = null, forceDir = null, slow = false) => {
     if (toScreen !== screen) {
@@ -4788,6 +5121,13 @@ export default function App() {
 
   const loginNav = () => { go(3, 'feed'); setMilestoneOpen(true) }
 
+  const saveProject = (p) => setProjects(prev => {
+    const i = prev.findIndex(x => x.id === p.id)
+    if (i === -1) return [p, ...prev]
+    const next = [...prev]; next[i] = p; return next
+  })
+  const openCreate = (draft = null) => { setStudioDraft(draft); go(36) }
+
   const getActiveNavKey = () => {
     if (screen >= 29 && screen <= 32) return 'loyalty-invite'
     if (screen === 34 || screen === 35) return 'journey-c'
@@ -4795,7 +5135,7 @@ export default function App() {
     if (screen === 12 || screen === 13 || screen === 14 || screen === 16 || screen === 17 || screen === 19 || screen === 33) return 'onboarding'
     if (screen <= 2) return 'login'
     if (screen === 15 || screen === 27) return 'challenges'
-    if (screen === 18 || screen === 25 || screen === 26) return 'studio'
+    if (screen === 18 || screen === 25 || screen === 26 || screen === 36) return 'studio'
     if (screen === 28) return 'managerview'
     if (screen === 3) {
       const map = { feed: 'dashboard', challenges: 'challenges', community: 'community', studio: 'studio', progress: 'progress', rewards: 'rewards', account: 'account' }
@@ -4805,10 +5145,10 @@ export default function App() {
   }
 
   const screens = [
-    <EmailScreen key="email" onNext={(e) => { setEmail(e); go(1) }} />,
+    <EmailScreen key="email" onNext={(e) => { setEmail(e); loginNav() }} />,
     <InboxScreen key="inbox" email={email} onNext={() => go(2)} />,
     <EmailClientScreen key="email-client" onNext={() => go(12)} />,
-    <HomeScreen key="home" activeTab={activeTab} onTabChange={setActiveTab} onChallengeOpen={() => go(15)} onGroupChallengeOpen={() => go(27)} onChallengeCreate={() => go(18)} onContentAnalyse={() => go(25)} onRemix={() => go(26)} profilePhoto={profilePhoto} onSetProfilePhoto={setProfilePhoto} showIntroSheet={showIntroSheet} onIntroPost={(s) => { setPostSentence(s); setShowIntroSheet(false); setShowMarkScreen(true) }} userPost={postSentence ? { sentence: postSentence, photo: profilePhoto } : null} milestoneOpen={milestoneOpen} onMilestoneClose={() => setMilestoneOpen(false)} mode={mode} />,
+    <HomeScreen key="home" activeTab={activeTab} onTabChange={setActiveTab} onChallengeOpen={() => go(15)} onGroupChallengeOpen={() => go(27)} onChallengeCreate={() => go(18)} onContentAnalyse={() => go(25)} onRemix={() => go(26)} onCreatePost={openCreate} projects={projects} onSaveProject={saveProject} profilePhoto={profilePhoto} onSetProfilePhoto={setProfilePhoto} showIntroSheet={showIntroSheet} onIntroPost={(s) => { setPostSentence(s); setShowIntroSheet(false); setShowMarkScreen(true) }} userPost={postSentence ? { sentence: postSentence, photo: profilePhoto } : null} milestoneOpen={milestoneOpen} onMilestoneClose={() => setMilestoneOpen(false)} mode={mode} />,
     <SignupMotivationScreen key="su-motivation" onNext={(sel) => ({ 1: () => go(22), 2: () => go(23), 3: () => go(24) }[sel] || (() => go(5)))()} />,
     <SignupBenefitsScreen key="su-benefits" onNext={() => go(20, null, 1)} />,
     <SignupBasicInfoScreen key="su-basic" onNext={(info) => { setSignupInfo(prev => ({ ...prev, ...info })); go(7) }} />,
@@ -4820,7 +5160,7 @@ export default function App() {
     <OnboardingLandingScreen key="ob-landing" onNext={() => go(33)} />,
     <OnboardingTiersScreen key="ob-tiers" onNext={() => go(17)} />,
     <OnboardingFrequencyScreen key="ob-frequency" onNext={() => go(13, null, 1)} />,
-    <ChallengeDetailScreen key="challenge-detail" onBack={() => go(3, 'challenges')} />,
+    <ChallengeDetailScreen key="challenge-detail" onBack={() => go(3, 'challenges')} onCreate={() => openCreate({ brief: { title: BC.challengeDetail.title, hashtag: BC.challengeDetail.hashtag } })} />,
     <OnboardingCommunityScreen key="ob-community" onNext={() => go(14, null, 1)} />,
     <OnboardingNotificationsScreen key="ob-notifications" onNext={() => { setShowIntroSheet(true); go(3, 'feed', 1, true) }} />,
     <ChallengeCreationScreen key="challenge-create" onBack={() => go(3, 'studio')} />,
@@ -4830,8 +5170,8 @@ export default function App() {
     <SignupBenefitsGrowthScreen key="su-benefits-growth" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
     <SignupBenefitsCommunityScreen key="su-benefits-community" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
     <SignupBenefitsFriendScreen key="su-benefits-friend" onNext={() => go(20, null, 1)} onBack={() => go(4, null, -1)} />,
-    <ContentAnalyserScreen key="content-analyser" onBack={() => go(3, 'studio')} />,
-    <RemixScreen key="remix" onBack={() => go(3, 'studio')} />,
+    <ContentAnalyserScreen key="content-analyser" onBack={() => go(3, 'studio')} onCreate={(seed) => openCreate(seed)} />,
+    <RemixScreen key="remix" onBack={() => go(3, 'studio')} onCreate={(seed) => openCreate(seed)} onSaveProject={saveProject} />,
     <GroupChallengeDetailScreen key="group-challenge-detail" onBack={() => go(3, 'challenges')} />,
     <ManagerViewScreen key="manager-view" onBack={() => go(3, 'progress')} />,
     <LoyaltyInviteScreen key="loyalty-invite" onNext={() => go(30)} />,
@@ -4841,6 +5181,7 @@ export default function App() {
     <OnboardingLoyaltyDetectedScreen key="ob-loyalty-detected" onLink={() => { setLoyaltyViaOnboarding(true); go(31) }} onSkip={() => go(19)} />,
     <LoyaltyNudgeSheetScreen key="loyalty-nudge-sheet" onConnect={() => go(35)} onDismiss={() => go(3, 'feed', -1)} />,
     <LoyaltyConnectConfirmScreen key="loyalty-connect-confirm" onConfirm={() => go(31)} onBack={() => go(34, null, -1)} />,
+    <CreateScreen key="create" draft={studioDraft} onSaveProject={saveProject} onExit={() => go(3, 'studio')} />,
   ]
 
   const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 500
