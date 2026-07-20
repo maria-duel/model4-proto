@@ -14,16 +14,6 @@ const BRAND_CONTENT = {
     { id: 3, name: 'Real Me Legging',          ago: 'Last month',  price: '$45', pts: 394, reviewNudge: false },
   ],
 
-  // ── Flywheel ──────────────────────────────────
-  flywheelMoves: [
-    { key: 'purchase',  label: 'Make a purchase',    desc: 'Every order earns points automatically',   icon: 'package',  pts: 15,  cta: 'Shop now',       done: true  },
-    { key: 'refer',     label: 'Refer a friend',     desc: 'Worth ~$50 of spend in points',            icon: 'userPlus', pts: 100, cta: 'Share link',     done: true  },
-    { key: 'review',    label: 'Write a review',     desc: 'Photo & video reviews earn even more',     icon: 'star',     pts: 25,  cta: 'Write review',   done: true  },
-    { key: 'share',     label: 'Share a look',       desc: 'Tag the brand in a post or story',         icon: 'globe',    pts: 50,  cta: 'Create post',    done: false },
-    { key: 'community', label: 'Help the community', desc: 'Answer a question, share a tip',           icon: 'users',    pts: 75,  cta: 'Open community', done: false },
-  ],
-  flywheelBonus: 300,
-
   // ── Feed: recommended challenges carousel ─────
   feedChallenges: [
     { emoji: '🛍️', gradient: 'linear-gradient(145deg,#dbe8ff,#a8c4f0,#6090d0)', title: 'Summer Edit Drop: Shop 2 New Arrivals', type: 'Purchase', time: '7d', level: 'Beginner', pts: 150 },
@@ -204,8 +194,6 @@ const BC = BRAND_CONTENT
 const BRAND = BC.name
 const BRAND_HANDLE = BC.handle
 const BRAND_LOGO = BC.logo
-const FLYWHEEL_MOVES = BC.flywheelMoves
-const FLYWHEEL_BONUS = BC.flywheelBonus
 const ORDERS = BC.orders
 const BRAND_SPOTLIGHT = BC.brandSpotlight
 const SIMILAR_POSTS_DATA = BC.similarPosts
@@ -542,113 +530,7 @@ const TABS_BY_MODE = {
 
 // ── TAB: FEED ─────────────────────────────────────────
 
-function FlywheelGraphic({ size = 88, countLabel }) {
-  const half = size / 2
-  const ro = size * 0.409, ctrlR = ro * 0.52, maskR = size * 0.25
-  const rad = d => d * Math.PI / 180
-  const px = (r, deg) => (half + r * Math.cos(rad(deg - 90))).toFixed(2)
-  const py = (r, deg) => (half + r * Math.sin(rad(deg - 90))).toFixed(2)
-  const bladePath = (base) => {
-    const a1 = base + 8, a2 = base + 65
-    return `M ${half} ${half} Q ${px(ctrlR, base - 22)} ${py(ctrlR, base - 22)} ${px(ro, a1)} ${py(ro, a1)} A ${ro} ${ro} 0 0 1 ${px(ro, a2)} ${py(ro, a2)} Q ${px(ctrlR, base + 82)} ${py(ctrlR, base + 82)} ${half} ${half} Z`
-  }
-  return (
-    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {FLYWHEEL_MOVES.map((m, i) => (
-          <path key={m.key} d={bladePath(i * 72)} fill={m.done ? C.text : 'rgba(66,66,66,0.1)'} />
-        ))}
-        <circle cx={half} cy={half} r={maskR} fill={C.white} />
-      </svg>
-      {countLabel && (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-          <span style={{ ...fw(700), fontSize: size * 0.2, color: C.text, lineHeight: 1 }}>{countLabel.count}</span>
-          <span style={{ ...fw(400), fontSize: size * 0.115, color: C.textMuted }}>of 5</span>
-        </div>
-      )}
-    </div>
-  )
-}
-
-
-function FlywheelSheet({ onClose }) {
-  const completedCount = FLYWHEEL_MOVES.filter(m => m.done).length
-  const openMoves = FLYWHEEL_MOVES.filter(m => !m.done)
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
-      onClick={onClose}
-      style={{ position: 'absolute', inset: 0, zIndex: 80, background: 'rgba(0,0,0,0.35)' }}>
-      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-        transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-        onClick={e => e.stopPropagation()}
-        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: C.white, borderRadius: '20px 20px 0 0', padding: '20px 16px 40px', maxHeight: '88%', overflowY: 'auto' }}>
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 20px' }} />
-        <p style={{ ...fw(500), fontSize: 11, color: C.textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>Monthly flywheel</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
-          {FLYWHEEL_MOVES.map((m, i) => {
-            const featured = !m.done && openMoves[0]?.key === m.key
-            const bg = m.done ? C.cardBg : featured ? C.text : C.white
-            const textCol = m.done ? C.textMuted : featured ? C.white : C.text
-            const subCol = m.done ? C.textMuted : featured ? 'rgba(255,255,255,0.6)' : C.textMuted
-            const iconBg = m.done ? 'rgba(66,66,66,0.1)' : featured ? 'rgba(255,255,255,0.12)' : C.cardBg
-            const iconCol = m.done ? C.textMuted : featured ? C.white : C.textBody
-            return (
-              <motion.button key={m.key} whileTap={{ scale: 0.98 }}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '16px 14px', borderRadius: 16, border: m.done ? 'none' : featured ? 'none' : `1px solid ${C.border}`, background: bg, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {m.done
-                    ? <Icon name="check" size={16} color={iconCol} strokeWidth={2.5} />
-                    : <Icon name={m.icon} size={18} color={iconCol} />}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ ...fw(700), fontSize: 15, color: textCol, marginBottom: 2 }}>{m.label}</p>
-                  <p style={{ ...fw(400), fontSize: 12, color: subCol, lineHeight: '16px' }}>{m.desc}</p>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ ...fw(700), fontSize: 15, color: m.done ? C.textMuted : featured ? C.white : C.text, marginBottom: 3 }}>+{m.pts} pts</p>
-                  {!m.done && (
-                    <p style={{ ...fw(600), fontSize: 12, color: featured ? 'rgba(255,255,255,0.7)' : C.textMuted }}>{m.cta} ↗</p>
-                  )}
-                </div>
-              </motion.button>
-            )
-          })}
-        </div>
-        <div style={{ padding: '11px 14px', background: C.cardBg, borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {openMoves.length > 0
-            ? <><span style={{ ...fw(400), fontSize: 13, color: C.textBody }}>Complete all 5 for a bonus</span><span style={{ ...fw(700), fontSize: 14, color: C.text }}>+{FLYWHEEL_BONUS} pts</span></>
-            : <><Icon name="check" size={14} color={C.text} strokeWidth={2.5} /><span style={{ ...fw(600), fontSize: 13, color: C.text }}>Loop complete · +{FLYWHEEL_BONUS} pts earned</span></>
-          }
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-function FlywheelSection({ onOpen }) {
-  const completedCount = FLYWHEEL_MOVES.filter(m => m.done).length
-  const openMoves = FLYWHEEL_MOVES.filter(m => !m.done)
-  return (
-    <motion.button whileTap={{ scale: 0.98 }} onClick={onOpen}
-      style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 14, padding: 16, background: C.white, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <p style={{ ...fw(700), fontSize: 15, color: C.text }}>Monthly flywheel</p>
-        <Icon name="chevronRight" size={16} color={C.textMuted} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-        <FlywheelGraphic size={88} countLabel={{ count: completedCount }} />
-      </div>
-      <div style={{ padding: '10px 14px', background: C.cardBg, borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {openMoves.length > 0
-          ? <><span style={{ ...fw(400), fontSize: 13, color: C.textBody }}>Complete all 5 for a bonus</span><span style={{ ...fw(700), fontSize: 14, color: C.text }}>+{FLYWHEEL_BONUS} pts</span></>
-          : <><Icon name="check" size={14} color={C.text} strokeWidth={2.5} /><span style={{ ...fw(600), fontSize: 13, color: C.text }}>Loop complete · +{FLYWHEEL_BONUS} pts earned</span></>
-        }
-      </div>
-    </motion.button>
-  )
-}
-
-function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFlywheelOpen, mode = 'advocate' }) {
+function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, mode = 'advocate' }) {
   const [bookmarked, setBookmarked] = useState(false)
   const [threadOpen, setThreadOpen] = useState(false)
   const [hearted, setHearted] = useState(false)
@@ -771,8 +653,6 @@ function FeedTab({ onMenuOpen, onWalletOpen, photo, userPost, onTabChange, onFly
             <span style={{ ...fw(400), fontSize: 14, color: C.textSecondary }}>You've earned 180 pts this month</span>
           </div>
         </motion.button>
-
-        <div style={{ marginBottom: 20 }}><FlywheelSection onOpen={onFlywheelOpen} /></div>
 
         <p style={{ ...fw(700), fontSize: 16, color: C.text, marginBottom: 16 }}>From the community</p>
 
@@ -2440,7 +2320,7 @@ function OrdersSection() {
 
 // ── TAB: PROGRESS + REWARDS ───────────────────────────
 
-function ProgressContent({ mode = 'advocate', onFlywheelOpen }) {
+function ProgressContent({ mode = 'advocate' }) {
   const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
   const streakState = ['none', 'active', 'none', 'today', 'none', 'none', 'none']
   const subBars = mode === 'loyalty'
@@ -2554,8 +2434,6 @@ function ProgressContent({ mode = 'advocate', onFlywheelOpen }) {
           })}
         </div>
       </div>}
-
-      <FlywheelSection onOpen={onFlywheelOpen} />
 
       <OrdersSection />
 
@@ -2674,7 +2552,7 @@ function RewardsContent() {
   )
 }
 
-function ProgressTab({ onMenuOpen, onWalletOpen, mode = 'advocate', onFlywheelOpen }) {
+function ProgressTab({ onMenuOpen, onWalletOpen, mode = 'advocate' }) {
   const [subTab, setSubTab] = useState('Progress')
   return (
     <div>
@@ -2688,7 +2566,7 @@ function ProgressTab({ onMenuOpen, onWalletOpen, mode = 'advocate', onFlywheelOp
       </div>
       <AnimatePresence mode="wait">
         {subTab === 'Progress'
-          ? <motion.div key="progress" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ProgressContent mode={mode} onFlywheelOpen={onFlywheelOpen} /></motion.div>
+          ? <motion.div key="progress" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ProgressContent mode={mode} /></motion.div>
           : subTab === 'Journey'
           ? <motion.div key="journey" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><ActivityTimeline mode={mode} /></motion.div>
           : <motion.div key="rewards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}><RewardsContent /></motion.div>
@@ -3806,16 +3684,15 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
   const [openCommunityRemix, setOpenCommunityRemix] = useState(null)
   const [recognitionOpen, setRecognitionOpen] = useState(false)
   const [savedRemixes, setSavedRemixes] = useState([])
-  const [flywheelOpen, setFlywheelOpen] = useState(false)
   const openMenu = () => setMenuOpen(true)
   const openWallet = () => setWalletOpen(true)
   const renderTab = () => {
     switch (activeTab) {
-      case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} onFlywheelOpen={() => setFlywheelOpen(true)} mode={mode} />
+      case 'feed':        return <FeedTab onMenuOpen={openMenu} onWalletOpen={openWallet} photo={profilePhoto} userPost={userPost} onTabChange={onTabChange} mode={mode} />
       case 'challenges':  return <ChallengesTab onFilterOpen={() => setFilterOpen(true)} onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeOpen={onChallengeOpen} onGroupChallengeOpen={onGroupChallengeOpen} mode={mode} />
       case 'community':   return <CommunityTab onMenuOpen={openMenu} onWalletOpen={openWallet} onAdvocateOpen={setOpenAdvocate} onReplyOpen={setOpenReply} onRemixOpen={setOpenCommunityRemix} onRecognitionOpen={() => setRecognitionOpen(true)} mode={mode} />
       case 'studio':      return <StudioTab onMenuOpen={openMenu} onWalletOpen={openWallet} onChallengeCreate={onChallengeCreate} onContentAnalyse={onContentAnalyse} onRemix={onRemix} savedRemixes={savedRemixes} />
-      case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} mode={mode} onFlywheelOpen={() => setFlywheelOpen(true)} />
+      case 'progress':    return <ProgressTab onMenuOpen={openMenu} onWalletOpen={openWallet} mode={mode} />
       case 'rewards':     return <RewardsTab mode={mode} onMenuOpen={openMenu} onWalletOpen={openWallet} />
       case 'account':     return <AccountTab mode={mode} />
       default:            return null
@@ -3857,9 +3734,6 @@ function HomeScreen({ activeTab, onTabChange, onChallengeOpen, onGroupChallengeO
       </AnimatePresence>
       <AnimatePresence>
         {openCommunityRemix && <CommunityRemixSheet post={openCommunityRemix} onClose={() => setOpenCommunityRemix(null)} savedRemixes={savedRemixes} onSave={r => setSavedRemixes(prev => [...prev, r])} />}
-      </AnimatePresence>
-      <AnimatePresence>
-        {flywheelOpen && <FlywheelSheet onClose={() => setFlywheelOpen(false)} />}
       </AnimatePresence>
       <AnimatePresence>
         {menuOpen && <SideDrawer onClose={() => setMenuOpen(false)} photo={profilePhoto} />}
@@ -4836,7 +4710,7 @@ function LoyaltyConnectConfirmScreen({ onConfirm, onBack }) {
   const benefits = [
     { icon: 'award',   title: '2,340 points carried over',          desc: 'Your existing balance arrives in full.' },
     { icon: 'star',    title: 'Gold status, from day one',           desc: 'Earn 1.5× points on every advocacy action.' },
-    { icon: 'package', title: 'Purchase history recognised',         desc: 'Past orders count toward your advocacy flywheel.' },
+    { icon: 'package', title: 'Purchase history recognised',         desc: 'Past orders count toward your rewards.' },
   ]
   return (
     <div style={{ width: 390, height: 844, background: C.white, display: 'flex', flexDirection: 'column' }}>
